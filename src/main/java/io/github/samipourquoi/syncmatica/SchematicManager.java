@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
 public class SchematicManager {

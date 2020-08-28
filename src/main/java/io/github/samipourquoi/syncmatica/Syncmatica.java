@@ -1,8 +1,5 @@
 package io.github.samipourquoi.syncmatica;
 
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.NetworkState;
-
 import java.io.File;
 
 public class Syncmatica {
