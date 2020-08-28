@@ -18,12 +18,12 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.7.4",
-		"minecraft": "1.16.x"
-	},
-	"recommends": {
-		"litematica": "*"
+		"minecraft": "1.16.x",
+		"litematica": "*",
+		"malilib": "*"
 	},
 	"suggests": {
 		"flamingo": "*"
-	}
+	},
+	"accessWidener" : "syncmatica.accesswidener"
 }

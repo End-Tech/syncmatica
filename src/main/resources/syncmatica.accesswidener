@@ -1,0 +1,4 @@
+accessWidener   v1  named
+
+accessible  class   net/minecraft/network/NetworkState$PacketHandlerInitializer
+accessible  class   net/minecraft/network/NetworkState$PacketHandler
