@@ -9,7 +9,7 @@ public class Syncmatica {
 	}
 
 	public static void initClient() {
-		File file = new File("./schematics");
-		file.mkdir();
+		File file = new File("./schematics/.sync");
+		file.mkdirs();
 	}
 }
