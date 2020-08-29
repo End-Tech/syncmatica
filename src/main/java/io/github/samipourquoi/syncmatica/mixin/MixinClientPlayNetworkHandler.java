@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinClientPlayNetworkHandler {
 	@Inject(method = "onCustomPayload", at = @At(
 			value = "INVOKE",
-			target = "Lorg/apache/logging/log4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V"
+			target = "Lorg/apache/logging/log4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V",
+			remap = false
 	))
 	private void handleRegisterLitematic(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		Identifier identifier = packet.getChannel();
