@@ -9,7 +9,7 @@ public class Syncmatica {
 	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
 	
 	public static String getSyncmaticaPlacementPath(String fileName) {
-		return getStoragePath()+File.separator+fileName;
+		return getStoragePath()+File.separator+fileName+".litematic";
 	}
 	
 	public static String getSchematicPath(String fileName) {
