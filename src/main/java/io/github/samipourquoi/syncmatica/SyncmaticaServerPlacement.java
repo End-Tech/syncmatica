@@ -11,8 +11,8 @@ public class SyncmaticaServerPlacement {
 	
 	private final UUID id;
 	
-	private String fileName;
-    private byte[] hashValue;
+	private final String fileName;
+    private final byte[] hashValue;
     
     private String dimensionId;
 	private BlockPos origin;
