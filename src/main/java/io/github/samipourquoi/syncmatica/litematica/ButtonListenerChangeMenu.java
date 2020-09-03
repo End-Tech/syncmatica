@@ -1,7 +1,9 @@
 package io.github.samipourquoi.syncmatica.litematica;
 
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import io.github.samipourquoi.syncmatica.litematica.gui.GuiSyncmaticaServerPlacementList;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ButtonListenerChangeMenu implements IButtonActionListener {
@@ -16,16 +18,21 @@ public class ButtonListenerChangeMenu implements IButtonActionListener {
 	
 	@Override
 	public void actionPerformedWithButton(ButtonBase arg0, int arg1) {
+		GuiBase gui = null;
 		switch (this.type) {
 		case MATERIAL_GATHERINGS:
 			System.out.println("Opened Material Gatherings GUI - currently unsupported operation");
 			break;
 		case VIEW_SYNCMATICS:
-			System.out.println("Opened View Syncmatics GUI - currently unsupported operation");
+			System.out.println("Opened View Syncmatics GUI - should result in open window");
+			gui = new GuiSyncmaticaServerPlacementList();
 			break;
 		default:
 			break;
-			
+		}
+		if (gui != null) {
+            gui.setParent(this.parent);
+            GuiBase.openGui(gui);
 		}
 	}
 	

@@ -26,11 +26,20 @@ public class SyncmaticaServerPlacementStorage {
 		return placements.values();
 	}
 	
+	public static void removePlacement(SyncmaticaServerPlacement placement) {
+		placements.remove(placement.getId());
+	}
+	
 	public static boolean hasLocalLitematic(SyncmaticaServerPlacement placement) {
 		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		if (localFile.isFile()) {
 			if (buffer.containsKey(placement)||hashCompare(localFile, placement)) {
 				return true;
+			} else {
+				// file not in sync with server resources
+				// Doesn't handle multiple servers very well
+				// But for now this is best solution
+				localFile.delete();
 			}
 		}
 		return false;
@@ -62,6 +71,11 @@ public class SyncmaticaServerPlacementStorage {
 			buffer.put(placement, true);
 			return true;
 		}
+		return false;
+	}
+
+	public static boolean isLoaded(SyncmaticaServerPlacement entry) {
+		// TODO Need to add functionality
 		return false;
 	}
 }

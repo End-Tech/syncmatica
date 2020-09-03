@@ -1,4 +1,9 @@
 {
 	"syncmatica.gui.button.view_syncmatics": "View Syncmatics",
-	"syncmatica.gui.button.material_gatherings": "Material Collections"
+	"syncmatica.gui.button.material_gatherings": "Material Collections",
+	"syncmatica.gui.button.load": "Load",
+	"syncmatica.gui.button.unload": "Unload",
+	"syncmatica.gui.button.remove": "Remove",
+	"syncmatica.gui.button.download": "Download",
+	"syncmatica.gui.title.manage_server_placements": "Manage Server Placements"
 }
