@@ -5,5 +5,8 @@
 	"syncmatica.gui.button.unload": "Unload",
 	"syncmatica.gui.button.remove": "Remove",
 	"syncmatica.gui.button.download": "Download",
-	"syncmatica.gui.title.manage_server_placements": "Manage Server Placements"
+	"syncmatica.gui.title.manage_server_placements": "Manage Server Placements",
+	"syncmatica.gui.label.placement_info.file_name": "File Name",
+	"syncmatica.gui.label.placement_info.position": "Origin (xyz)",
+	"syncmatica.gui.label.placement_info.dimension_id": "Dimension"
 }

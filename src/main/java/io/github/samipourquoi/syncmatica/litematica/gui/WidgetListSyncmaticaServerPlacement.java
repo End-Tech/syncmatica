@@ -7,15 +7,16 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
 
 public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<SyncmaticaServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
 	
@@ -68,8 +69,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
 
         RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-        if (placement == null)
-        {
+        if (placement == null) {
             return;
         }
 
@@ -79,6 +79,26 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
         y += 3;
         int textColor = 0xC0C0C0C0;
         int valueColor = 0xFFFFFFFF;
+        
+        String str = StringUtils.translate("syncmatica.gui.label.placement_info.file_name");
+        drawString(matrixStack, str, x, y, textColor);
+        y += 12;
+        drawString(matrixStack, placement.getFileName(), x + 4, y, valueColor);
+        y += 12;
+        
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.position");
+        drawString(matrixStack, str, x, y, textColor);
+        y += 12;
+        drawString(matrixStack, placement.getDimension(), x + 4, y, valueColor);
+        y += 12;
+
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
+        drawString(matrixStack, str, x, y, textColor);
+        y += 12;
+        BlockPos origin = placement.getOrigin();
+        String tmp = String.format("%d x %d x %d", origin.getX(), origin.getY(), origin.getZ());
+        this.drawString(matrixStack, tmp, x + 4, y, valueColor);
+        y += 12;
     }
 	
     @Override

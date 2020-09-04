@@ -6,6 +6,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import io.github.samipourquoi.syncmatica.SyncmaticaLitematicaFileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
@@ -34,10 +35,13 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.REMOVE, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
-        
-        if (!SyncmaticaServerPlacementStorage.hasLocalLitematic(entry)) {
+        SyncmaticaLitematicaFileStorage.LocalLitematicState state = SyncmaticaLitematicaFileStorage.getLocalState(entry);
+        if (!state.isLocalFileReady()||state.isReadyForDownload()) {
             text = StringUtils.translate("syncmatica.gui.button.download");
             listener = new ButtonListener(ButtonListener.Type.DOWNLOAD, this);
+        } else if (state == SyncmaticaLitematicaFileStorage.LocalLitematicState.DOWNLOADING_LITEMATIC) {
+        	text = StringUtils.translate("syncmatica.gui.button.downloading");
+        	listener = new ButtonListener(null, null);
         } else if (!SyncmaticaServerPlacementStorage.isLoaded(entry)) {
             text = StringUtils.translate("syncmatica.gui.button.load");
             listener = new ButtonListener(ButtonListener.Type.LOAD, this);
@@ -48,7 +52,11 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
         
         len = this.getStringWidth(text) + 10;
         posX -= (len + 2);
-        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
+        ButtonGeneric button = new ButtonGeneric(posX, y, len, 20, text);
+        if (listener.type == null) {
+        	button.setEnabled(false);
+        }
+        this.addButton(button, listener);
 	}
 	
 	public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
@@ -88,6 +96,9 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
 		
 		@Override
 		public void actionPerformedWithButton(ButtonBase arg0, int arg1) {
+			if (type == null) {
+				return;
+			}
 			type.onAction(placement);			
 		}
 		
