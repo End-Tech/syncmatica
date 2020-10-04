@@ -11,16 +11,16 @@ import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
 
+
+
 public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<SyncmaticaServerPlacement> {
 
-	private WidgetListSyncmaticaServerPlacement parent;
 	private SyncmaticaServerPlacement placement;
 	private boolean isOdd;
 	
 	public WidgetSyncmaticaServerPlacementEntry(int x, int y, int width, int height, SyncmaticaServerPlacement entry,
-			int listIndex, WidgetListSyncmaticaServerPlacement parent) {
+			int listIndex) {
 		super(x, y, width, height, entry, listIndex);
-        this.parent = parent;
         this.placement = entry;
         this.isOdd = (listIndex % 2 == 1);
         y += 1;
@@ -35,6 +35,13 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.REMOVE, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
+        
+        text = StringUtils.translate("syncmatica.gui.button.material_gathering_placement");
+        len = this.getStringWidth(text) + 10;
+        posX -= (len + 2);
+        listener = new ButtonListener(ButtonListener.Type.MATERIAL_GATHERING, this);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
+        
         SyncmaticaLitematicaFileStorage.LocalLitematicState state = SyncmaticaLitematicaFileStorage.getLocalState(entry);
         if (!state.isLocalFileReady()||state.isReadyForDownload()) {
             text = StringUtils.translate("syncmatica.gui.button.download");
@@ -99,7 +106,8 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
 			if (type == null) {
 				return;
 			}
-			type.onAction(placement);			
+			type.onAction(placement);
+			// TODO: update button type
 		}
 		
 		public static enum Type {
@@ -126,7 +134,14 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
 					System.out.println("REMOVING SYNCMATIC");					
 				}
-			};
+			},
+			MATERIAL_GATHERING() {
+				@Override
+				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
+					System.out.println("DISLAY MATERIAL GATHERINGS");
+				}
+			}
+			;
 			abstract void onAction(WidgetSyncmaticaServerPlacementEntry placement);
 		}
 

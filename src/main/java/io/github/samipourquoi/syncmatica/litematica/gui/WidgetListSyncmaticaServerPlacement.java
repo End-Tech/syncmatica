@@ -1,6 +1,7 @@
 package io.github.samipourquoi.syncmatica.litematica.gui;
 
 
+
 import java.util.Collection;
 import java.util.List;
 
@@ -86,17 +87,17 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
         drawString(matrixStack, placement.getFileName(), x + 4, y, valueColor);
         y += 12;
         
-        str = StringUtils.translate("syncmatica.gui.label.placement_info.position");
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
         drawString(matrixStack, placement.getDimension(), x + 4, y, valueColor);
         y += 12;
 
-        str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.position");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
-        BlockPos origin = placement.getOrigin();
-        String tmp = String.format("%d x %d x %d", origin.getX(), origin.getY(), origin.getZ());
+        BlockPos origin = placement.getPosition();
+        String tmp = String.format("%d %d %d", origin.getX(), origin.getY(), origin.getZ());
         this.drawString(matrixStack, tmp, x + 4, y, valueColor);
         y += 12;
     }
@@ -110,7 +111,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
 	@Override
 	protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SyncmaticaServerPlacement entry) {
 		// TODO Auto-generated method stub
-		return new WidgetSyncmaticaServerPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), entry, listIndex, this);
+		return new WidgetSyncmaticaServerPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), entry, listIndex);
 	}
 	
     @Override

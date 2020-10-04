@@ -15,13 +15,13 @@ public class SyncmaticaLitematicaFileStorage {
 	public static LocalLitematicState getLocalState(SyncmaticaServerPlacement placement) {
 		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		if (localFile.isFile()) {
+			if (isDownloading(placement)) {
+				return LocalLitematicState.DOWNLOADING_LITEMATIC;
+			}
 			if ((buffer.containsKey(placement) && buffer.get(placement) == localFile.lastModified())||hashCompare(localFile, placement)) {
 				return LocalLitematicState.LOCAL_LITEMATIC_PRESENT;
-			} else {
-				return LocalLitematicState.LOCAL_LITEMATIC_DESYNC;
 			}
-		} else if (isDownloading(placement)) {
-			return LocalLitematicState.DOWNLOADING_LITEMATIC;
+			return LocalLitematicState.LOCAL_LITEMATIC_DESYNC;
 		}
 		return LocalLitematicState.NO_LOCAL_LITEMATIC;
 	}
