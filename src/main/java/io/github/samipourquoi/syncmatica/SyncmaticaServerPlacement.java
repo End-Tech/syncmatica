@@ -14,8 +14,7 @@ public class SyncmaticaServerPlacement {
 	private final String fileName;
     private final byte[] hashValue;
     
-    private String dimensionId;
-	private BlockPos origin;
+    private ServerPosition origin;
     private BlockRotation rotation;
     private BlockMirror mirror;
     
@@ -32,12 +31,17 @@ public class SyncmaticaServerPlacement {
     public String getFileName() {return fileName;}
     public byte[] getHash() {return hashValue;}
     
-    public String getDimension() {return dimensionId;}
-    public BlockPos getOrigin() {return origin;}
+    public String getDimension() {return origin.getDimensionId();}
+    public BlockPos getPosition() {return origin.getBlockPosition();}
+    public ServerPosition getOrigin() {return origin;}
     public BlockRotation getRotation() {return rotation;}
     public BlockMirror getMirror() {return mirror;}
+    
     public SyncmaticaServerPlacement move(String dimensionId, BlockPos origin, BlockRotation rotation, BlockMirror mirror) {
-    	this.dimensionId = dimensionId;
+    	move(new ServerPosition(origin, dimensionId), rotation, mirror);
+    	return this;
+    }
+    public SyncmaticaServerPlacement move(ServerPosition origin, BlockRotation rotation, BlockMirror mirror) {
     	this.origin = origin;
     	this.rotation = rotation;
     	this.mirror = mirror;

@@ -3,13 +3,17 @@ package io.github.samipourquoi.syncmatica.material;
 import java.util.function.Predicate;
 
 public class SyncmaticaMaterialEntry {
-	int amountRequired;
-	int amountPresent;
-	String claimedBy;
+	private int amountRequired;
+	private int amountPresent;
+	private String claimedBy;
 	
 	public static final Unclaimed UNCLAIMED = new Unclaimed();
 	public static final Unfinished UNFINISHED = new Unfinished();
 
+	public int getAmountRequired() {return amountRequired;}
+	public int getAmountPresent() {return amountPresent;}
+	public int getAmountMissing() {return amountRequired-amountPresent;}
+	
 	public boolean isClaimed() {
 		return claimedBy != null;
 	}
