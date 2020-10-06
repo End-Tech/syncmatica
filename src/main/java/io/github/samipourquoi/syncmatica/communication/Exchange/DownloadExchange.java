@@ -16,7 +16,6 @@ import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
 public class DownloadExchange extends AbstractExchange {
@@ -35,14 +34,12 @@ public class DownloadExchange extends AbstractExchange {
 	}
 
 	@Override
-	public boolean checkPackage(CustomPayloadS2CPacket packet) {
-		Identifier ident = packet.getChannel();
-		PacketByteBuf buf = packet.getData();
-		if (ident == PacketType.SEND_LITEMATIC.IDENTIFIER||ident == PacketType.FINISHED_LITEMATIC.IDENTIFIER) {
+	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf) {
+		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)||id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
 			byte[] uuidByte = new byte[16];
 			for (int i = 0; i<16; i++) {
 				// getByte does not progress the pointer
-				uuidByte[i] = buf.getByte(i);
+				uuidByte[i] = packetBuf.getByte(i);
 			}
 			return (UUID.nameUUIDFromBytes(uuidByte) == toDownload.getId());
 		}
@@ -50,13 +47,11 @@ public class DownloadExchange extends AbstractExchange {
 	}
 
 	@Override
-	public void handle(CustomPayloadS2CPacket packet) {
-		Identifier ident = packet.getChannel();
-		PacketByteBuf buf = packet.getData();
-		buf.readUuid(); //skips the UUID
-		if (ident == PacketType.SEND_LITEMATIC.IDENTIFIER) {
-			int size = buf.readInt();
-			byte[] data = buf.readByteArray(size);
+	public void handle(Identifier id, PacketByteBuf packetBuf) {
+		packetBuf.readUuid(); //skips the UUID
+		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)) {
+			int size = packetBuf.readInt();
+			byte[] data = packetBuf.readByteArray(size);
 				try {
 					outputStream.write(data);
 				} catch (IOException e) {
@@ -65,10 +60,9 @@ public class DownloadExchange extends AbstractExchange {
 				}
 				PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
 				packetByteBuf.writeUuid(toDownload.getId());
-				CustomPayloadS2CPacket responsePacket = new CustomPayloadS2CPacket(PacketType.RECEIVED_LITEMATIC.IDENTIFIER, packetByteBuf);
-				getPartner().sendPacket(responsePacket);
+				getPartner().sendPacket(PacketType.RECEIVED_LITEMATIC.IDENTIFIER, packetByteBuf);
 		}
-		if (ident == PacketType.FINISHED_LITEMATIC.IDENTIFIER) {
+		if (id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
 			byte[] downloadHash = md5.digest();
 			byte[] placementHash = toDownload.getHash();
 			try {
@@ -88,8 +82,7 @@ public class DownloadExchange extends AbstractExchange {
 	public void init() {
 		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
 		packetByteBuf.writeUuid(toDownload.getId());
-		CustomPayloadS2CPacket initPacket = new CustomPayloadS2CPacket(PacketType.REQUEST_LITEMATIC.IDENTIFIER, packetByteBuf);
-		getPartner().sendPacket(initPacket);
+		getPartner().sendPacket(PacketType.REQUEST_LITEMATIC.IDENTIFIER, packetByteBuf);
 	}
 
 }

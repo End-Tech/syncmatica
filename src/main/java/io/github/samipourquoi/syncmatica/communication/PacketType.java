@@ -43,4 +43,13 @@ public enum PacketType {
 	PacketType(String id) {
 		this.IDENTIFIER = new Identifier(id);
 	}
+	
+	public static boolean containsIdentifier(Identifier id) {
+		for (PacketType p : PacketType.values()) {
+			if (id.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

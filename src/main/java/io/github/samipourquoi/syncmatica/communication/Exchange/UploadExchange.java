@@ -13,7 +13,6 @@ import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
 // uploading part of transmit data exchange
@@ -35,14 +34,12 @@ public class UploadExchange extends AbstractExchange {
 	}
 
 	@Override
-	public boolean checkPackage(CustomPayloadS2CPacket packet) {
-		Identifier ident = packet.getChannel();
-		if (ident == PacketType.RECEIVED_LITEMATIC.IDENTIFIER) {
-			PacketByteBuf buf = packet.getData();
+	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf) {
+		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
 			byte[] uuidByte = new byte[16];
 			for (int i = 0; i<16; i++) {
 				// getByte does not progress the pointer
-				uuidByte[i] = buf.getByte(i);
+				uuidByte[i] = packetBuf.getByte(i);
 			}
 			return (UUID.nameUUIDFromBytes(uuidByte) == toUpload.getId());
 		}
@@ -50,8 +47,8 @@ public class UploadExchange extends AbstractExchange {
 	}
 
 	@Override
-	public void handle(CustomPayloadS2CPacket packet) {
-		packet.getData().readUuid(); // uncertain if the data has to be consumed
+	public void handle(Identifier id, PacketByteBuf packetBuf) {
+		packetBuf.readUuid(); // uncertain if the data has to be consumed
 		send();
 	}
 
@@ -75,15 +72,13 @@ public class UploadExchange extends AbstractExchange {
 		packetByteBuf.writeUuid(toUpload.getId());
 		packetByteBuf.writeInt(bytesRead);
 		packetByteBuf.writeBytes(buffer, 0, bytesRead);
-		CustomPayloadS2CPacket dataPacket = new CustomPayloadS2CPacket(PacketType.SEND_LITEMATIC.IDENTIFIER, packetByteBuf);
-		getPartner().sendPacket(dataPacket);
+		getPartner().sendPacket(PacketType.SEND_LITEMATIC.IDENTIFIER, packetByteBuf);
 	}
 
 	private void sendFinish() {
 		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
 		packetByteBuf.writeUuid(toUpload.getId());
-		CustomPayloadS2CPacket finishPacket = new CustomPayloadS2CPacket(PacketType.FINISHED_LITEMATIC.IDENTIFIER, packetByteBuf);
-		getPartner().sendPacket(finishPacket);
+		getPartner().sendPacket(PacketType.FINISHED_LITEMATIC.IDENTIFIER, packetByteBuf);
 		succeed();
 	}
 

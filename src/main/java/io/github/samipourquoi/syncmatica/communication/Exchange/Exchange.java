@@ -1,7 +1,8 @@
 package io.github.samipourquoi.syncmatica.communication.Exchange;
 
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 
 // an exchange represents a portion of a communication with a specific goal 
 // that stretches across multiple packages
@@ -26,10 +27,11 @@ public interface Exchange {
 	// looks into the received packet and returns
 	// whether this exchange handles the packet or not
 	// this test should have no side effects.
-	public boolean checkPackage(CustomPayloadS2CPacket packet);
+	// doesn't handle packets directly 
+	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf);
 	
 	// handles the data of this specific packet
-	public void handle(CustomPayloadS2CPacket packet);
+	public void handle(Identifier id, PacketByteBuf packetBuf);
 	
 	// marks an exchange that has terminated
 	public boolean isFinished();
