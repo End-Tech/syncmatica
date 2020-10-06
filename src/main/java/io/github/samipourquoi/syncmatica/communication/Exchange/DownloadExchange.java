@@ -65,11 +65,6 @@ public class DownloadExchange extends AbstractExchange {
 		if (id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
 			byte[] downloadHash = md5.digest();
 			byte[] placementHash = toDownload.getHash();
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
 			if (Arrays.equals(downloadHash, placementHash)) {
 				succeed();
 			} else {
@@ -83,6 +78,16 @@ public class DownloadExchange extends AbstractExchange {
 		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
 		packetByteBuf.writeUuid(toDownload.getId());
 		getPartner().sendPacket(PacketType.REQUEST_LITEMATIC.IDENTIFIER, packetByteBuf);
+	}
+	
+	@Override
+	protected void onClose() {
+		getManager().setDownloadState(toDownload, false);
+		try {
+			outputStream.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

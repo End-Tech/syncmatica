@@ -17,6 +17,8 @@ import net.minecraft.util.Identifier;
 
 public interface Exchange {
 	
+	//TODO: Timeout stuff
+	
 	// uniquely identifies the partner of this exchange
 	public ExchangeTarget getPartner();
 	

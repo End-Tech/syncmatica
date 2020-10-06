@@ -18,10 +18,12 @@ import net.minecraft.util.Identifier;
 public class CommunicationManager {
 	private final Collection<ExchangeTarget> broadcastTargets = new ArrayList<>();
 	private final Map<ExchangeTarget, Collection<Exchange>> openExchange = new HashMap<>();
+	private final Map<SyncmaticaServerPlacement,Boolean> downloadState = new HashMap<>();
 	
 	public void onPacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
-		// one of the syncmatica packet types
+		// TODO: Timeout
 		Exchange handler = null;
+		// id is one of the syncmatica packet types
 		if (!PacketType.containsIdentifier(id)) {
 			return;
 		}
@@ -48,11 +50,20 @@ public class CommunicationManager {
 	}
 
 	public void download(SyncmaticaServerPlacement syncmatic, ExchangeTarget source) throws NoSuchAlgorithmException, IOException {
-		if (!SyncmaticaLitematicaFileStorage.getLocalState(syncmatic).isLocalFileReady()) {
-			throw new IllegalArgumentException(syncmatic.toString()+" is not locally available");
+		if (SyncmaticaLitematicaFileStorage.getLocalState(syncmatic).isReadyForDownload()) {
+			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download");
 		}
 		Exchange downloadExchange = new DownloadExchange(syncmatic, source, this);
+		setDownloadState(syncmatic, true);
 		startExchange(downloadExchange);
+	}
+
+	public void setDownloadState(SyncmaticaServerPlacement syncmatic, boolean b) {
+		downloadState.put(syncmatic, b);
+	}
+	
+	public boolean getDownloadState(SyncmaticaServerPlacement syncmatic) {
+		return downloadState.getOrDefault(syncmatic, false);
 	}
 
 	private void startExchange(Exchange newExchange) {
@@ -62,7 +73,5 @@ public class CommunicationManager {
 		openExchange.computeIfAbsent(newExchange.getPartner(), (k) -> new ArrayList<>()).add(newExchange);
 		newExchange.init();
 	}
-	
-	
 	
 }
