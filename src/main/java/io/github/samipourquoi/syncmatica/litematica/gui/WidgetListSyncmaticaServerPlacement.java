@@ -110,7 +110,6 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
 
 	@Override
 	protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SyncmaticaServerPlacement entry) {
-		// TODO Auto-generated method stub
 		return new WidgetSyncmaticaServerPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), entry, listIndex);
 	}
 	

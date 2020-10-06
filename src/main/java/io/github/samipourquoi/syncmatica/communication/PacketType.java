@@ -1,4 +1,4 @@
-package io.github.samipourquoi.syncmatica.packets;
+package io.github.samipourquoi.syncmatica.communication;
 
 import net.minecraft.util.Identifier;
 
@@ -29,14 +29,27 @@ public enum PacketType {
 	SEND_LITEMATIC("syncmatica:send_litematic"),
 	// a packet responsible for sending a bit of a syncmatic (32kbits to be precise (half of a TCP/IP packets size))
 	
-	RECEIVED_LITEMATIC("syncmatica:received_litematic");
+	RECEIVED_LITEMATIC("syncmatica:received_litematic"),
 	// a packet responsible for triggering another send for a litematic
 	// by waiting until a response is send I hope we can ensure 
 	// that we do not overwhelm the clients connection to the server
+	
+	FINISHED_LITEMATIC("syncmatica:finished_litematic");
+	// a packet responsible for marking the end of a litematic
+	// transmission
 	
 	public final Identifier IDENTIFIER;
 
 	PacketType(String id) {
 		this.IDENTIFIER = new Identifier(id);
+	}
+	
+	public static boolean containsIdentifier(Identifier id) {
+		for (PacketType p : PacketType.values()) {
+			if (id.equals(p)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
