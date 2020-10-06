@@ -1,6 +1,6 @@
 package io.github.samipourquoi.syncmatica.mixin;
 
-import io.github.samipourquoi.syncmatica.packets.PacketType;
+import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketByteBuf;

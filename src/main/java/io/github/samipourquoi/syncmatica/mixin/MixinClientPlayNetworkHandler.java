@@ -1,7 +1,7 @@
 package io.github.samipourquoi.syncmatica.mixin;
 
 import io.github.samipourquoi.syncmatica.SchematicManager;
-import io.github.samipourquoi.syncmatica.packets.PacketType;
+import io.github.samipourquoi.syncmatica.communication.PacketType;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;

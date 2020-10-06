@@ -3,6 +3,7 @@ package io.github.samipourquoi.syncmatica;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -37,6 +38,19 @@ public class SyncmaticaLitematicaFileStorage {
 		} else {
 			return null;
 		}
+	}
+	
+	// method for creating an empty file for the litematic data
+	public static File createLocalLitematic(SyncmaticaServerPlacement placement) throws IOException {
+		if (getLocalState(placement).isLocalFileReady()) {
+			throw new IllegalArgumentException("");
+		}
+		File file = new File(Syncmatica.getSchematicPath(placement.getFileName()));
+		if (file.exists()) {
+			file.delete();
+		}
+		file.createNewFile();
+		return file;
 	}
 
 	private static boolean hashCompare(File localFile, SyncmaticaServerPlacement placement) {
