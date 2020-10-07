@@ -7,13 +7,25 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
-public class SyncmaticaLitematicaFileStorage {
+public class FileStorage {
 	
-	private static HashMap<SyncmaticaServerPlacement, Long> buffer = new HashMap<>();
+	private HashMap<SyncmaticaServerPlacement, Long> buffer = new HashMap<>();
+	private CommunicationManager manager = null;
 	
-	public static LocalLitematicState getLocalState(SyncmaticaServerPlacement placement) {
+	public FileStorage() {}
+	
+	public void setCommunitcationManager(CommunicationManager man) {
+		if (manager == null) {
+			manager = man;
+		} else {
+			throw new RuntimeException("Duplicate CommunicationManager assignment");
+		}
+	}
+	
+	public LocalLitematicState getLocalState(SyncmaticaServerPlacement placement) {
 		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
@@ -27,12 +39,14 @@ public class SyncmaticaLitematicaFileStorage {
 		return LocalLitematicState.NO_LOCAL_LITEMATIC;
 	}
 	
-	private static boolean isDownloading(SyncmaticaServerPlacement placement) {
-		// TODO Create functionality
-		return false;
+	private boolean isDownloading(SyncmaticaServerPlacement placement) {
+		if (manager == null) {
+			throw new RuntimeException("No CommunicationManager has been set yet - cannot determ litematic state");
+		}
+		return manager.getDownloadState(placement);
 	}
 
-	public static File getLocalLitematic(SyncmaticaServerPlacement placement) {
+	public File getLocalLitematic(SyncmaticaServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
 			return new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		} else {
@@ -41,7 +55,7 @@ public class SyncmaticaLitematicaFileStorage {
 	}
 	
 	// method for creating an empty file for the litematic data
-	public static File createLocalLitematic(SyncmaticaServerPlacement placement) throws IOException {
+	public File createLocalLitematic(SyncmaticaServerPlacement placement) throws IOException {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
@@ -53,7 +67,7 @@ public class SyncmaticaLitematicaFileStorage {
 		return file;
 	}
 
-	private static boolean hashCompare(File localFile, SyncmaticaServerPlacement placement) {
+	private boolean hashCompare(File localFile, SyncmaticaServerPlacement placement) {
 		byte[] hash = null;
 		try {
 			hash = SyncmaticaUtil.createChecksum(new FileInputStream(localFile));
