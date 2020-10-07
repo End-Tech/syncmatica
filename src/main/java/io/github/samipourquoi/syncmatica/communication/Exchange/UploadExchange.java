@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.SyncmaticaLitematicaFileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
@@ -26,10 +25,9 @@ public class UploadExchange extends AbstractExchange {
 	private final InputStream inputStream;
 	private byte[] buffer = new byte[BUFFER_SIZE];
 	
-	public UploadExchange(SyncmaticaServerPlacement syncmatic, ExchangeTarget partner, CommunicationManager manager) throws FileNotFoundException {
+	public UploadExchange(SyncmaticaServerPlacement syncmatic, File uploadFile,ExchangeTarget partner, CommunicationManager manager) throws FileNotFoundException {
 		super(partner, manager);
 		toUpload = syncmatic;
-		File uploadFile = SyncmaticaLitematicaFileStorage.getLocalLitematic(syncmatic);
 		inputStream = new FileInputStream(uploadFile);
 	}
 

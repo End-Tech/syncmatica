@@ -1,5 +1,6 @@
 package io.github.samipourquoi.syncmatica.communication;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.samipourquoi.syncmatica.SyncmaticaLitematicaFileStorage;
+import io.github.samipourquoi.syncmatica.FileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
@@ -19,6 +20,12 @@ public class CommunicationManager {
 	private final Collection<ExchangeTarget> broadcastTargets = new ArrayList<>();
 	private final Map<ExchangeTarget, Collection<Exchange>> openExchange = new HashMap<>();
 	private final Map<SyncmaticaServerPlacement,Boolean> downloadState = new HashMap<>();
+	private final FileStorage fileStorage;
+	
+	public CommunicationManager(FileStorage storage) {
+		fileStorage = storage;
+		storage.setCommunitcationManager(this);
+	}
 	
 	public void onPacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
 		// TODO: Timeout
@@ -50,10 +57,11 @@ public class CommunicationManager {
 	}
 
 	public void download(SyncmaticaServerPlacement syncmatic, ExchangeTarget source) throws NoSuchAlgorithmException, IOException {
-		if (SyncmaticaLitematicaFileStorage.getLocalState(syncmatic).isReadyForDownload()) {
+		if (fileStorage.getLocalState(syncmatic).isReadyForDownload()) {
 			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download");
 		}
-		Exchange downloadExchange = new DownloadExchange(syncmatic, source, this);
+		File toDownload = fileStorage.createLocalLitematic(syncmatic);
+		Exchange downloadExchange = new DownloadExchange(syncmatic, toDownload, source, this);
 		setDownloadState(syncmatic, true);
 		startExchange(downloadExchange);
 	}

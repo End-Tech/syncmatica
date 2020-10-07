@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.SyncmaticaLitematicaFileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
@@ -24,10 +23,9 @@ public class DownloadExchange extends AbstractExchange {
 	private final OutputStream outputStream;
 	private final MessageDigest md5;
 	
-	public DownloadExchange(SyncmaticaServerPlacement syncmatic, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
-		super(partner, manager);
-		File fileToDownload = SyncmaticaLitematicaFileStorage.createLocalLitematic(syncmatic);
-		OutputStream os = new FileOutputStream(fileToDownload);
+	public DownloadExchange(SyncmaticaServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
+		super(partner, manager);;
+		OutputStream os = new FileOutputStream(downloadFile);
 		toDownload = syncmatic;
 		md5 = MessageDigest.getInstance("MD5");
 		outputStream = new DigestOutputStream(os, md5);
