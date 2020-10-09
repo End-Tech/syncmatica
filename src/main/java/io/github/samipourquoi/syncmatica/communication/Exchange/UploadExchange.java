@@ -19,7 +19,9 @@ import net.minecraft.util.Identifier;
 
 public class UploadExchange extends AbstractExchange {
 	
-	private static final int BUFFER_SIZE = 32768;
+	// The maximum buffer size for CustomPayloadPackets is actually 32767
+	// so 32768 is a bad value to send - thus adjusted it to 16384 - exactly halfed
+	private static final int BUFFER_SIZE = 16384;
 	
 	private final ServerPlacement toUpload;
 	private final InputStream inputStream;
