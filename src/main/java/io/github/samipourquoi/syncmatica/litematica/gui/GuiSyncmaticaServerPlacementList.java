@@ -4,9 +4,9 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
+import io.github.samipourquoi.syncmatica.ServerPlacement;
 
-public class GuiSyncmaticaServerPlacementList extends GuiListBase<SyncmaticaServerPlacement, WidgetSyncmaticaServerPlacementEntry, WidgetListSyncmaticaServerPlacement> {
+public class GuiSyncmaticaServerPlacementList extends GuiListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry, WidgetListSyncmaticaServerPlacement> {
 
 	public GuiSyncmaticaServerPlacementList() {
 		super(12, 30);

@@ -8,18 +8,18 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.FileStorage;
 import io.github.samipourquoi.syncmatica.Syncmatica;
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacementStorage;
+import io.github.samipourquoi.syncmatica.ServerPlacement;
+import io.github.samipourquoi.syncmatica.PlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
 
 
 
-public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<SyncmaticaServerPlacement> {
+public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<ServerPlacement> {
 
-	private SyncmaticaServerPlacement placement;
+	private ServerPlacement placement;
 	private boolean isOdd;
 	
-	public WidgetSyncmaticaServerPlacementEntry(int x, int y, int width, int height, SyncmaticaServerPlacement entry,
+	public WidgetSyncmaticaServerPlacementEntry(int x, int y, int width, int height, ServerPlacement entry,
 			int listIndex) {
 		super(x, y, width, height, entry, listIndex);
         this.placement = entry;
@@ -50,7 +50,7 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Sy
         } else if (state == FileStorage.LocalLitematicState.DOWNLOADING_LITEMATIC) {
         	text = StringUtils.translate("syncmatica.gui.button.downloading");
         	listener = new ButtonListener(null, null);
-        } else if (!SyncmaticaServerPlacementStorage.isLoaded(entry)) {
+        } else if (!PlacementStorage.isLoaded(entry)) {
             text = StringUtils.translate("syncmatica.gui.button.load");
             listener = new ButtonListener(ButtonListener.Type.LOAD, this);
         } else {

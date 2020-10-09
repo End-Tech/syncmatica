@@ -14,19 +14,19 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacementStorage;
+import io.github.samipourquoi.syncmatica.ServerPlacement;
+import io.github.samipourquoi.syncmatica.PlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<SyncmaticaServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
+public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
 	
     private final int infoWidth;
     private final int infoHeight;
     private final GuiSyncmaticaServerPlacementList parent;
 	
 	public WidgetListSyncmaticaServerPlacement(int x, int y, int width, int height, GuiSyncmaticaServerPlacementList parent,
-			ISelectionListener<SyncmaticaServerPlacement> selectionListener) {
+			ISelectionListener<ServerPlacement> selectionListener) {
 		super(x, y, width, height, selectionListener);
 		this.browserEntryHeight = 22;
         this.infoWidth = 170;
@@ -63,7 +63,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
         this.drawPlacementInfo(this.getLastSelectedEntry(), matrixStack);
     }
 
-    private void drawPlacementInfo(SyncmaticaServerPlacement placement, MatrixStack matrixStack) {
+    private void drawPlacementInfo(ServerPlacement placement, MatrixStack matrixStack) {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
@@ -103,20 +103,20 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<Syncmati
     }
 	
     @Override
-    protected List<String> getEntryStringsForFilter(SyncmaticaServerPlacement entry) {
+    protected List<String> getEntryStringsForFilter(ServerPlacement entry) {
         String metaName = entry.getFileName().toLowerCase();
         return ImmutableList.of(metaName);
     }
 
 	@Override
-	protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SyncmaticaServerPlacement entry) {
+	protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ServerPlacement entry) {
 		return new WidgetSyncmaticaServerPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), entry, listIndex);
 	}
 	
     @Override
-    protected Collection<SyncmaticaServerPlacement> getAllEntries()
+    protected Collection<ServerPlacement> getAllEntries()
     {
-        return SyncmaticaServerPlacementStorage.getEntries();
+        return PlacementStorage.getEntries();
     }
 
 }
