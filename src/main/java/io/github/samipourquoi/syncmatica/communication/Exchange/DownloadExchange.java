@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
+import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
@@ -19,11 +19,11 @@ import net.minecraft.util.Identifier;
 
 public class DownloadExchange extends AbstractExchange {
 	
-	private final SyncmaticaServerPlacement toDownload;
+	private final ServerPlacement toDownload;
 	private final OutputStream outputStream;
 	private final MessageDigest md5;
 	
-	public DownloadExchange(SyncmaticaServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
+	public DownloadExchange(ServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
 		super(partner, manager);;
 		OutputStream os = new FileOutputStream(downloadFile);
 		toDownload = syncmatic;
@@ -32,7 +32,7 @@ public class DownloadExchange extends AbstractExchange {
 	}
 
 	@Override
-	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf) {
+	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)||id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
 			byte[] uuidByte = new byte[16];
 			for (int i = 0; i<16; i++) {
@@ -86,6 +86,10 @@ public class DownloadExchange extends AbstractExchange {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public ServerPlacement getPlacement() {
+		return toDownload;
 	}
 
 }

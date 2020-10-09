@@ -2,20 +2,27 @@ package io.github.samipourquoi.syncmatica;
 
 import java.io.File;
 
+import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import net.minecraft.client.MinecraftClient;
 
 // could probably turn this into a singleton
 
 public class Syncmatica {
 	
 	private static boolean isServer;
+	private static boolean isInit = false;
 	private static boolean isStarted = false;
 	
+	public static final String VERSION = "0.0.1";
 	public static final String SERVER_PATH = "."+File.separator+"syncmatics";
 	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
 	
 	private static CommunicationManager comms;
 	private static FileStorage data;
+	private static SchematicManager schematics;
 	
 	public static String getSyncmaticaPlacementPath(String fileName) {
 		return getStoragePath()+File.separator+fileName+".litematic";
@@ -48,14 +55,36 @@ public class Syncmatica {
 	}
 	
 	private static void init() {
+		if (isInit) {
+			return;
+		}
 		data = new FileStorage();
-		comms = new CommunicationManager(data);
-		isStarted = true;
+		schematics = new SchematicManager();
+		if (isServer) {
+			comms = new ServerCommunicationManager(data, schematics);
+		} else {
+			ExchangeTarget server = new ExchangeTarget(MinecraftClient.getInstance().getNetworkHandler());
+			comms = new ClientCommunicationManager(data, schematics, server);
+		}
+		isInit = true;
 	}
 	
-	public static void shutdown() {
+	private static void deinit() {
+		if (!isInit) {
+			return;
+		}
 		data = null;
 		comms = null;
+		isInit = false;
+	}
+	
+	public static void startup() {
+		init();
+		isStarted = true;
+	}
+
+	public static void shutdown() {
+		deinit();
 		isStarted = false;
 	}
 	
@@ -74,4 +103,10 @@ public class Syncmatica {
 	public static boolean isStarted() {
 		return isStarted;
 	}
+	
+	public static boolean checkPartnerVersion(String partnerVersion) {
+		// so far no unmatching or matching versions lol
+		return true;
+	}
+	
 }

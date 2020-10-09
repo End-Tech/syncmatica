@@ -14,5 +14,6 @@ public class MixinMinecraftServer {
 	@Inject(method = "startServer", at = @At("RETURN"))
 	private static <S extends MinecraftServer> void initSyncmatica(Function<Thread, S> serverFactory, CallbackInfoReturnable<S> cir) {
 		Syncmatica.initServer();
+		Syncmatica.startup();
 	}
 }

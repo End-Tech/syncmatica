@@ -12,7 +12,7 @@ import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
 public class FileStorage {
 	
-	private HashMap<SyncmaticaServerPlacement, Long> buffer = new HashMap<>();
+	private HashMap<ServerPlacement, Long> buffer = new HashMap<>();
 	private CommunicationManager manager = null;
 	
 	public FileStorage() {}
@@ -25,7 +25,7 @@ public class FileStorage {
 		}
 	}
 	
-	public LocalLitematicState getLocalState(SyncmaticaServerPlacement placement) {
+	public LocalLitematicState getLocalState(ServerPlacement placement) {
 		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
@@ -39,14 +39,14 @@ public class FileStorage {
 		return LocalLitematicState.NO_LOCAL_LITEMATIC;
 	}
 	
-	private boolean isDownloading(SyncmaticaServerPlacement placement) {
+	private boolean isDownloading(ServerPlacement placement) {
 		if (manager == null) {
 			throw new RuntimeException("No CommunicationManager has been set yet - cannot determ litematic state");
 		}
 		return manager.getDownloadState(placement);
 	}
 
-	public File getLocalLitematic(SyncmaticaServerPlacement placement) {
+	public File getLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
 			return new File(Syncmatica.getSchematicPath(placement.getFileName()));
 		} else {
@@ -55,7 +55,7 @@ public class FileStorage {
 	}
 	
 	// method for creating an empty file for the litematic data
-	public File createLocalLitematic(SyncmaticaServerPlacement placement) throws IOException {
+	public File createLocalLitematic(ServerPlacement placement) throws IOException {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
@@ -67,7 +67,7 @@ public class FileStorage {
 		return file;
 	}
 
-	private boolean hashCompare(File localFile, SyncmaticaServerPlacement placement) {
+	private boolean hashCompare(File localFile, ServerPlacement placement) {
 		byte[] hash = null;
 		try {
 			hash = SyncmaticaUtil.createChecksum(new FileInputStream(localFile));

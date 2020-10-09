@@ -7,7 +7,7 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
-public class SyncmaticaServerPlacement {
+public class ServerPlacement {
 	
 	private final UUID id;
 	
@@ -20,7 +20,7 @@ public class SyncmaticaServerPlacement {
     
     private SyncmaticaMaterialList matList;
     
-    public SyncmaticaServerPlacement(UUID id, String fileName, byte[] hashValue) {
+    public ServerPlacement(UUID id, String fileName, byte[] hashValue) {
     	this.id = id;
     	this.fileName = fileName;
     	this.hashValue = hashValue;
@@ -37,11 +37,11 @@ public class SyncmaticaServerPlacement {
     public BlockRotation getRotation() {return rotation;}
     public BlockMirror getMirror() {return mirror;}
     
-    public SyncmaticaServerPlacement move(String dimensionId, BlockPos origin, BlockRotation rotation, BlockMirror mirror) {
+    public ServerPlacement move(String dimensionId, BlockPos origin, BlockRotation rotation, BlockMirror mirror) {
     	move(new ServerPosition(origin, dimensionId), rotation, mirror);
     	return this;
     }
-    public SyncmaticaServerPlacement move(ServerPosition origin, BlockRotation rotation, BlockMirror mirror) {
+    public ServerPlacement move(ServerPosition origin, BlockRotation rotation, BlockMirror mirror) {
     	this.origin = origin;
     	this.rotation = rotation;
     	this.mirror = mirror;
@@ -49,7 +49,7 @@ public class SyncmaticaServerPlacement {
     }
     
     public SyncmaticaMaterialList getMaterialList() {return matList;}
-    public SyncmaticaServerPlacement setMaterialList(SyncmaticaMaterialList matList) {
+    public ServerPlacement setMaterialList(SyncmaticaMaterialList matList) {
     	if (this.matList != null) {
     		this.matList = matList;
     	}

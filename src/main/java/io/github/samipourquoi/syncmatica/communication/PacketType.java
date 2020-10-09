@@ -34,9 +34,21 @@ public enum PacketType {
 	// by waiting until a response is send I hope we can ensure 
 	// that we do not overwhelm the clients connection to the server
 	
-	FINISHED_LITEMATIC("syncmatica:finished_litematic");
+	FINISHED_LITEMATIC("syncmatica:finished_litematic"),
 	// a packet responsible for marking the end of a litematic
 	// transmission
+	
+	REGISTER_VERSION("syncmatica:register_version"),
+	// this packet will be send to the client when it joins the server
+	// upon receiving this packet the client will check the server version
+	// initializes syncmatica on the clients end
+	// if it can function with the version on the server then it will respond with a version of its own 
+	// if the server can handle the client version the server will send
+	
+	CONFIRM_USER("syncmatica:confirm_user");
+	// the confirm user packet
+	// send after a successful version exchange
+	// fully starts up syncmatica on the clients end
 	
 	public final Identifier IDENTIFIER;
 

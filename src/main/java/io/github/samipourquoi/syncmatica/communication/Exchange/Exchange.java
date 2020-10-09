@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 
 public interface Exchange {
 	
-	//TODO: Timeout stuff
+	//TODO: Timeout Exchange prerequirements
 	
 	// uniquely identifies the partner of this exchange
 	public ExchangeTarget getPartner();
@@ -30,7 +30,7 @@ public interface Exchange {
 	// whether this exchange handles the packet or not
 	// this test should have no side effects.
 	// doesn't handle packets directly 
-	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf);
+	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf);
 	
 	// handles the data of this specific packet
 	public void handle(Identifier id, PacketByteBuf packetBuf);

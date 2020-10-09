@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.SyncmaticaServerPlacement;
+import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
@@ -19,20 +19,22 @@ import net.minecraft.util.Identifier;
 
 public class UploadExchange extends AbstractExchange {
 	
-	private static final int BUFFER_SIZE = 32768;
+	// The maximum buffer size for CustomPayloadPackets is actually 32767
+	// so 32768 is a bad value to send - thus adjusted it to 16384 - exactly halfed
+	private static final int BUFFER_SIZE = 16384;
 	
-	private final SyncmaticaServerPlacement toUpload;
+	private final ServerPlacement toUpload;
 	private final InputStream inputStream;
 	private byte[] buffer = new byte[BUFFER_SIZE];
 	
-	public UploadExchange(SyncmaticaServerPlacement syncmatic, File uploadFile,ExchangeTarget partner, CommunicationManager manager) throws FileNotFoundException {
+	public UploadExchange(ServerPlacement syncmatic, File uploadFile,ExchangeTarget partner, CommunicationManager manager) throws FileNotFoundException {
 		super(partner, manager);
 		toUpload = syncmatic;
 		inputStream = new FileInputStream(uploadFile);
 	}
 
 	@Override
-	public boolean checkPackage(Identifier id, PacketByteBuf packetBuf) {
+	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
 			byte[] uuidByte = new byte[16];
 			for (int i = 0; i<16; i++) {
