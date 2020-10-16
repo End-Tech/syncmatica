@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.PlacementStorage;
+import io.github.samipourquoi.syncmatica.Syncmatica;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -116,7 +116,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
     @Override
     protected Collection<ServerPlacement> getAllEntries()
     {
-        return PlacementStorage.getEntries();
+        return Syncmatica.getSyncmaticManager().getAll();
     }
 
 }

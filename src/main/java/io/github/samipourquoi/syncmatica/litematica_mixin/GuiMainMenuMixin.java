@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.litematica.ButtonListenerChangeMenu;
-import io.github.samipourquoi.syncmatica.litematica.ButtonType;
+import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerChangeMenu;
+import io.github.samipourquoi.syncmatica.litematica.gui.ButtonType;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.selection.SelectionMode;
 

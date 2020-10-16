@@ -7,8 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.FileStorage;
-import io.github.samipourquoi.syncmatica.SchematicManager;
+import io.github.samipourquoi.syncmatica.IFileStorage;
+import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
@@ -20,8 +20,8 @@ import net.minecraft.util.Identifier;
 
 public class ServerCommunicationManager extends CommunicationManager {
 
-	public ServerCommunicationManager(FileStorage storage, SchematicManager schematicManager) {
-		super(storage, schematicManager);
+	public ServerCommunicationManager(IFileStorage data, SyncmaticManager schematicManager) {
+		super(data, schematicManager);
 	}
 	
 	public void onPlayerJoin(ExchangeTarget newPlayer) {

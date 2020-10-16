@@ -1,9 +1,8 @@
-package io.github.samipourquoi.syncmatica.litematica;
+package io.github.samipourquoi.syncmatica.litematica.gui;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import io.github.samipourquoi.syncmatica.litematica.gui.GuiSyncmaticaServerPlacementList;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ButtonListenerChangeMenu implements IButtonActionListener {

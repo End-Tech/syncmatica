@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.FileStorage;
-import io.github.samipourquoi.syncmatica.SchematicManager;
+import io.github.samipourquoi.syncmatica.IFileStorage;
+import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
@@ -28,13 +28,13 @@ public abstract class CommunicationManager {
 	
 	private final Map<ServerPlacement,Boolean> downloadState = new HashMap<>();
 	
-	protected final FileStorage fileStorage;
-	protected final SchematicManager schematicManager;
+	protected final IFileStorage fileStorage;
+	protected final SyncmaticManager schematicManager;
 	
 	protected static final BlockRotation[] rotOrdinals = BlockRotation.values();
 	protected static final BlockMirror[] mirOrdinals = BlockMirror.values();
 	
-	public CommunicationManager(FileStorage storage, SchematicManager manager) {
+	public CommunicationManager(IFileStorage storage, SyncmaticManager manager) {
 		fileStorage = storage;
 		storage.setCommunitcationManager(this);
 		schematicManager = manager;

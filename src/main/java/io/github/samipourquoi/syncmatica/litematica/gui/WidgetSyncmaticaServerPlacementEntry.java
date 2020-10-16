@@ -1,15 +1,20 @@
 package io.github.samipourquoi.syncmatica.litematica.gui;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.FileStorage;
+import io.github.samipourquoi.syncmatica.LocalLitematicState;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.PlacementStorage;
 import net.minecraft.client.util.math.MatrixStack;
 
 
@@ -43,14 +48,14 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
         listener = new ButtonListener(ButtonListener.Type.MATERIAL_GATHERING, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
         
-        FileStorage.LocalLitematicState state = Syncmatica.getFileStorage().getLocalState(entry);
+        LocalLitematicState state = Syncmatica.getFileStorage().getLocalState(entry);
         if (!state.isLocalFileReady()||state.isReadyForDownload()) {
             text = StringUtils.translate("syncmatica.gui.button.download");
             listener = new ButtonListener(ButtonListener.Type.DOWNLOAD, this);
-        } else if (state == FileStorage.LocalLitematicState.DOWNLOADING_LITEMATIC) {
+        } else if (state == LocalLitematicState.DOWNLOADING_LITEMATIC) {
         	text = StringUtils.translate("syncmatica.gui.button.downloading");
         	listener = new ButtonListener(null, null);
-        } else if (!PlacementStorage.isLoaded(entry)) {
+        } else if (LitematicManager.getInstance().isRendered(entry)) {
             text = StringUtils.translate("syncmatica.gui.button.load");
             listener = new ButtonListener(ButtonListener.Type.LOAD, this);
         } else {
@@ -115,30 +120,39 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			LOAD() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					System.out.println("LOADING SYNCMATIC");
+					LitematicManager.getInstance().renderSyncmatic(placement.placement);
 				}
 			},
 			UNLOAD() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					System.out.println("UNLOADING SYNCMATIC");
+					LitematicManager.getInstance().unrenderSyncmatic(placement.placement);
 				}
 			},
 			DOWNLOAD() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					System.out.println("DOWNLOADING SYNCMATIC");
+					ExchangeTarget server = ((ClientCommunicationManager)Syncmatica.getCommunicationManager()).getServer();
+					try {
+						Syncmatica.getCommunicationManager().download(placement.placement, server);
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			},
 			REMOVE() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
+					// TODO: Remove functionality
 					System.out.println("REMOVING SYNCMATIC");					
 				}
 			},
 			MATERIAL_GATHERING() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
+					// TODO: Material Gatherings
 					System.out.println("DISLAY MATERIAL GATHERINGS");
 				}
 			}

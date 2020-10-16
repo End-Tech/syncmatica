@@ -10,7 +10,7 @@ import java.util.HashMap;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
-public class FileStorage {
+public class FileStorage implements IFileStorage {
 	
 	private HashMap<ServerPlacement, Long> buffer = new HashMap<>();
 	private CommunicationManager manager = null;
@@ -55,7 +55,7 @@ public class FileStorage {
 	}
 	
 	// method for creating an empty file for the litematic data
-	public File createLocalLitematic(ServerPlacement placement) throws IOException {
+	public File createLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
@@ -63,7 +63,11 @@ public class FileStorage {
 		if (file.exists()) {
 			file.delete();
 		}
-		file.createNewFile();
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return file;
 	}
 
@@ -86,28 +90,5 @@ public class FileStorage {
 			return true;
 		}
 		return false;
-	}
-	
-	public enum LocalLitematicState {
-		NO_LOCAL_LITEMATIC(true, false),
-		LOCAL_LITEMATIC_DESYNC(true, false),
-		DOWNLOADING_LITEMATIC(false, false),
-		LOCAL_LITEMATIC_PRESENT(false, true);
-		
-		private boolean downloadReady;
-		private boolean fileReady;
-		
-		LocalLitematicState(boolean downloadReady, boolean fileReady) {
-			this.downloadReady = downloadReady;
-			this.fileReady = fileReady;
-		}
-		
-		public boolean isReadyForDownload() {
-			return downloadReady;
-		}
-		
-		public boolean isLocalFileReady() {
-			return fileReady;
-		}
 	}
 }
