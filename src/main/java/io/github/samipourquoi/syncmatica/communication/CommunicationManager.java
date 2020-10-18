@@ -23,10 +23,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class CommunicationManager {
-	protected final Collection<ExchangeTarget> broadcastTargets = new ArrayList<>();
-	protected final Map<ExchangeTarget, Collection<Exchange>> openExchange = new HashMap<>();
+	protected final Collection<ExchangeTarget> broadcastTargets;
+	protected final Map<ExchangeTarget, Collection<Exchange>> openExchange;
 	
-	private final Map<ServerPlacement,Boolean> downloadState = new HashMap<>();
+	private final Map<ServerPlacement,Boolean> downloadState;
 	
 	protected final IFileStorage fileStorage;
 	protected final SyncmaticManager schematicManager;
@@ -36,15 +36,22 @@ public abstract class CommunicationManager {
 	
 	public CommunicationManager(IFileStorage storage, SyncmaticManager manager) {
 		fileStorage = storage;
+		broadcastTargets = new ArrayList<>();
+		openExchange = new HashMap<>();
+		downloadState = new HashMap<>();
 		storage.setCommunitcationManager(this);
 		schematicManager = manager;
+	}
+	
+	public boolean handlePacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
+		return PacketType.containsIdentifier(id);
 	}
 	
 	public void onPacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
 		// TODO: Timeout Exchanges
 		Exchange handler = null;
 		// id is one of the syncmatica packet types
-		if (!PacketType.containsIdentifier(id)) {
+		if (!handlePacket(source, id, packetBuf)) {
 			return;
 		}
 		Collection<Exchange> potentialMessageTarget = openExchange.get(source);
@@ -92,13 +99,13 @@ public abstract class CommunicationManager {
 	public ServerPlacement receiveMetaData(PacketByteBuf buf) {
 		UUID id = buf.readUuid();
 		
-		String fileName = buf.readString();
+		String fileName = buf.readString(32767);
 		byte[] hash = new byte[16];
 		buf.readBytes(hash);	
 		ServerPlacement placement = new ServerPlacement(id, fileName, hash);
 		
 		BlockPos pos = buf.readBlockPos();
-		String dimensionId = buf.readString();
+		String dimensionId = buf.readString(32767);
 		BlockRotation rot = rotOrdinals[buf.readInt()];
 		BlockMirror mir = mirOrdinals[buf.readInt()];
 		placement.move(dimensionId, pos, rot, mir);
@@ -107,8 +114,9 @@ public abstract class CommunicationManager {
 	}
 	
 	public void download(ServerPlacement syncmatic, ExchangeTarget source) throws NoSuchAlgorithmException, IOException {
-		if (fileStorage.getLocalState(syncmatic).isReadyForDownload()) {
-			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download");
+		if (!fileStorage.getLocalState(syncmatic).isReadyForDownload()) {
+			// forgot a negation here
+			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download local state is: "+fileStorage.getLocalState(syncmatic).toString());
 		}
 		File toDownload = fileStorage.createLocalLitematic(syncmatic);
 		Exchange downloadExchange = new DownloadExchange(syncmatic, toDownload, source, this);

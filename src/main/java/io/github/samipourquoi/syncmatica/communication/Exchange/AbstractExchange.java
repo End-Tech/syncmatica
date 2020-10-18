@@ -1,13 +1,16 @@
 package io.github.samipourquoi.syncmatica.communication.Exchange;
 
+import java.util.UUID;
+
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import net.minecraft.network.PacketByteBuf;
 
 public abstract class AbstractExchange implements Exchange {
 
 	private boolean success = false;
 	private boolean finished = false;
-	private ExchangeTarget partner;
-	private CommunicationManager manager;
+	private final ExchangeTarget partner;
+	private final CommunicationManager manager;
 	
 	public AbstractExchange(ExchangeTarget partner, CommunicationManager manager) {
 		this.partner = partner;
@@ -47,8 +50,16 @@ public abstract class AbstractExchange implements Exchange {
 	
 	protected void succeed() {
 		finished = true;
-		success = false;
+		success = true;
+		// Ctrl+C Ctrl+V and forget to adapt the success state - typical
 		onClose();
+	}
+	
+	protected static boolean checkUUID(PacketByteBuf sourceBuf, UUID targetId) {
+		int r = sourceBuf.readerIndex();
+		UUID sourceId = sourceBuf.readUuid();
+		sourceBuf.readerIndex(r);
+		return sourceId.equals(targetId);
 	}
 	
 }

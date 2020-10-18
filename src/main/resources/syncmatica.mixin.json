@@ -11,7 +11,8 @@
 	],
 	"server": [
 		"MixinMinecraftServer",
-		"MixinPlayerManager"
+		"MixinServerPlayNetworkHandler",
+		"MixinCustomPayloadC2SPacket"
 	],
 
 	"injectors": {

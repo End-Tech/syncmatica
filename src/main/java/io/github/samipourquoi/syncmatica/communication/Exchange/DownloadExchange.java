@@ -8,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.DigestOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
@@ -24,7 +23,7 @@ public class DownloadExchange extends AbstractExchange {
 	private final MessageDigest md5;
 	
 	public DownloadExchange(ServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
-		super(partner, manager);;
+		super(partner, manager);
 		OutputStream os = new FileOutputStream(downloadFile);
 		toDownload = syncmatic;
 		md5 = MessageDigest.getInstance("MD5");
@@ -34,12 +33,7 @@ public class DownloadExchange extends AbstractExchange {
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)||id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
-			byte[] uuidByte = new byte[16];
-			for (int i = 0; i<16; i++) {
-				// getByte does not progress the pointer
-				uuidByte[i] = packetBuf.getByte(i);
-			}
-			return (UUID.nameUUIDFromBytes(uuidByte) == toDownload.getId());
+			return checkUUID(packetBuf, toDownload.getId());
 		}
 		return false;
 	}
@@ -49,9 +43,8 @@ public class DownloadExchange extends AbstractExchange {
 		packetBuf.readUuid(); //skips the UUID
 		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)) {
 			int size = packetBuf.readInt();
-			byte[] data = packetBuf.readByteArray(size);
 				try {
-					outputStream.write(data);
+					packetBuf.readBytes(outputStream, size);
 				} catch (IOException e) {
 					this.close();
 					throw new RuntimeException(e);
@@ -61,6 +54,12 @@ public class DownloadExchange extends AbstractExchange {
 				getPartner().sendPacket(PacketType.RECEIVED_LITEMATIC.IDENTIFIER, packetByteBuf);
 		}
 		if (id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
+			try {
+				outputStream.flush();
+			} catch (IOException e) {
+				this.close();
+				throw new RuntimeException(e);
+			}
 			byte[] downloadHash = md5.digest();
 			byte[] placementHash = toDownload.getHash();
 			if (Arrays.equals(downloadHash, placementHash)) {

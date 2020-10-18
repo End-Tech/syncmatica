@@ -38,7 +38,7 @@ public class RedirectFileStorage implements IFileStorage {
 		if (redirect.containsKey(hashId) && Arrays.equals(redirect.get(hashId).getHash(), placement.getHash())) {
 			return LocalLitematicState.LOCAL_LITEMATIC_PRESENT;
 		} else {
-			return Syncmatica.getFileStorage().getLocalState(placement);
+			return fs.getLocalState(placement);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class RedirectFileStorage implements IFileStorage {
 				redirect.remove(hashId);
 			}
 		}
-		return Syncmatica.getFileStorage().getLocalLitematic(placement);
+		return fs.getLocalLitematic(placement);
 	}
 
 	@Override

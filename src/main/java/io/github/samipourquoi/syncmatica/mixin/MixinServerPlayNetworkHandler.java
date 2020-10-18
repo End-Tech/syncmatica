@@ -1,5 +1,6 @@
 package io.github.samipourquoi.syncmatica.mixin;
 
+import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,36 +21,34 @@ import net.minecraft.util.Identifier;
 
 
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class MixinServerPlayNetworkHandler extends ServerPlayNetworkHandler {
+public abstract class MixinServerPlayNetworkHandler {
 	
 	@Unique
 	private ExchangeTarget exTarget = null;
 
-	public MixinServerPlayNetworkHandler(MinecraftServer server, ClientConnection connection,
-			ServerPlayerEntity player) {
-		super(server, connection, player);
-	}
-	
-	@Inject(method = "<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;)V", at = @At("TAIL"))
+	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+		LogManager.getLogger(ServerPlayNetworkHandler.class).info("server player join");
 		((ServerCommunicationManager)Syncmatica.getCommunicationManager()).onPlayerJoin(getExchangeTarget());
 	}
 	
 	@Inject(method = "onDisconnected", at = @At("HEAD"))
 	public void onDisconnected(Text reason, CallbackInfo ci) {
+		LogManager.getLogger(ServerPlayNetworkHandler.class).info("server player leave");
 		((ServerCommunicationManager)Syncmatica.getCommunicationManager()).onPlayerLeave(getExchangeTarget());
 	}
 	
 	@Inject(method = "onCustomPayload", at = @At("HEAD"))
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Identifier id = ((MixinCustomPayloadC2SPacket)packet).getChannel();
+		LogManager.getLogger(ServerPlayNetworkHandler.class).info("received server"+id.toString());
 		PacketByteBuf packetBuf = ((MixinCustomPayloadC2SPacket)packet).getData();
 		Syncmatica.getCommunicationManager().onPacket(getExchangeTarget(), id, packetBuf);
 	}
 	
 	private ExchangeTarget getExchangeTarget() {
 		if (exTarget == null) {
-			exTarget = new ExchangeTarget(this);
+			exTarget = new ExchangeTarget((ServerPlayNetworkHandler)(Object)this);
 		}
 		return exTarget;
 	}
