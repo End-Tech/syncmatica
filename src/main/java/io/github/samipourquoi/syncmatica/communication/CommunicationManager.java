@@ -102,7 +102,7 @@ public abstract class CommunicationManager {
 		String fileName = buf.readString(32767);
 		byte[] hash = new byte[16];
 		buf.readBytes(hash);	
-		ServerPlacement placement = new ServerPlacement(id, fileName, hash);
+		ServerPlacement placement =  new ServerPlacement(id, fileName, hash);
 		
 		BlockPos pos = buf.readBlockPos();
 		String dimensionId = buf.readString(32767);

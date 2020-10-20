@@ -1,8 +1,11 @@
 package io.github.samipourquoi.syncmatica;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.material.SyncmaticaMaterialList;
+import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -24,6 +27,10 @@ public class ServerPlacement {
     	this.id = id;
     	this.fileName = fileName;
     	this.hashValue = hashValue;
+    }
+    
+    public ServerPlacement(UUID id, File file) {
+    	this(id, removeExtension(file), generateHash(file));
     }
     
     public UUID getId() {return id;}
@@ -56,5 +63,21 @@ public class ServerPlacement {
     	return this;
     }
     
+    private static String removeExtension(File file) {
+    	// source stackoverflow
+    	String fileName = file.getName();
+    	int pos = fileName.lastIndexOf(".");
+    	return fileName.substring(0, pos);
+    }
+    
+    private static byte[] generateHash(File file) {
+		byte[] hash = null;
+		try {
+			hash = SyncmaticaUtil.createChecksum(new FileInputStream(file));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return hash;
+    }
     
 }

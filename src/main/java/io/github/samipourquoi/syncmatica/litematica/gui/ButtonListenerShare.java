@@ -9,6 +9,7 @@ import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ShareLitematicExchange;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 
 public class ButtonListenerShare implements IButtonActionListener {
@@ -21,6 +22,10 @@ public class ButtonListenerShare implements IButtonActionListener {
 
 	@Override
 	public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
+		if (LitematicManager.getInstance().isSyncmatic(schem)) {
+			return;
+		}
+		button.setEnabled(false);
 		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Started sharing litematic");
 		ClientCommunicationManager comms = (ClientCommunicationManager) Syncmatica.getCommunicationManager();
 		ExchangeTarget server = comms.getServer();

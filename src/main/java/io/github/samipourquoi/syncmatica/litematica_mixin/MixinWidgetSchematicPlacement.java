@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerShare;
 
 @Mixin(WidgetSchematicPlacement.class)
@@ -31,7 +32,7 @@ public abstract class MixinWidgetSchematicPlacement extends WidgetListEntryBase<
 	public void addUploadButton(int x, int y, int width, int height, boolean isOdd,
 			SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, CallbackInfo ci) {
 		ButtonGeneric share = new ButtonGeneric(buttonsStartX, y+1, -1, true, "syncmatica.gui.button.share");
-		share.setEnabled(Syncmatica.isStarted());
+		share.setEnabled(Syncmatica.isStarted() && !LitematicManager.getInstance().isSyncmatic(placement));
 		buttonsStartX = addButton(share, new ButtonListenerShare(placement)).getX()-1;
 	}
 	

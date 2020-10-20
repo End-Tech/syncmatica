@@ -55,7 +55,7 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
         } else if (state == LocalLitematicState.DOWNLOADING_LITEMATIC) {
         	text = StringUtils.translate("syncmatica.gui.button.downloading");
         	listener = new ButtonListener(null, null);
-        } else if (LitematicManager.getInstance().isRendered(entry)) {
+        } else if (!LitematicManager.getInstance().isRendered(entry)) {
             text = StringUtils.translate("syncmatica.gui.button.load");
             listener = new ButtonListener(ButtonListener.Type.LOAD, this);
         } else {
@@ -108,10 +108,11 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 		}
 		
 		@Override
-		public void actionPerformedWithButton(ButtonBase arg0, int arg1) {
+		public void actionPerformedWithButton(ButtonBase button, int arg1) {
 			if (type == null) {
 				return;
 			}
+			button.setEnabled(false);
 			type.onAction(placement);
 			// TODO: update button type
 		}
@@ -133,6 +134,9 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
 					ExchangeTarget server = ((ClientCommunicationManager)Syncmatica.getCommunicationManager()).getServer();
+					if (Syncmatica.getCommunicationManager().getDownloadState(placement.placement)) {
+						return;
+					}
 					try {
 						Syncmatica.getCommunicationManager().download(placement.placement, server);
 					} catch (NoSuchAlgorithmException e) {
