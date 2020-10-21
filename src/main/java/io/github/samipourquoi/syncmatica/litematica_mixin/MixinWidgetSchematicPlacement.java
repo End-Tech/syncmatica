@@ -9,7 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicPlacements;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
@@ -31,6 +33,13 @@ public abstract class MixinWidgetSchematicPlacement extends WidgetListEntryBase<
 	@Inject(method = "<init>(IIIIZLfi/dy/masa/litematica/schematic/placement/SchematicPlacement;ILfi/dy/masa/litematica/gui/widgets/WidgetListSchematicPlacements;)V", at = @At("TAIL"), remap = false)
 	public void addUploadButton(int x, int y, int width, int height, boolean isOdd,
 			SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, CallbackInfo ci) {
+		if (LitematicManager.getInstance().isSyncmatic(placement))
+			for (WidgetBase base: this.subWidgets) {
+				if (base instanceof ButtonBase) {
+					((ButtonBase) base).setEnabled(false);
+				}
+			}
+		}
 		ButtonGeneric share = new ButtonGeneric(buttonsStartX, y+1, -1, true, "syncmatica.gui.button.share");
 		share.setEnabled(Syncmatica.isStarted() && !LitematicManager.getInstance().isSyncmatic(placement));
 		buttonsStartX = addButton(share, new ButtonListenerShare(placement)).getX()-1;
