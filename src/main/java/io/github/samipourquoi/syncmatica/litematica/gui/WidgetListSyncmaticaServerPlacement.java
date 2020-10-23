@@ -84,7 +84,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         String str = StringUtils.translate("syncmatica.gui.label.placement_info.file_name");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
-        drawString(matrixStack, placement.getFileName(), x + 4, y, valueColor);
+        drawString(matrixStack, placement.getName(), x + 4, y, valueColor);
         y += 12;
         
         str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
@@ -104,7 +104,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 	
     @Override
     protected List<String> getEntryStringsForFilter(ServerPlacement entry) {
-        String metaName = entry.getFileName().toLowerCase();
+        String metaName = entry.getName().toLowerCase();
         return ImmutableList.of(metaName);
     }
 

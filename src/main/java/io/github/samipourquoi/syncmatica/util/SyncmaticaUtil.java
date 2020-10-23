@@ -2,10 +2,11 @@ package io.github.samipourquoi.syncmatica.util;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.UUID;
 
 public class SyncmaticaUtil {
 	
-	public static byte[] createChecksum(InputStream fis) throws Exception {
+	public static UUID createChecksum(InputStream fis) throws Exception {
 		// source StackOverflow
 	    byte[] buffer = new byte[4096]; // 4096 is the most common cluster size
 	    MessageDigest complete = MessageDigest.getInstance("MD5");
@@ -19,6 +20,6 @@ public class SyncmaticaUtil {
 	    } while (numRead != -1);
 
 	    fis.close();
-	    return complete.digest();
+	    return UUID.nameUUIDFromBytes(complete.digest());
 	}
 }

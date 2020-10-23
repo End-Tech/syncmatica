@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
@@ -26,7 +26,7 @@ public class FileStorage implements IFileStorage {
 	}
 	
 	public LocalLitematicState getLocalState(ServerPlacement placement) {
-		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
+		File localFile = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
 				return LocalLitematicState.DOWNLOADING_LITEMATIC;
@@ -48,7 +48,7 @@ public class FileStorage implements IFileStorage {
 
 	public File getLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
-			return new File(Syncmatica.getSchematicPath(placement.getFileName()));
+			return new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		} else {
 			return null;
 		}
@@ -59,7 +59,7 @@ public class FileStorage implements IFileStorage {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
-		File file = new File(Syncmatica.getSchematicPath(placement.getFileName()));
+		File file = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		if (file.exists()) {
 			file.delete();
 		}
@@ -72,7 +72,7 @@ public class FileStorage implements IFileStorage {
 	}
 
 	private boolean hashCompare(File localFile, ServerPlacement placement) {
-		byte[] hash = null;
+		UUID hash = null;
 		try {
 			hash = SyncmaticaUtil.createChecksum(new FileInputStream(localFile));
 		} catch (FileNotFoundException e) {
@@ -85,7 +85,7 @@ public class FileStorage implements IFileStorage {
 		if (hash == null) {
 			return false;
 		}
-		if (Arrays.equals(hash, placement.getHash())) {
+		if (hash.equals(placement.getHash())) {
 			buffer.put(placement, localFile.lastModified());
 			return true;
 		}

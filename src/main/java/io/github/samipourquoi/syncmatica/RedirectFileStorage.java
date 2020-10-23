@@ -2,7 +2,6 @@ package io.github.samipourquoi.syncmatica;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,14 +27,13 @@ public class RedirectFileStorage implements IFileStorage {
 	
 	public void addRedirect(File file) {
 		RedirectData red = new RedirectData(file);
-		UUID hashId = UUID.nameUUIDFromBytes(red.getHash());
-		redirect.put(hashId, red);
+		redirect.put(red.getHash(), red);
 	}
 	
 	@Override
 	public LocalLitematicState getLocalState(ServerPlacement placement) {
-		UUID hashId = UUID.nameUUIDFromBytes(placement.getHash());
-		if (redirect.containsKey(hashId) && Arrays.equals(redirect.get(hashId).getHash(), placement.getHash())) {
+		UUID hashId = placement.getHash();
+		if (redirect.containsKey(hashId) && hashId.equals(redirect.get(hashId).getHash())) {
 			return LocalLitematicState.LOCAL_LITEMATIC_PRESENT;
 		} else {
 			return fs.getLocalState(placement);
@@ -49,10 +47,10 @@ public class RedirectFileStorage implements IFileStorage {
 
 	@Override
 	public File getLocalLitematic(ServerPlacement placement) {
-		UUID hashId = UUID.nameUUIDFromBytes(placement.getHash());
+		UUID hashId = placement.getHash();
 		if (redirect.containsKey(hashId)) {
 			RedirectData red = redirect.get(hashId);
-			if (Arrays.equals(placement.getHash(), red.getHash())) {
+			if (hashId.equals(red.getHash())) {
 				return red.redirect;
 			} else {
 				redirect.remove(hashId);
@@ -68,7 +66,7 @@ public class RedirectFileStorage implements IFileStorage {
 	
 	private class RedirectData {
 		File redirect = null;
-		byte[] hash = null;
+		UUID hash = null;
 		long hashTimeStamp;
 		
 		RedirectData(File file) {
@@ -79,7 +77,7 @@ public class RedirectFileStorage implements IFileStorage {
 			}
 		}
 		
-		byte[] getHash() {
+		UUID getHash() {
 			if (hashTimeStamp==redirect.lastModified()) {
 				return hash;
 			}

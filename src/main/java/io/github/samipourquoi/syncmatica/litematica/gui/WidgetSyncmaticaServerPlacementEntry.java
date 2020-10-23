@@ -92,7 +92,7 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
 		}
 
-		String schematicName = this.placement.getFileName();
+		String schematicName = this.placement.getName();
 		this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, schematicName, matrixStack);
 		this.drawSubWidgets(mouseX, mouseY, matrixStack);
     }

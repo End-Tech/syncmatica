@@ -82,8 +82,8 @@ public abstract class CommunicationManager {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeUuid(metaData.getId());
 		
-		buf.writeString(metaData.getFileName());
-		buf.writeBytes(metaData.getHash());
+		buf.writeString(metaData.getName());
+		buf.writeUuid(metaData.getHash());
 		
 		buf.writeBlockPos(metaData.getPosition());
 		buf.writeString(metaData.getDimension());
@@ -100,8 +100,7 @@ public abstract class CommunicationManager {
 		UUID id = buf.readUuid();
 		
 		String fileName = buf.readString(32767);
-		byte[] hash = new byte[16];
-		buf.readBytes(hash);	
+		UUID hash = buf.readUuid();
 		ServerPlacement placement =  new ServerPlacement(id, fileName, hash);
 		
 		BlockPos pos = buf.readBlockPos();

@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.DigestOutputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
@@ -60,9 +60,8 @@ public class DownloadExchange extends AbstractExchange {
 				this.close();
 				throw new RuntimeException(e);
 			}
-			byte[] downloadHash = md5.digest();
-			byte[] placementHash = toDownload.getHash();
-			if (Arrays.equals(downloadHash, placementHash)) {
+			UUID downloadHash = UUID.nameUUIDFromBytes(md5.digest());
+			if (downloadHash.equals(toDownload.getHash())) {
 				succeed();
 			} else {
 				close();

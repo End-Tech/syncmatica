@@ -1,7 +1,6 @@
 package io.github.samipourquoi.syncmatica.litematica;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,7 +12,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
-import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
@@ -86,7 +85,9 @@ public class LitematicManager {
 		}
 		File placementFile = schem.getSchematicFile();
 		ServerPlacement placement = new ServerPlacement(UUID.randomUUID(), placementFile);
-		placement.move("somewhere in minecraft", schem.getOrigin(), schem.getRotation(), schem.getMirror());
+		// thanks miniHUD
+		String dimension = MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
+		placement.move(dimension, schem.getOrigin(), schem.getRotation(), schem.getMirror());
 		return placement;
 	}
 	

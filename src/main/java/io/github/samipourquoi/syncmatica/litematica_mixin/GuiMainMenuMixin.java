@@ -25,14 +25,15 @@ public class GuiMainMenuMixin extends GuiBase {
 		int y = 30;
 		createChangeMenuButton(x, y, width, ButtonType.VIEW_SYNCMATICS);
 		y += 22;
-		createChangeMenuButton(x, y, width, ButtonType.MATERIAL_GATHERINGS);
+		createChangeMenuButton(x, y, width, ButtonType.MATERIAL_GATHERINGS).setEnabled(false);
 	}
 	
-    private void createChangeMenuButton(int x, int y, int width, ButtonType type)
+    private ButtonGeneric createChangeMenuButton(int x, int y, int width, ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getDisplayName(), type.getIcon());
         button.setEnabled(Syncmatica.isStarted());
         addButton(button, new ButtonListenerChangeMenu(type, this));
+        return button;
     }
     
     private int getButtonWidth()
