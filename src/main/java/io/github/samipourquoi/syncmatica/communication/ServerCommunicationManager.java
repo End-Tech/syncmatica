@@ -7,8 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.FileStorage;
-import io.github.samipourquoi.syncmatica.SchematicManager;
+import org.apache.logging.log4j.LogManager;
+
+import io.github.samipourquoi.syncmatica.IFileStorage;
+import io.github.samipourquoi.syncmatica.SyncmaticManager;
+import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
@@ -16,12 +19,13 @@ import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.Exchange.UploadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.VersionHandshakeServer;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 public class ServerCommunicationManager extends CommunicationManager {
 
-	public ServerCommunicationManager(FileStorage storage, SchematicManager schematicManager) {
-		super(storage, schematicManager);
+	public ServerCommunicationManager(IFileStorage data, SyncmaticManager schematicManager) {
+		super(data, schematicManager);
 	}
 	
 	public void onPlayerJoin(ExchangeTarget newPlayer) {
@@ -65,12 +69,19 @@ public class ServerCommunicationManager extends CommunicationManager {
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
 			ServerPlacement placement = receiveMetaData(packetBuf);
 			if (schematicManager.getPlacement(placement.getId()) == null) {
-				try {
-					download(placement, source);
-				} catch (NoSuchAlgorithmException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
+				if (!Syncmatica.getFileStorage().getLocalState(placement).isLocalFileReady()) {
+					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Started downloading litematic");
+					try {
+						download(placement, source);
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					addPlacement(placement);
 				}
 			}
 		}
@@ -84,12 +95,16 @@ public class ServerCommunicationManager extends CommunicationManager {
 				sendMetaData(placement, exchange.getPartner());
 			}
 		}
+		LogManager.getLogger(ServerPlayNetworkHandler.class).info("Finished Exchange " + exchange.toString());
 		if (exchange instanceof DownloadExchange && exchange.isSuccessful()) {
-			ServerPlacement placement = ((DownloadExchange)exchange).getPlacement();
-			schematicManager.addPlacement(placement);
-			for (ExchangeTarget target: broadcastTargets) {
-				sendMetaData(placement, target);
-			}
+			addPlacement(((DownloadExchange)exchange).getPlacement());
+		}
+	}
+	
+	private void addPlacement(ServerPlacement placement) {
+		schematicManager.addPlacement(placement);
+		for (ExchangeTarget target: broadcastTargets) {
+			sendMetaData(placement, target);
 		}
 	}
 }

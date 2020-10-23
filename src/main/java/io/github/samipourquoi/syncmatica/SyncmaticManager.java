@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SchematicManager {
+public class SyncmaticManager {
 	private final Map<UUID, ServerPlacement> schematics = new HashMap<>();
 	
 	public void addPlacement(ServerPlacement placement) {

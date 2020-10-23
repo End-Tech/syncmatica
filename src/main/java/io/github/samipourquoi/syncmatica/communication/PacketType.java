@@ -58,7 +58,7 @@ public enum PacketType {
 	
 	public static boolean containsIdentifier(Identifier id) {
 		for (PacketType p : PacketType.values()) {
-			if (id.equals(p)) {
+			if (id.equals(p.IDENTIFIER)) { // this took I kid you not 4-5 hours to find
 				return true;
 			}
 		}

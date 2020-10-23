@@ -5,8 +5,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.litematica.ButtonListenerChangeMenu;
-import io.github.samipourquoi.syncmatica.litematica.ButtonType;
+import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerChangeMenu;
+import io.github.samipourquoi.syncmatica.litematica.gui.ButtonType;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.selection.SelectionMode;
 
@@ -24,13 +25,15 @@ public class GuiMainMenuMixin extends GuiBase {
 		int y = 30;
 		createChangeMenuButton(x, y, width, ButtonType.VIEW_SYNCMATICS);
 		y += 22;
-		createChangeMenuButton(x, y, width, ButtonType.MATERIAL_GATHERINGS);
+		createChangeMenuButton(x, y, width, ButtonType.MATERIAL_GATHERINGS).setEnabled(false);
 	}
 	
-    private void createChangeMenuButton(int x, int y, int width, ButtonType type)
+    private ButtonGeneric createChangeMenuButton(int x, int y, int width, ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getDisplayName(), type.getIcon());
+        button.setEnabled(Syncmatica.isStarted());
         addButton(button, new ButtonListenerChangeMenu(type, this));
+        return button;
     }
     
     private int getButtonWidth()

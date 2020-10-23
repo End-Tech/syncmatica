@@ -1,8 +1,11 @@
 package io.github.samipourquoi.syncmatica;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.material.SyncmaticaMaterialList;
+import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -12,7 +15,8 @@ public class ServerPlacement {
 	private final UUID id;
 	
 	private final String fileName;
-    private final byte[] hashValue;
+    private final UUID hashValue; //UUID for the file contents
+    // UUID since easier to transmit compare etc.
     
     private ServerPosition origin;
     private BlockRotation rotation;
@@ -20,16 +24,20 @@ public class ServerPlacement {
     
     private SyncmaticaMaterialList matList;
     
-    public ServerPlacement(UUID id, String fileName, byte[] hashValue) {
+    public ServerPlacement(UUID id, String fileName, UUID hashValue) {
     	this.id = id;
     	this.fileName = fileName;
     	this.hashValue = hashValue;
     }
     
+    public ServerPlacement(UUID id, File file) {
+    	this(id, removeExtension(file), generateHash(file));
+    }
+    
     public UUID getId() {return id;}
     
-    public String getFileName() {return fileName;}
-    public byte[] getHash() {return hashValue;}
+    public String getName() {return fileName;}
+    public UUID getHash() {return hashValue;}
     
     public String getDimension() {return origin.getDimensionId();}
     public BlockPos getPosition() {return origin.getBlockPosition();}
@@ -56,5 +64,21 @@ public class ServerPlacement {
     	return this;
     }
     
+    private static String removeExtension(File file) {
+    	// source stackoverflow
+    	String fileName = file.getName();
+    	int pos = fileName.lastIndexOf(".");
+    	return fileName.substring(0, pos);
+    }
+    
+    private static UUID generateHash(File file) {
+		UUID hash = null;
+		try {
+			hash = SyncmaticaUtil.createChecksum(new FileInputStream(file));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return hash;
+    }
     
 }

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
@@ -36,12 +35,7 @@ public class UploadExchange extends AbstractExchange {
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
-			byte[] uuidByte = new byte[16];
-			for (int i = 0; i<16; i++) {
-				// getByte does not progress the pointer
-				uuidByte[i] = packetBuf.getByte(i);
-			}
-			return (UUID.nameUUIDFromBytes(uuidByte) == toUpload.getId());
+			return checkUUID(packetBuf, toUpload.getId());
 		}
 		return false;
 	}

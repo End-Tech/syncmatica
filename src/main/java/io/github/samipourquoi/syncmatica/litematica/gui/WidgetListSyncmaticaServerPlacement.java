@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.PlacementStorage;
+import io.github.samipourquoi.syncmatica.Syncmatica;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -84,7 +84,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         String str = StringUtils.translate("syncmatica.gui.label.placement_info.file_name");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
-        drawString(matrixStack, placement.getFileName(), x + 4, y, valueColor);
+        drawString(matrixStack, placement.getName(), x + 4, y, valueColor);
         y += 12;
         
         str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
@@ -104,7 +104,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 	
     @Override
     protected List<String> getEntryStringsForFilter(ServerPlacement entry) {
-        String metaName = entry.getFileName().toLowerCase();
+        String metaName = entry.getName().toLowerCase();
         return ImmutableList.of(metaName);
     }
 
@@ -116,7 +116,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
     @Override
     protected Collection<ServerPlacement> getAllEntries()
     {
-        return PlacementStorage.getEntries();
+        return Syncmatica.getSyncmaticManager().getAll();
     }
 
 }

@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.FileStorage;
-import io.github.samipourquoi.syncmatica.SchematicManager;
+import io.github.samipourquoi.syncmatica.IFileStorage;
+import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
@@ -23,28 +23,35 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class CommunicationManager {
-	protected final Collection<ExchangeTarget> broadcastTargets = new ArrayList<>();
-	protected final Map<ExchangeTarget, Collection<Exchange>> openExchange = new HashMap<>();
+	protected final Collection<ExchangeTarget> broadcastTargets;
+	protected final Map<ExchangeTarget, Collection<Exchange>> openExchange;
 	
-	private final Map<ServerPlacement,Boolean> downloadState = new HashMap<>();
+	private final Map<ServerPlacement,Boolean> downloadState;
 	
-	protected final FileStorage fileStorage;
-	protected final SchematicManager schematicManager;
+	protected final IFileStorage fileStorage;
+	protected final SyncmaticManager schematicManager;
 	
 	protected static final BlockRotation[] rotOrdinals = BlockRotation.values();
 	protected static final BlockMirror[] mirOrdinals = BlockMirror.values();
 	
-	public CommunicationManager(FileStorage storage, SchematicManager manager) {
+	public CommunicationManager(IFileStorage storage, SyncmaticManager manager) {
 		fileStorage = storage;
+		broadcastTargets = new ArrayList<>();
+		openExchange = new HashMap<>();
+		downloadState = new HashMap<>();
 		storage.setCommunitcationManager(this);
 		schematicManager = manager;
+	}
+	
+	public boolean handlePacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
+		return PacketType.containsIdentifier(id);
 	}
 	
 	public void onPacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
 		// TODO: Timeout Exchanges
 		Exchange handler = null;
 		// id is one of the syncmatica packet types
-		if (!PacketType.containsIdentifier(id)) {
+		if (!handlePacket(source, id, packetBuf)) {
 			return;
 		}
 		Collection<Exchange> potentialMessageTarget = openExchange.get(source);
@@ -75,8 +82,8 @@ public abstract class CommunicationManager {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeUuid(metaData.getId());
 		
-		buf.writeString(metaData.getFileName());
-		buf.writeBytes(metaData.getHash());
+		buf.writeString(metaData.getName());
+		buf.writeUuid(metaData.getHash());
 		
 		buf.writeBlockPos(metaData.getPosition());
 		buf.writeString(metaData.getDimension());
@@ -92,13 +99,12 @@ public abstract class CommunicationManager {
 	public ServerPlacement receiveMetaData(PacketByteBuf buf) {
 		UUID id = buf.readUuid();
 		
-		String fileName = buf.readString();
-		byte[] hash = new byte[16];
-		buf.readBytes(hash);	
-		ServerPlacement placement = new ServerPlacement(id, fileName, hash);
+		String fileName = buf.readString(32767);
+		UUID hash = buf.readUuid();
+		ServerPlacement placement =  new ServerPlacement(id, fileName, hash);
 		
 		BlockPos pos = buf.readBlockPos();
-		String dimensionId = buf.readString();
+		String dimensionId = buf.readString(32767);
 		BlockRotation rot = rotOrdinals[buf.readInt()];
 		BlockMirror mir = mirOrdinals[buf.readInt()];
 		placement.move(dimensionId, pos, rot, mir);
@@ -107,8 +113,9 @@ public abstract class CommunicationManager {
 	}
 	
 	public void download(ServerPlacement syncmatic, ExchangeTarget source) throws NoSuchAlgorithmException, IOException {
-		if (fileStorage.getLocalState(syncmatic).isReadyForDownload()) {
-			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download");
+		if (!fileStorage.getLocalState(syncmatic).isReadyForDownload()) {
+			// forgot a negation here
+			throw new IllegalArgumentException(syncmatic.toString()+" is not ready for download local state is: "+fileStorage.getLocalState(syncmatic).toString());
 		}
 		File toDownload = fileStorage.createLocalLitematic(syncmatic);
 		Exchange downloadExchange = new DownloadExchange(syncmatic, toDownload, source, this);

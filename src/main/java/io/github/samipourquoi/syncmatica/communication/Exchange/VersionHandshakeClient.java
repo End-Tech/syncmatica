@@ -21,7 +21,7 @@ public class VersionHandshakeClient extends AbstractExchange {
 	@Override
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)) {
-			String partnerVersion = packetBuf.readString();
+			String partnerVersion = packetBuf.readString(32767);
 			if (!Syncmatica.checkPartnerVersion(partnerVersion)) {
 				close();
 			} else {
@@ -30,7 +30,7 @@ public class VersionHandshakeClient extends AbstractExchange {
 				getPartner().sendPacket(PacketType.REGISTER_VERSION.IDENTIFIER, newBuf);
 			}
 		} else
-		if (id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)) {
+		if (id.equals(PacketType.CONFIRM_USER.IDENTIFIER)) {
 			Syncmatica.startup();
 		}
 	}

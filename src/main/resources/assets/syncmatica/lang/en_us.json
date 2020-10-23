@@ -5,6 +5,7 @@
 	"syncmatica.gui.button.unload": "Unload",
 	"syncmatica.gui.button.remove": "Remove",
 	"syncmatica.gui.button.download": "Download",
+	"syncmatica.gui.button.share": "Share",
 	"syncmatica.gui.button.material_gathering_placement": "Materials",
 	"syncmatica.gui.title.manage_server_placements": "Manage Server Placements",
 	"syncmatica.gui.label.placement_info.file_name": "File Name",

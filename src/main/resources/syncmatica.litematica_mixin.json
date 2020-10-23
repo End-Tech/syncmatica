@@ -6,7 +6,8 @@
 
 	"mixins": [],
 	"client": [
-		"GuiMainMenuMixin"
+		"GuiMainMenuMixin",
+		"MixinWidgetSchematicPlacement"
 	 ],
 	"server": [],
 

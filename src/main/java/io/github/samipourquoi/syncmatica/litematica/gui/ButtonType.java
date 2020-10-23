@@ -1,4 +1,4 @@
-package io.github.samipourquoi.syncmatica.litematica;
+package io.github.samipourquoi.syncmatica.litematica.gui;
 
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.util.StringUtils;

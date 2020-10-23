@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
-public class FileStorage {
+public class FileStorage implements IFileStorage {
 	
 	private HashMap<ServerPlacement, Long> buffer = new HashMap<>();
 	private CommunicationManager manager = null;
@@ -26,7 +26,7 @@ public class FileStorage {
 	}
 	
 	public LocalLitematicState getLocalState(ServerPlacement placement) {
-		File localFile = new File(Syncmatica.getSchematicPath(placement.getFileName()));
+		File localFile = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
 				return LocalLitematicState.DOWNLOADING_LITEMATIC;
@@ -48,27 +48,31 @@ public class FileStorage {
 
 	public File getLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
-			return new File(Syncmatica.getSchematicPath(placement.getFileName()));
+			return new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		} else {
 			return null;
 		}
 	}
 	
 	// method for creating an empty file for the litematic data
-	public File createLocalLitematic(ServerPlacement placement) throws IOException {
+	public File createLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
-		File file = new File(Syncmatica.getSchematicPath(placement.getFileName()));
+		File file = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
 		if (file.exists()) {
 			file.delete();
 		}
-		file.createNewFile();
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return file;
 	}
 
 	private boolean hashCompare(File localFile, ServerPlacement placement) {
-		byte[] hash = null;
+		UUID hash = null;
 		try {
 			hash = SyncmaticaUtil.createChecksum(new FileInputStream(localFile));
 		} catch (FileNotFoundException e) {
@@ -81,33 +85,10 @@ public class FileStorage {
 		if (hash == null) {
 			return false;
 		}
-		if (Arrays.equals(hash, placement.getHash())) {
+		if (hash.equals(placement.getHash())) {
 			buffer.put(placement, localFile.lastModified());
 			return true;
 		}
 		return false;
-	}
-	
-	public enum LocalLitematicState {
-		NO_LOCAL_LITEMATIC(true, false),
-		LOCAL_LITEMATIC_DESYNC(true, false),
-		DOWNLOADING_LITEMATIC(false, false),
-		LOCAL_LITEMATIC_PRESENT(false, true);
-		
-		private boolean downloadReady;
-		private boolean fileReady;
-		
-		LocalLitematicState(boolean downloadReady, boolean fileReady) {
-			this.downloadReady = downloadReady;
-			this.fileReady = fileReady;
-		}
-		
-		public boolean isReadyForDownload() {
-			return downloadReady;
-		}
-		
-		public boolean isLocalFileReady() {
-			return fileReady;
-		}
 	}
 }

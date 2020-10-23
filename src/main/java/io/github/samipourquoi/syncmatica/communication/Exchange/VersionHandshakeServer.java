@@ -20,7 +20,7 @@ public class VersionHandshakeServer extends AbstractExchange {
 
 	@Override
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
-		if (Syncmatica.checkPartnerVersion(packetBuf.readString())) {
+		if (Syncmatica.checkPartnerVersion(packetBuf.readString(32767))) {
 			PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
 			getPartner().sendPacket(PacketType.CONFIRM_USER.IDENTIFIER, newBuf);
 			succeed();

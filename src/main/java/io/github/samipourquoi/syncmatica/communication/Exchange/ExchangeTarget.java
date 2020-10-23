@@ -34,23 +34,5 @@ public class ExchangeTarget {
 		}
 	}
 	
-	// to properly sort into hashTables according to the target
-	@Override
-	public int hashCode() {
-		if (server==null) {
-			return client.hashCode();
-		} else {
-			return server.hashCode();
-		}
-	}
-	
-	// to properly sort into hashTables according to the target
-	@Override
-	public boolean equals(Object o) {
-		if (server==null) {
-			return client.equals(o);
-		} else {
-			return server.equals(o);
-		}
-	}
+	// removed equals code due to issues with Collection.contains
 }

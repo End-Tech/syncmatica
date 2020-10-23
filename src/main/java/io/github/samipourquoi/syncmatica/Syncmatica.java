@@ -2,11 +2,7 @@ package io.github.samipourquoi.syncmatica;
 
 import java.io.File;
 
-import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
-import net.minecraft.client.MinecraftClient;
 
 // could probably turn this into a singleton
 
@@ -21,15 +17,11 @@ public class Syncmatica {
 	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
 	
 	private static CommunicationManager comms;
-	private static FileStorage data;
-	private static SchematicManager schematics;
-	
-	public static String getSyncmaticaPlacementPath(String fileName) {
-		return getStoragePath()+File.separator+fileName+".litematic";
-	}
+	private static IFileStorage data;
+	private static SyncmaticManager schematics;
 	
 	public static String getSchematicPath(String fileName) {
-		return getStoragePath()+File.separator+fileName+".sync";
+		return getStoragePath()+File.separator+fileName+".litematic";
 	}
 	
 	private static String getStoragePath() {
@@ -40,32 +32,30 @@ public class Syncmatica {
 		}
 	}
 	
-	public static void initServer() {
+	public static void initServer(CommunicationManager comms, IFileStorage fileStorage, SyncmaticManager schematics) {
 		File file = new File(SERVER_PATH);
 		file.mkdirs();
 		isServer = true;
-		init();
+		init(comms, fileStorage, schematics);
 	}
 
-	public static void initClient() {
+	public static void initClient(CommunicationManager comms, IFileStorage fileStorage, SyncmaticManager schematics) {
 		File file = new File(CLIENT_PATH);
 		file.mkdirs();
 		isServer = false;
-		init();
+		init(comms, fileStorage, schematics);
 	}
 	
-	private static void init() {
+	private static void init(CommunicationManager comms, IFileStorage fileStorage, SyncmaticManager schematics) {
 		if (isInit) {
 			return;
 		}
 		data = new FileStorage();
-		schematics = new SchematicManager();
-		if (isServer) {
-			comms = new ServerCommunicationManager(data, schematics);
-		} else {
-			ExchangeTarget server = new ExchangeTarget(MinecraftClient.getInstance().getNetworkHandler());
-			comms = new ClientCommunicationManager(data, schematics, server);
-		}
+		Syncmatica.comms = comms;
+		Syncmatica.schematics = schematics;
+		data = fileStorage;
+		//	ExchangeTarget server = new ExchangeTarget(MinecraftClient.getInstance().getNetworkHandler());
+		//	comms = new ClientCommunicationManager(data, schematics, server);
 		isInit = true;
 	}
 	
@@ -79,7 +69,9 @@ public class Syncmatica {
 	}
 	
 	public static void startup() {
-		init();
+		if (!isInit) {
+			throw new RuntimeException("Started Syncmatica before initializing it");
+		}
 		isStarted = true;
 	}
 
@@ -92,8 +84,12 @@ public class Syncmatica {
 		return comms;
 	}
 	
-	public static FileStorage getFileStorage() {
+	public static IFileStorage getFileStorage() {
 		return data;
+	}
+	
+	public static SyncmaticManager getSyncmaticManager() {
+		return schematics;
 	}
 	
 	public static boolean isServer() {
