@@ -30,7 +30,7 @@ public abstract class MixinWidgetSchematicPlacement extends WidgetListEntryBase<
 	private SchematicPlacement placement;
 	
 	
-	@Inject(method = "<init>(IIIIZLfi/dy/masa/litematica/schematic/placement/SchematicPlacement;ILfi/dy/masa/litematica/gui/widgets/WidgetListSchematicPlacements;)V", at = @At("TAIL"), remap = false)
+	@Inject(method = "<init>", at = @At("TAIL"), remap = false)
 	public void addUploadButton(int x, int y, int width, int height, boolean isOdd,
 			SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, CallbackInfo ci) {
 		if (LitematicManager.getInstance().isSyncmatic(placement)) {

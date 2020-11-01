@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
@@ -63,6 +64,13 @@ public class ShareLitematicExchange extends AbstractExchange {
 
 	@Override
 	public void init() {
+		((ClientCommunicationManager) getManager()).setSharingState(toShare, true);
+		Syncmatica.getSyncmaticManager().updateServerPlacement(toShare);
 		getManager().sendMetaData(toShare, getPartner());
+	}
+	
+	@Override
+	public void onClose() {
+		((ClientCommunicationManager) getManager()).setSharingState(toShare, false);
 	}
 }

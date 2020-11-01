@@ -38,6 +38,7 @@ public class ServerCommunicationManager extends CommunicationManager {
 		if (potentialMessageTarget != null) {
 			for (Exchange target: potentialMessageTarget) {
 				target.close();
+				handleExchange(target);
 			}
 		}
 		openExchange.remove(oldPlayer);
@@ -95,7 +96,6 @@ public class ServerCommunicationManager extends CommunicationManager {
 				sendMetaData(placement, exchange.getPartner());
 			}
 		}
-		LogManager.getLogger(ServerPlayNetworkHandler.class).info("Finished Exchange " + exchange.toString());
 		if (exchange instanceof DownloadExchange && exchange.isSuccessful()) {
 			addPlacement(((DownloadExchange)exchange).getPlacement());
 		}

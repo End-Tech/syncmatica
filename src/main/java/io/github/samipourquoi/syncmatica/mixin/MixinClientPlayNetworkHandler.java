@@ -7,6 +7,7 @@ import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -39,6 +40,7 @@ public abstract class MixinClientPlayNetworkHandler {
 		CommunicationManager comms = new ClientCommunicationManager(data, man, exTarget);
 		LogManager.getLogger(ClientPlayNetworkHandler.class).info("init client");
 		Syncmatica.initClient(comms, data, man);
+		ScreenUpdater.init();
 	}
 	
 	@Inject(method = "onCustomPayload", at = @At("HEAD"))

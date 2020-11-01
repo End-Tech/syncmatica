@@ -7,10 +7,10 @@ import net.minecraft.client.gui.screen.Screen;
 
 public class ButtonListenerChangeMenu implements IButtonActionListener {
 	
-	private ButtonType type;
+	private MainMenuButtonType type;
 	private Screen parent;
 	
-	public ButtonListenerChangeMenu(ButtonType type, Screen parent) {
+	public ButtonListenerChangeMenu(MainMenuButtonType type, Screen parent) {
 		this.type = type;
 		this.parent = parent;
 	}
