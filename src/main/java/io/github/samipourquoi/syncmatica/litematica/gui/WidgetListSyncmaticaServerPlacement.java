@@ -4,6 +4,7 @@ package io.github.samipourquoi.syncmatica.litematica.gui;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 
@@ -16,6 +17,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -35,6 +37,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.parent = parent;
         this.setSize(width, height);
+        ScreenUpdater.getInstance().setCurrentWidget(this);
 	}
 	
     @Override
@@ -114,9 +117,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 	}
 	
     @Override
-    protected Collection<ServerPlacement> getAllEntries()
-    {
+    protected Collection<ServerPlacement> getAllEntries() {
         return Syncmatica.getSyncmaticManager().getAll();
     }
-
 }

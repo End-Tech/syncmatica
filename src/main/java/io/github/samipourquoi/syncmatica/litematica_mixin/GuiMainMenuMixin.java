@@ -7,7 +7,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerChangeMenu;
-import io.github.samipourquoi.syncmatica.litematica.gui.ButtonType;
+import io.github.samipourquoi.syncmatica.litematica.gui.MainMenuButtonType;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.selection.SelectionMode;
 
@@ -23,14 +23,14 @@ public class GuiMainMenuMixin extends GuiBase {
 		int width = getButtonWidth();
 		int x = 52 + 2*width;
 		int y = 30;
-		createChangeMenuButton(x, y, width, ButtonType.VIEW_SYNCMATICS);
+		createChangeMenuButton(x, y, width, MainMenuButtonType.VIEW_SYNCMATICS);
 		y += 22;
-		createChangeMenuButton(x, y, width, ButtonType.MATERIAL_GATHERINGS).setEnabled(false);
+		createChangeMenuButton(x, y, width, MainMenuButtonType.MATERIAL_GATHERINGS).setEnabled(false);
 	}
 	
-    private ButtonGeneric createChangeMenuButton(int x, int y, int width, ButtonType type)
+    private ButtonGeneric createChangeMenuButton(int x, int y, int width, MainMenuButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getDisplayName(), type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getTranslatedKey(), type.getIcon());
         button.setEnabled(Syncmatica.isStarted());
         addButton(button, new ButtonListenerChangeMenu(type, this));
         return button;
@@ -40,9 +40,9 @@ public class GuiMainMenuMixin extends GuiBase {
     {
         int width = 0;
 
-        for (ButtonType type : ButtonType.values())
+        for (MainMenuButtonType type : MainMenuButtonType.values())
         {
-            width = Math.max(width, this.getStringWidth(type.getDisplayName()) + 30);
+            width = Math.max(width, this.getStringWidth(type.getTranslatedKey()) + 30);
         }
 
         for (SelectionMode mode : SelectionMode.values())

@@ -67,6 +67,7 @@ public class LitematicManager {
 		litematicaPlacement.toggleLocked();
 
 		DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, true);
+		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
 	}
 	
 	// 2nd case litematic placement is present but gets turned into ServerPlacement
@@ -108,6 +109,7 @@ public class LitematicManager {
 		if (!litematicaPlacement.isLocked()) {
 			litematicaPlacement.toggleLocked();
 		}
+		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
 		if (addToRendering) {
 			DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, false);
 		}
@@ -119,6 +121,7 @@ public class LitematicManager {
 		}
 		DataManager.getSchematicPlacementManager().removeSchematicPlacement(rendering.get(placement));
 		rendering.remove(placement);
+		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
 	}
 	
 	public boolean isRendered(ServerPlacement placement) {
@@ -128,5 +131,4 @@ public class LitematicManager {
 	public boolean isSyncmatic(SchematicPlacement schem) {
 		return rendering.containsValue(schem);
 	}
-	
 }

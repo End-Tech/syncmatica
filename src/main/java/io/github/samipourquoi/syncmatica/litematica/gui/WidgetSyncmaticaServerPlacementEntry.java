@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.litematica.gui;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -48,28 +49,25 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
         listener = new ButtonListener(ButtonListener.Type.MATERIAL_GATHERING, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
         
-        LocalLitematicState state = Syncmatica.getFileStorage().getLocalState(entry);
-        if (!state.isLocalFileReady()||state.isReadyForDownload()) {
-            text = StringUtils.translate("syncmatica.gui.button.download");
-            listener = new ButtonListener(ButtonListener.Type.DOWNLOAD, this);
-        } else if (state == LocalLitematicState.DOWNLOADING_LITEMATIC) {
-        	text = StringUtils.translate("syncmatica.gui.button.downloading");
-        	listener = new ButtonListener(null, null);
-        } else if (!LitematicManager.getInstance().isRendered(entry)) {
-            text = StringUtils.translate("syncmatica.gui.button.load");
-            listener = new ButtonListener(ButtonListener.Type.LOAD, this);
-        } else {
-            text = StringUtils.translate("syncmatica.gui.button.unload");
-            listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);       	
-        }
+        ArrayList<IButtonType> multi = new ArrayList<>();
+        multi.add(new BaseButtonType("syncmatica.gui.button.downloading"
+        		,()-> false, new ButtonListener(null, null)));
+        multi.add(new BaseButtonType("syncmatica.gui.button.download"
+        		,()-> {
+        			LocalLitematicState state = Syncmatica.getFileStorage().getLocalState(placement);
+        			return !state.isLocalFileReady()&&state.isReadyForDownload();
+        }, new ButtonListener(ButtonListener.Type.DOWNLOAD, this)));
+        multi.add(new BaseButtonType("syncmatica.gui.button.load"
+        		,()-> {
+        			return !LitematicManager.getInstance().isRendered(placement);
+        }, new ButtonListener(ButtonListener.Type.LOAD, this)));
+        multi.add(new BaseButtonType("syncmatica.gui.button.unload"
+        		,()-> {
+        			return LitematicManager.getInstance().isRendered(placement);
+        }, new ButtonListener(ButtonListener.Type.UNLOAD, this)));
         
-        len = this.getStringWidth(text) + 10;
-        posX -= (len + 2);
-        ButtonGeneric button = new ButtonGeneric(posX, y, len, 20, text);
-        if (listener.type == null) {
-        	button.setEnabled(false);
-        }
-        this.addButton(button, listener);
+        ButtonGeneric button = new MultiTypeButton(posX, y, true, multi);
+        this.addButton(button, null);
 	}
 	
 	public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)

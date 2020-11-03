@@ -26,7 +26,7 @@ public abstract class CommunicationManager {
 	protected final Collection<ExchangeTarget> broadcastTargets;
 	protected final Map<ExchangeTarget, Collection<Exchange>> openExchange;
 	
-	private final Map<ServerPlacement,Boolean> downloadState;
+	protected final Map<UUID,Boolean> downloadState;
 	
 	protected final IFileStorage fileStorage;
 	protected final SyncmaticManager schematicManager;
@@ -121,14 +121,16 @@ public abstract class CommunicationManager {
 		Exchange downloadExchange = new DownloadExchange(syncmatic, toDownload, source, this);
 		setDownloadState(syncmatic, true);
 		startExchange(downloadExchange);
+		schematicManager.updateServerPlacement(syncmatic);
 	}
 
 	public void setDownloadState(ServerPlacement syncmatic, boolean b) {
-		downloadState.put(syncmatic, b);
+		downloadState.put(syncmatic.getHash(), b);
+		schematicManager.updateServerPlacement(syncmatic);
 	}
 	
 	public boolean getDownloadState(ServerPlacement syncmatic) {
-		return downloadState.getOrDefault(syncmatic, false);
+		return downloadState.getOrDefault(syncmatic.getHash(), false);
 	}
 
 	public void startExchange(Exchange newExchange) {
