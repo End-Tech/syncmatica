@@ -38,12 +38,17 @@ public abstract class AbstractExchange implements Exchange {
 	}
 	
 	@Override
-	public void close() {
+	public void close(boolean notifyPartner) {
 		finished = true;
 		success = false;
 		onClose();
+		if (notifyPartner) {
+			sendCancelPacket();
+		}
 	}
 	
+	protected abstract void sendCancelPacket();
+
 	protected void onClose() {
 		return;
 	}

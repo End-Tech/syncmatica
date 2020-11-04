@@ -42,7 +42,10 @@ public interface Exchange {
 	public boolean isSuccessful();
 	
 	// marks an external unsuccessful close
-	public void close();
+	// upon a close the exchange might send a cancel packet for this request
+	// if the notifyPartner boolean is set to true
+	// otherwise this will not happen
+	public void close(boolean notifyPartner);
 	
 	// initializes the actual Exchange
 	public void init();

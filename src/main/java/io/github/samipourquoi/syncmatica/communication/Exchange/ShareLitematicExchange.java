@@ -33,7 +33,9 @@ public class ShareLitematicExchange extends AbstractExchange {
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		LogManager.getLogger(ClientPlayNetworkHandler.class).info("recognized possible target exchange");
-		if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)||id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
+		if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)
+				||id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)
+				||id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {
 			return checkUUID(packetBuf, toShare.getId());
 		}
 		return false;
@@ -53,12 +55,17 @@ public class ShareLitematicExchange extends AbstractExchange {
 				return;
 			}
 			getManager().startExchange(upload);
+			return;
 		}
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
 			RedirectFileStorage redirect = (RedirectFileStorage)Syncmatica.getFileStorage();
 			redirect.addRedirect(toUpload);
-			Syncmatica.getSyncmaticManager().addPlacement(toShare);
 			LitematicManager.getInstance().renderSyncmatic(toShare, schem, false);
+			Syncmatica.getSyncmaticManager().addPlacement(toShare);
+			return;
+		}
+		if (id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {
+			close(false);
 		}
 	}
 
@@ -73,4 +80,7 @@ public class ShareLitematicExchange extends AbstractExchange {
 	public void onClose() {
 		((ClientCommunicationManager) getManager()).setSharingState(toShare, false);
 	}
+
+	@Override
+	protected void sendCancelPacket() {}
 }

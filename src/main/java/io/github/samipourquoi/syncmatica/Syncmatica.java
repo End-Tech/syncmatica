@@ -20,8 +20,12 @@ public class Syncmatica {
 	private static IFileStorage data;
 	private static SyncmaticManager schematics;
 	
-	public static String getSchematicPath(String fileName) {
-		return getStoragePath()+File.separator+fileName+".litematic";
+	public static String getSchematicPath(ServerPlacement p) {
+		if (isServer) {
+			return getStoragePath()+File.separator+p.getHash().toString()+".litematic";
+		} else {
+			return getStoragePath()+File.separator+p.getName()+".litematic";
+		}
 	}
 	
 	private static String getStoragePath() {

@@ -26,7 +26,7 @@ public class FileStorage implements IFileStorage {
 	}
 	
 	public LocalLitematicState getLocalState(ServerPlacement placement) {
-		File localFile = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
+		File localFile = new File(Syncmatica.getSchematicPath(placement));
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
 				return LocalLitematicState.DOWNLOADING_LITEMATIC;
@@ -48,7 +48,7 @@ public class FileStorage implements IFileStorage {
 
 	public File getLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
-			return new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
+			return new File(Syncmatica.getSchematicPath(placement));
 		} else {
 			return null;
 		}
@@ -59,7 +59,7 @@ public class FileStorage implements IFileStorage {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
-		File file = new File(Syncmatica.getSchematicPath(placement.getHash().toString()));
+		File file = new File(Syncmatica.getSchematicPath(placement));
 		if (file.exists()) {
 			file.delete();
 		}

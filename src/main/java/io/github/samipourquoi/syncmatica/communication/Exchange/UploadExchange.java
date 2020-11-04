@@ -34,7 +34,8 @@ public class UploadExchange extends AbstractExchange {
 
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
-		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
+		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)
+				||id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
 			return checkUUID(packetBuf, toUpload.getId());
 		}
 		return false;
@@ -42,8 +43,14 @@ public class UploadExchange extends AbstractExchange {
 
 	@Override
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
+		
 		packetBuf.readUuid(); // uncertain if the data has to be consumed
-		send();
+		if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
+			send();
+		}
+		if (id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+			close(false);
+		}
 	}
 
 	private void send() {
@@ -52,7 +59,9 @@ public class UploadExchange extends AbstractExchange {
 		try {
 			bytesRead = inputStream.read(buffer);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			close(true);
+			e.printStackTrace();
+			return;
 		}
 		if (bytesRead == -1) {
 			sendFinish();
@@ -88,6 +97,13 @@ public class UploadExchange extends AbstractExchange {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void sendCancelPacket() {
+		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
+		packetByteBuf.writeUuid(toUpload.getId());
+		getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.IDENTIFIER, packetByteBuf);
 	}
 	
 }

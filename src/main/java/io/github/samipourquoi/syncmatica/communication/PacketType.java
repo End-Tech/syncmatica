@@ -22,12 +22,16 @@ public enum PacketType {
 	// it marks the creation of a syncmatic - for now it also is responsible
 	// for changing the syncmatic server and client side
 	
+	CANCEL_SHARE("syncmatica:cancel_share"),
+	// send to a client when a share failed
+	// the client can cancel the upload or upon finishing send a removal packet
+	
 	REQUEST_LITEMATIC("syncmatica:request_download"),
 	// another group of packets will be responsible for downloading the entire
 	// litematic starting with a download request
 	
 	SEND_LITEMATIC("syncmatica:send_litematic"),
-	// a packet responsible for sending a bit of a syncmatic (32kbits to be precise (half of a TCP/IP packets size))
+	// a packet responsible for sending a bit of a litematic (16kbits to be precise (half of what minecraft can send in one packet at most))
 	
 	RECEIVED_LITEMATIC("syncmatica:received_litematic"),
 	// a packet responsible for triggering another send for a litematic
@@ -37,6 +41,10 @@ public enum PacketType {
 	FINISHED_LITEMATIC("syncmatica:finished_litematic"),
 	// a packet responsible for marking the end of a litematic
 	// transmission
+	
+	CANCEL_LITEMATIC("syncmatica:cancel_litematic"),
+	// a packet responsible for cancelling an ongoing upload/download
+	// will be sent in several cases - upon errors mostly
 	
 	REGISTER_VERSION("syncmatica:register_version"),
 	// this packet will be send to the client when it joins the server
