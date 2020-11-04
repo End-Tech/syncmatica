@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.mixin;
 
 import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,11 +12,13 @@ import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -25,6 +28,9 @@ public abstract class MixinServerPlayNetworkHandler {
 	
 	@Unique
 	private ExchangeTarget exTarget = null;
+	
+	@Shadow
+	private ServerPlayerEntity player;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
@@ -40,6 +46,7 @@ public abstract class MixinServerPlayNetworkHandler {
 	
 	@Inject(method = "onCustomPayload", at = @At("HEAD"))
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
+		NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler)(Object)this, (ServerWorld)this.player.getServerWorld());
 		Identifier id = ((MixinCustomPayloadC2SPacket)packet).getChannel();
 		LogManager.getLogger(ServerPlayNetworkHandler.class).info("received server"+id.toString());
 		PacketByteBuf packetBuf = ((MixinCustomPayloadC2SPacket)packet).getData();

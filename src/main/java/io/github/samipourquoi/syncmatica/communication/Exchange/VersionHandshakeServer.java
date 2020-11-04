@@ -25,7 +25,8 @@ public class VersionHandshakeServer extends AbstractExchange {
 			getPartner().sendPacket(PacketType.CONFIRM_USER.IDENTIFIER, newBuf);
 			succeed();
 		} else {
-			close();
+			// same as client - avoid further packets
+			close(false);
 		}
 		
 	}
@@ -36,5 +37,8 @@ public class VersionHandshakeServer extends AbstractExchange {
 		newBuf.writeString(Syncmatica.VERSION);
 		getPartner().sendPacket(PacketType.REGISTER_VERSION.IDENTIFIER, newBuf);
 	}
+
+	@Override
+	protected void sendCancelPacket() {}
 
 }

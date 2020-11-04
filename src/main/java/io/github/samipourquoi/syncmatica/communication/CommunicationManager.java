@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +83,7 @@ public abstract class CommunicationManager {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeUuid(metaData.getId());
 		
-		buf.writeString(metaData.getName());
+		buf.writeString(sanitizeFileName(metaData.getName()));
 		buf.writeUuid(metaData.getHash());
 		
 		buf.writeBlockPos(metaData.getPosition());
@@ -99,7 +100,7 @@ public abstract class CommunicationManager {
 	public ServerPlacement receiveMetaData(PacketByteBuf buf) {
 		UUID id = buf.readUuid();
 		
-		String fileName = buf.readString(32767);
+		String fileName = sanitizeFileName(buf.readString(32767));
 		UUID hash = buf.readUuid();
 		ServerPlacement placement =  new ServerPlacement(id, fileName, hash);
 		
@@ -143,6 +144,33 @@ public abstract class CommunicationManager {
 	protected void startExchangeUnchecked(Exchange newExchange) {
 		openExchange.computeIfAbsent(newExchange.getPartner(), (k) -> new ArrayList<>()).add(newExchange);
 		newExchange.init();
+	}
+	
+	
+	// taken from stackoverflow
+	final static int[] illegalChars = {34, 60, 62, 124, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 58, 42, 63, 92, 47};
+	final static String illegalPatterns = "(^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\\..*)?$)|(^\\.\\.*$)";
+	
+	static {
+		Arrays.sort(illegalChars);
+	}
+	
+	private static String sanitizeFileName(String badFileName) {
+		StringBuilder sanitized = new StringBuilder();
+	    int len = badFileName.codePointCount(0, badFileName.length());
+	    
+	    for (int i=0; i<len; i++) {
+	      int c = badFileName.codePointAt(i);
+	      if (Arrays.binarySearch(illegalChars, c) < 0) {
+	    	  sanitized.appendCodePoint(c);
+	    	  if (sanitized.length() == 255) { //make sure .length stays below 255
+	    		  break;
+	    	  }
+	      }
+	    }
+	    // ^ sanitizes unique characters
+	    // v sanatizes entire patterns
+		return sanitized.toString().replaceAll(illegalPatterns, "_");
 	}
 	
 }

@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 
 import io.github.samipourquoi.syncmatica.IFileStorage;
+import io.github.samipourquoi.syncmatica.LocalLitematicState;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
@@ -18,11 +23,14 @@ import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.Exchange.UploadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.VersionHandshakeServer;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 public class ServerCommunicationManager extends CommunicationManager {
+	
+	private final Map<UUID, List<ServerPlacement>> downloadingFile = new HashMap<>();
 
 	public ServerCommunicationManager(IFileStorage data, SyncmaticManager schematicManager) {
 		super(data, schematicManager);
@@ -37,7 +45,7 @@ public class ServerCommunicationManager extends CommunicationManager {
 		Collection<Exchange> potentialMessageTarget = openExchange.get(oldPlayer);
 		if (potentialMessageTarget != null) {
 			for (Exchange target: potentialMessageTarget) {
-				target.close();
+				target.close(false);
 				handleExchange(target);
 			}
 		}
@@ -71,6 +79,11 @@ public class ServerCommunicationManager extends CommunicationManager {
 			ServerPlacement placement = receiveMetaData(packetBuf);
 			if (schematicManager.getPlacement(placement.getId()) == null) {
 				if (!Syncmatica.getFileStorage().getLocalState(placement).isLocalFileReady()) {
+					// edge case because files are transmitted by placement rather than 
+					if (Syncmatica.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
+						downloadingFile.computeIfAbsent(placement.getHash(), (key)->new ArrayList<>());
+						return;
+					}
 					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Started downloading litematic");
 					try {
 						download(placement, source);
@@ -82,8 +95,10 @@ public class ServerCommunicationManager extends CommunicationManager {
 						e.printStackTrace();
 					}
 				} else {
-					addPlacement(placement);
+					addPlacement(source, placement);
 				}
+			} else {
+				cancelShare(source, placement);
 			}
 		}
 	}
@@ -96,15 +111,43 @@ public class ServerCommunicationManager extends CommunicationManager {
 				sendMetaData(placement, exchange.getPartner());
 			}
 		}
-		if (exchange instanceof DownloadExchange && exchange.isSuccessful()) {
-			addPlacement(((DownloadExchange)exchange).getPlacement());
+		if (exchange instanceof DownloadExchange) {
+			ServerPlacement p = ((DownloadExchange)exchange).getPlacement();
+			
+			if (exchange.isSuccessful()) {
+				addPlacement(exchange.getPartner(), p);
+				if (downloadingFile.containsKey(p.getHash())) {
+					for (ServerPlacement placement: downloadingFile.get(p.getHash())) {
+						addPlacement(exchange.getPartner(), placement);
+					}
+				}
+			} else {
+				cancelShare(exchange.getPartner(), p);
+				if (downloadingFile.containsKey(p.getHash())) {
+					for (ServerPlacement placement: downloadingFile.get(p.getHash())) {
+						cancelShare(exchange.getPartner(), placement);
+					}
+				}
+			}
+			
+			downloadingFile.remove(p.getHash());
 		}
 	}
 	
-	private void addPlacement(ServerPlacement placement) {
+	private void addPlacement(ExchangeTarget t, ServerPlacement placement) {
+		if (schematicManager.getPlacement(placement.getId()) != null) {
+			cancelShare(t, placement);
+			return;
+		}
 		schematicManager.addPlacement(placement);
 		for (ExchangeTarget target: broadcastTargets) {
 			sendMetaData(placement, target);
 		}
+	}
+	
+	private void cancelShare(ExchangeTarget source, ServerPlacement placement) {
+		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
+		packetByteBuf.writeUuid(placement.getId());
+		source.sendPacket(PacketType.CANCEL_SHARE.IDENTIFIER, packetByteBuf);
 	}
 }

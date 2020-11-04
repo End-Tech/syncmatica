@@ -32,7 +32,9 @@ public class DownloadExchange extends AbstractExchange {
 
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
-		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)||id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
+		if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)
+				||id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)
+				||id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
 			return checkUUID(packetBuf, toDownload.getId());
 		}
 		return false;
@@ -46,26 +48,34 @@ public class DownloadExchange extends AbstractExchange {
 				try {
 					packetBuf.readBytes(outputStream, size);
 				} catch (IOException e) {
-					this.close();
-					throw new RuntimeException(e);
+					close(true);
+					e.printStackTrace();
+					return;
 				}
 				PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
 				packetByteBuf.writeUuid(toDownload.getId());
 				getPartner().sendPacket(PacketType.RECEIVED_LITEMATIC.IDENTIFIER, packetByteBuf);
+				return;
 		}
 		if (id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
 			try {
 				outputStream.flush();
 			} catch (IOException e) {
-				this.close();
-				throw new RuntimeException(e);
+				close(false);
+				e.printStackTrace();
+				return;
 			}
 			UUID downloadHash = UUID.nameUUIDFromBytes(md5.digest());
 			if (downloadHash.equals(toDownload.getHash())) {
 				succeed();
 			} else {
-				close();
+				// no need to notify partner since exchange is closed on partner side
+				close(false);
 			}
+			return;
+		}
+		if (id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+			close(false);
 		}
 	}
 
@@ -82,8 +92,15 @@ public class DownloadExchange extends AbstractExchange {
 		try {
 			outputStream.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	protected void sendCancelPacket() {
+		PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
+		packetByteBuf.writeUuid(toDownload.getId());
+		getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.IDENTIFIER, packetByteBuf);
 	}
 	
 	public ServerPlacement getPlacement() {
