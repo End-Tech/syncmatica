@@ -1,8 +1,10 @@
 package io.github.samipourquoi.syncmatica.communication.Exchange;
 
+import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -32,6 +34,12 @@ public class VersionHandshakeClient extends AbstractExchange {
 			}
 		} else
 		if (id.equals(PacketType.CONFIRM_USER.IDENTIFIER)) {
+			int placementCount = packetBuf.readInt();
+			for (int i =0; i<placementCount; i++) {
+				ServerPlacement p = getManager().receiveMetaData(packetBuf);
+				Syncmatica.getSyncmaticManager().addPlacement(p);
+			}
+			LitematicManager.getInstance().commitLoad();
 			Syncmatica.startup();
 		}
 	}

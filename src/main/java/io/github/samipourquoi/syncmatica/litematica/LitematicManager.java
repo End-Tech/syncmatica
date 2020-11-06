@@ -1,6 +1,8 @@
 package io.github.samipourquoi.syncmatica.litematica;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -10,8 +12,11 @@ import org.apache.logging.log4j.LogManager;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
+import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.litematica.gui.IIDContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
@@ -24,9 +29,11 @@ public class LitematicManager {
 	
 	private static LitematicManager instance = null;
 	
+	
 	// links syncmatic to schematic if it is rendered on the client
 	// specific client
 	private final Map<ServerPlacement, SchematicPlacement> rendering;
+	private Collection<SchematicPlacement> preLoadList = new ArrayList<>();
 	
 	public static LitematicManager getInstance() {
 		if (instance == null) {
@@ -36,6 +43,7 @@ public class LitematicManager {
 	}
 	
 	public static void clear() {
+		LogManager.getLogger(ClientPlayNetworkHandler.class).info("clear");
 		instance = null;
 	}
 
@@ -61,7 +69,10 @@ public class LitematicManager {
 
 		SchematicPlacement litematicaPlacement = SchematicPlacement.createFor(schematic, origin, file.getName(), true, true);
 		rendering.put(placement, litematicaPlacement);
-
+		((IIDContainer)litematicaPlacement).setServerId(placement.getId());
+		if (litematicaPlacement.isLocked()) {
+			litematicaPlacement.toggleLocked();
+		}
 		litematicaPlacement.setRotation(placement.getRotation(), null);
 		litematicaPlacement.setMirror(placement.getMirror(), null);
 		litematicaPlacement.toggleLocked();
@@ -74,7 +85,7 @@ public class LitematicManager {
 	// removed side effects
 	public ServerPlacement syncmaticFromSchematic(SchematicPlacement schem) {
 		if (rendering.containsValue(schem)) {
-			// FIXME: this seems like an anti-pattern
+			// TODO: use the new ID for faster retrieval
 			for (ServerPlacement checkPlacement: rendering.keySet()) {
 				if (rendering.get(checkPlacement) == schem) {
 					return checkPlacement;
@@ -99,16 +110,21 @@ public class LitematicManager {
 		if (rendering.containsKey(placement)) {
 			return;
 		}
+		IIDContainer modPlacement = (IIDContainer)litematicaPlacement;
+		if (modPlacement.getServerId() != null && !modPlacement.getServerId().equals(placement.getId())) {
+			return;
+		}
 		rendering.put(placement, litematicaPlacement);
+		modPlacement.setServerId(placement.getId());
 		
 		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Rendered Placement");
-
+		if (litematicaPlacement.isLocked()) {
+			litematicaPlacement.toggleLocked();
+		}
 		litematicaPlacement.setOrigin(placement.getPosition(), null);
 		litematicaPlacement.setRotation(placement.getRotation(), null);
 		litematicaPlacement.setMirror(placement.getMirror(), null);
-		if (!litematicaPlacement.isLocked()) {
-			litematicaPlacement.toggleLocked();
-		}
+		litematicaPlacement.toggleLocked();
 		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
 		if (addToRendering) {
 			DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, false);
@@ -130,5 +146,29 @@ public class LitematicManager {
 	
 	public boolean isSyncmatic(SchematicPlacement schem) {
 		return rendering.containsValue(schem);
+	}
+	
+	// gets called by code mixed into litematicas loading stage
+	// its responsible for keeping the litematics that got loaded in such a way
+	// until a time where the server has told the client which syncmatics actually are still loaded
+	public void preLoad(SchematicPlacement schem) {
+		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Pre load");
+		preLoadList.add(schem);
+	}
+	
+	public void commitLoad() {
+		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Commit load");
+		SyncmaticManager man = Syncmatica.getSyncmaticManager();
+		for (SchematicPlacement schem: preLoadList) {
+			UUID id = ((IIDContainer)schem).getServerId();
+			ServerPlacement p = man.getPlacement(id);
+			if (p != null) {
+				if (Syncmatica.getFileStorage().getLocalLitematic(p) != schem.getSchematicFile()) {
+					((RedirectFileStorage)Syncmatica.getFileStorage()).addRedirect(schem.getSchematicFile());
+				}
+				renderSyncmatic(p, schem, true);
+			}
+		}
+		preLoadList = null;
 	}
 }

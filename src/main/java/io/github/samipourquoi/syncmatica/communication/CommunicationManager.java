@@ -81,6 +81,11 @@ public abstract class CommunicationManager {
 	
 	public void sendMetaData(ServerPlacement metaData, ExchangeTarget target) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		putMetaData(metaData, buf);
+		target.sendPacket(PacketType.REGISTER_METADATA.IDENTIFIER, buf);
+	}
+	
+	public void putMetaData(ServerPlacement metaData, PacketByteBuf buf) {
 		buf.writeUuid(metaData.getId());
 		
 		buf.writeString(sanitizeFileName(metaData.getName()));
@@ -94,7 +99,6 @@ public abstract class CommunicationManager {
 		// of the ordinal values over time
 		buf.writeInt(metaData.getRotation().ordinal());
 		buf.writeInt(metaData.getMirror().ordinal());
-		target.sendPacket(PacketType.REGISTER_METADATA.IDENTIFIER, buf);
 	}
 	
 	public ServerPlacement receiveMetaData(PacketByteBuf buf) {

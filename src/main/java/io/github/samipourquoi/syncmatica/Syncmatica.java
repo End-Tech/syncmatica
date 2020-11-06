@@ -1,6 +1,15 @@
 package io.github.samipourquoi.syncmatica;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 
@@ -12,7 +21,8 @@ public class Syncmatica {
 	private static boolean isInit = false;
 	private static boolean isStarted = false;
 	
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.1.0";
+	public static final String MOD_ID = "syncmatica";
 	public static final String SERVER_PATH = "."+File.separator+"syncmatics";
 	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
 	
@@ -105,8 +115,73 @@ public class Syncmatica {
 	}
 	
 	public static boolean checkPartnerVersion(String partnerVersion) {
-		// so far no unmatching or matching versions lol
-		return true;
+		return (!partnerVersion.equals("0.0.1"));
+	}
+	
+	public static void saveServer() {
+		JsonObject obj = new JsonObject();
+		JsonArray arr = new JsonArray();
+		
+		for (ServerPlacement p : schematics.getAll()) {
+			arr.add(p.toJson());
+		}
+		
+		obj.add("placements", arr);
+		getConfigFolder().mkdirs();
+		File f = new File(getConfigFolder(), "placements.json");
+		
+		FileWriter writer = null;
+        try {
+        	writer = new FileWriter(f);
+			writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+	}
+	
+	public static void loadServer() {
+		File f = new File(getConfigFolder(), "placements.json");
+        if (f != null && f.exists() && f.isFile() && f.canRead()) {
+        	JsonElement element = null;
+            try {
+                JsonParser parser = new JsonParser();
+                FileReader reader = new FileReader(f);
+
+                element = parser.parse(reader);
+                reader.close();
+
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+            	JsonObject obj = element.getAsJsonObject();
+            	if (!obj.has("placements")) {return;}
+            	JsonArray arr = obj.getAsJsonArray("placements");
+            	for (JsonElement elem : arr) {
+            		ServerPlacement p = ServerPlacement.fromJson(elem.getAsJsonObject());
+            		schematics.addPlacement(p);
+            	}
+            	
+            } catch (IllegalStateException e) {
+            	e.printStackTrace();
+            } catch (NullPointerException e) {
+            	e.printStackTrace();
+            }
+        }
+	}
+	
+	private static File getConfigFolder() {
+		return new File(new File("."), "config"+File.separator+MOD_ID);
 	}
 	
 }

@@ -1,5 +1,8 @@
 package io.github.samipourquoi.syncmatica.communication.Exchange;
 
+import java.util.Collection;
+
+import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
@@ -22,6 +25,11 @@ public class VersionHandshakeServer extends AbstractExchange {
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
 		if (Syncmatica.checkPartnerVersion(packetBuf.readString(32767))) {
 			PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
+			Collection<ServerPlacement> l = Syncmatica.getSyncmaticManager().getAll();
+			newBuf.writeInt(l.size());
+			for (ServerPlacement p: l) {
+				getManager().putMetaData(p, newBuf);
+			}
 			getPartner().sendPacket(PacketType.CONFIRM_USER.IDENTIFIER, newBuf);
 			succeed();
 		} else {
