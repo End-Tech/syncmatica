@@ -8,6 +8,7 @@
 	"client": [
 		"GuiMainMenuMixin",
 		"MixinWidgetListSchematicPlacement",
+		"MixinSchematicPlacement",
 		"MixinWidgetSchematicPlacement",
 		"MixinGuiBase"
 	 ],

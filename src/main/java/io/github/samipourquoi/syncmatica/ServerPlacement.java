@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.UUID;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import io.github.samipourquoi.syncmatica.material.SyncmaticaMaterialList;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 import net.minecraft.util.BlockMirror;
@@ -80,5 +83,46 @@ public class ServerPlacement {
 		}
 		return hash;
     }
+    
+    public JsonObject toJson() {
+    	JsonObject obj = new JsonObject();
+    	obj.add("id", new JsonPrimitive(id.toString()));
+    	
+    	obj.add("file_name", new JsonPrimitive(fileName));
+    	obj.add("hash", new JsonPrimitive(hashValue.toString()));
+    	
+    	obj.add("origin", origin.toJson());
+    	obj.add("rotation", new JsonPrimitive(rotation.name()));
+    	obj.add("mirror", new JsonPrimitive(mirror.name()));
+    	
+    	return obj;
+    }
+    
+    public static ServerPlacement fromJson(JsonObject obj) {
+    	if (obj.has("id") 
+    			&& obj.has("file_name")
+    			&& obj.has("hash")
+    			&& obj.has("origin")
+    			&& obj.has("rotation")
+    			&& obj.has("mirror")) {
+    		UUID id = UUID.fromString(obj.get("id").getAsString());
+			String name = obj.get("file_name").getAsString();
+			UUID hashValue = UUID.fromString(obj.get("hash").getAsString());
+			
+			ServerPlacement newPlacement = new ServerPlacement(id, name, hashValue);
+			
+			ServerPosition pos = ServerPosition.fromJson(obj.get("origin").getAsJsonObject());
+			if (pos == null) {
+				return null;
+			}
+			newPlacement.origin = pos;
+			newPlacement.rotation = BlockRotation.valueOf(obj.get("rotation").getAsString());
+			newPlacement.mirror = BlockMirror.valueOf(obj.get("mirror").getAsString());
+		
+			return newPlacement;
+    	}
+    	return null;
+    }
+    
     
 }

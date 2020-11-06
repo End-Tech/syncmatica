@@ -13,10 +13,13 @@ import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.LocalLitematicState;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
+import io.netty.buffer.Unpooled;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
 
 
 
@@ -112,7 +115,6 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			}
 			button.setEnabled(false);
 			type.onAction(placement);
-			// TODO: update button type
 		}
 		
 		public static enum Type {
@@ -147,8 +149,10 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			REMOVE() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					// TODO: Remove functionality
-					System.out.println("REMOVING SYNCMATIC");					
+					ExchangeTarget server = ((ClientCommunicationManager)Syncmatica.getCommunicationManager()).getServer();
+					PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
+					packetBuf.writeUuid(placement.placement.getId());
+					server.sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, packetBuf);
 				}
 			},
 			MATERIAL_GATHERING() {

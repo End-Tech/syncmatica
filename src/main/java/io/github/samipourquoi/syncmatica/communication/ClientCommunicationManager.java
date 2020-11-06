@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.communication;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -41,6 +42,16 @@ public class ClientCommunicationManager extends CommunicationManager {
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
 			ServerPlacement placement = receiveMetaData(packetBuf);
 			schematicManager.addPlacement(placement);
+		}
+		if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
+			UUID placementId = packetBuf.readUuid();
+			ServerPlacement placement = schematicManager.getPlacement(placementId);
+			if (placement != null) {
+				schematicManager.removePlacement(placement);
+				if (LitematicManager.getInstance().isRendered(placement)) {
+					LitematicManager.getInstance().unrenderSyncmatic(placement);
+				}
+			}
 		}
 	}
 

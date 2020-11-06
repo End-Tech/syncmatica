@@ -4,7 +4,6 @@ package io.github.samipourquoi.syncmatica.litematica.gui;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 

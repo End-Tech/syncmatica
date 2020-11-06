@@ -79,9 +79,10 @@ public class ServerCommunicationManager extends CommunicationManager {
 			ServerPlacement placement = receiveMetaData(packetBuf);
 			if (schematicManager.getPlacement(placement.getId()) == null) {
 				if (!Syncmatica.getFileStorage().getLocalState(placement).isLocalFileReady()) {
-					// edge case because files are transmitted by placement rather than 
+					// special edge case because files are transmitted by placement rather than file names/hashes
 					if (Syncmatica.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
-						downloadingFile.computeIfAbsent(placement.getHash(), (key)->new ArrayList<>());
+						LogManager.getLogger(ServerPlayNetworkHandler.class).info("Continued existing download");
+						downloadingFile.computeIfAbsent(placement.getHash(), (key)->new ArrayList<>()).add(placement);
 						return;
 					}
 					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Started downloading litematic");
@@ -95,22 +96,30 @@ public class ServerCommunicationManager extends CommunicationManager {
 						e.printStackTrace();
 					}
 				} else {
+					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Added placement directly due to existing file");
 					addPlacement(source, placement);
 				}
 			} else {
 				cancelShare(source, placement);
+			}
+			return;
+		}
+		if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
+			UUID placementId = packetBuf.readUuid();
+			ServerPlacement placement = schematicManager.getPlacement(placementId);
+			if (placement != null) {
+				schematicManager.removePlacement(placement);
+				for (ExchangeTarget client: broadcastTargets) {
+					PacketByteBuf newPacketBuf = new PacketByteBuf(Unpooled.buffer());
+					newPacketBuf.writeUuid(placement.getId());
+					client.sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, newPacketBuf);
+				}
 			}
 		}
 	}
 	
 	@Override
 	protected void handleExchange(Exchange exchange) {
-		if (exchange instanceof VersionHandshakeServer && exchange.isSuccessful()) {
-			broadcastTargets.add(exchange.getPartner());
-			for (ServerPlacement placement: schematicManager.getAll()) {
-				sendMetaData(placement, exchange.getPartner());
-			}
-		}
 		if (exchange instanceof DownloadExchange) {
 			ServerPlacement p = ((DownloadExchange)exchange).getPlacement();
 			
@@ -131,6 +140,10 @@ public class ServerCommunicationManager extends CommunicationManager {
 			}
 			
 			downloadingFile.remove(p.getHash());
+			return;
+		}
+		if (exchange instanceof VersionHandshakeServer && exchange.isSuccessful()) {
+			broadcastTargets.add(exchange.getPartner());
 		}
 	}
 	

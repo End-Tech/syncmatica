@@ -68,7 +68,6 @@ public class MultiTypeButton extends ButtonGeneric {
 		int w = 0;
 		if (type.getTranslatedKey() != null) {
 			// is it really 30px?? need to check
-			// TODO: check this
 			w += getStringWidth(type.getTranslatedKey()) + 10;
 		}
 		if (type.getIcon() != null) {

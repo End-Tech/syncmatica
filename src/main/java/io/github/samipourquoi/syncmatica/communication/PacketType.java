@@ -3,19 +3,6 @@ package io.github.samipourquoi.syncmatica.communication;
 import net.minecraft.util.Identifier;
 
 public enum PacketType {
-	@Deprecated
-	REGISTER("sycnmatica:register"), // a single packet design doesn't make any sense
-	// and has the potential to permanently damage the server to syncmatica users since the
-	// downloading of a syncmatic is blocking the bandwidth of the connection
-	// leading to a potential disconnection due to no response being made
-	// with larger litematics
-	// this potentially leaves the server open for attacks that upload very large litematics from
-	// multiple connections
-	// additionally it will be hard to move server syncmatics since the entire litematic
-	// will have to be resend each time a syncmatic is moved
-	// therefore a split system will be used
-	// also buffering syncmatics over several sessions on the same server will become impossible
-	// for clients
 	
 	REGISTER_METADATA("syncmatica:register_metadata"),
 	// one packet will be responsible for sending the entire meta data of a syncmatic
@@ -46,6 +33,10 @@ public enum PacketType {
 	// a packet responsible for cancelling an ongoing upload/download
 	// will be sent in several cases - upon errors mostly
 	
+	REMOVE_SYNCMATIC("syncmatica:remove_syncmatic"),
+	// a packet that will be send to clients when a syncmatic got removed
+	// send to the server by a client if a specific client intends to remove a litematic from the server
+	
 	REGISTER_VERSION("syncmatica:register_version"),
 	// this packet will be send to the client when it joins the server
 	// upon receiving this packet the client will check the server version
@@ -57,6 +48,7 @@ public enum PacketType {
 	// the confirm user packet
 	// send after a successful version exchange
 	// fully starts up syncmatica on the clients end
+	// sends all server placements along to the client
 	
 	public final Identifier IDENTIFIER;
 
