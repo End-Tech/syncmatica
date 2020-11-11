@@ -5,7 +5,6 @@ import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.MinecraftClient;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +15,6 @@ public class MixinMinecraftClient {
 
 	@Inject(method = "disconnect()V", at = @At("HEAD"))
 	private void shutdownSyncmatica(CallbackInfo ci) {
-		LogManager.getLogger(MinecraftClient.class).info("shutdown client");
 		ScreenUpdater.close();
 		Syncmatica.shutdown();
 		LitematicManager.clear();

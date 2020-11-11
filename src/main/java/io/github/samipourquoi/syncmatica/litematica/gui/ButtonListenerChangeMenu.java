@@ -23,7 +23,6 @@ public class ButtonListenerChangeMenu implements IButtonActionListener {
 			System.out.println("Opened Material Gatherings GUI - currently unsupported operation");
 			break;
 		case VIEW_SYNCMATICS:
-			System.out.println("Opened View Syncmatics GUI - should result in open window");
 			gui = new GuiSyncmaticaServerPlacementList();
 			break;
 		default:

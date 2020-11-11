@@ -16,7 +16,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,12 +37,11 @@ public abstract class MixinClientPlayNetworkHandler {
 		SyncmaticManager man = new SyncmaticManager();
 		exTarget = new ExchangeTarget((ClientPlayNetworkHandler)(Object)this);
 		CommunicationManager comms = new ClientCommunicationManager(data, man, exTarget);
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("init client");
 		Syncmatica.initClient(comms, data, man);
 		ScreenUpdater.init();
 	}
 	
-	@Inject(method = "onCustomPayload", at = @At("HEAD"))
+	@Inject(method = "onCustomPayload", at = @At("HEAD"), cancellable = true)
 	private void handlePacket(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (!MinecraftClient.getInstance().isOnThread()) {
 			return; //only execute packet on main thread
@@ -52,10 +50,8 @@ public abstract class MixinClientPlayNetworkHandler {
 		PacketByteBuf buf = packet.getData();
 		CommunicationManager comms = Syncmatica.getCommunicationManager();
 		if (comms.handlePacket(exTarget, id, buf)) {
-			LogManager.getLogger(ClientPlayNetworkHandler.class).info("received message");
 			comms.onPacket(exTarget, id, buf);
-		} else {
-			LogManager.getLogger(ClientPlayNetworkHandler.class).info("irrelevant message");
+			ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
 		}
 	}
 }

@@ -21,7 +21,7 @@ public class Syncmatica {
 	private static boolean isInit = false;
 	private static boolean isStarted = false;
 	
-	public static final String VERSION = "0.1.0";
+	public static final String VERSION = "0.1.1";
 	public static final String MOD_ID = "syncmatica";
 	public static final String SERVER_PATH = "."+File.separator+"syncmatics";
 	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
@@ -68,8 +68,6 @@ public class Syncmatica {
 		Syncmatica.comms = comms;
 		Syncmatica.schematics = schematics;
 		data = fileStorage;
-		//	ExchangeTarget server = new ExchangeTarget(MinecraftClient.getInstance().getNetworkHandler());
-		//	comms = new ClientCommunicationManager(data, schematics, server);
 		isInit = true;
 	}
 	

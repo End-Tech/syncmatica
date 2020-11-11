@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,9 +16,8 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.util.JsonUtils;
+import io.github.samipourquoi.syncmatica.litematica.IIDContainer;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
-import io.github.samipourquoi.syncmatica.litematica.gui.IIDContainer;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 @Mixin(SchematicPlacement.class)
@@ -35,11 +33,8 @@ public abstract class MixinSchematicPlacement implements IIDContainer {
 	@Inject(method="toJson", at = @At("RETURN"), remap=false)
 	public void saveUuid(CallbackInfoReturnable<JsonObject> cir) {
 		JsonObject saveData = cir.getReturnValue();
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Called toJson");
 		if (saveData != null) {
-			LogManager.getLogger(ClientPlayNetworkHandler.class).info("saveData does not equal null");
 			if (serverId != null) {
-				LogManager.getLogger(ClientPlayNetworkHandler.class).info("is Syncmatic");
 				saveData.add("syncmatica_uuid", new JsonPrimitive(serverId.toString()));
 			}
 		}

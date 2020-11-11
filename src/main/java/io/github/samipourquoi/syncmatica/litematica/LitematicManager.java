@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
 
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -16,9 +15,7 @@ import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.Syncmatica;
-import io.github.samipourquoi.syncmatica.litematica.gui.IIDContainer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 // responsible for loading and keeping track of rendered syncmatic placements
@@ -43,7 +40,6 @@ public class LitematicManager {
 	}
 	
 	public static void clear() {
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("clear");
 		instance = null;
 	}
 
@@ -117,7 +113,6 @@ public class LitematicManager {
 		rendering.put(placement, litematicaPlacement);
 		modPlacement.setServerId(placement.getId());
 		
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Rendered Placement");
 		if (litematicaPlacement.isLocked()) {
 			litematicaPlacement.toggleLocked();
 		}
@@ -152,12 +147,19 @@ public class LitematicManager {
 	// its responsible for keeping the litematics that got loaded in such a way
 	// until a time where the server has told the client which syncmatics actually are still loaded
 	public void preLoad(SchematicPlacement schem) {
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Pre load");
-		preLoadList.add(schem);
+		if (Syncmatica.isStarted()) {
+			UUID id = ((IIDContainer)schem).getServerId();
+			ServerPlacement p = Syncmatica.getSyncmaticManager().getPlacement(id);
+			if (isRendered(p)) {
+				rendering.put(p, schem);
+				DataManager.getSchematicPlacementManager().addSchematicPlacement(schem, false);
+			}
+		} else if (preLoadList != null) {
+			preLoadList.add(schem);
+		}
 	}
 	
 	public void commitLoad() {
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Commit load");
 		SyncmaticManager man = Syncmatica.getSyncmaticManager();
 		for (SchematicPlacement schem: preLoadList) {
 			UUID id = ((IIDContainer)schem).getServerId();

@@ -4,7 +4,7 @@ Syncmatica is a mod which aims to mod into litematica so that schematics and the
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.1.0) is a mod for both Minecraft client and server.  
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.1.1) is a mod for both Minecraft client and server.  
 It's made for [Minecraft Fabric 1.16.3](https://fabricmc.net/).  
 It relies on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/?mcver=1.16.3) to provide all client features.  
 

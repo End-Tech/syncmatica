@@ -3,8 +3,6 @@ package io.github.samipourquoi.syncmatica.communication.Exchange;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import org.apache.logging.log4j.LogManager;
-
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
@@ -13,7 +11,6 @@ import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManage
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -32,7 +29,6 @@ public class ShareLitematicExchange extends AbstractExchange {
 
 	@Override
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("recognized possible target exchange");
 		if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)
 				||id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)
 				||id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {

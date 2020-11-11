@@ -2,6 +2,8 @@ package io.github.samipourquoi.syncmatica.communication.Exchange;
 
 import java.util.Collection;
 
+import org.apache.logging.log4j.LogManager;
+
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
@@ -23,7 +25,9 @@ public class VersionHandshakeServer extends AbstractExchange {
 
 	@Override
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
-		if (Syncmatica.checkPartnerVersion(packetBuf.readString(32767))) {
+		String partnerVersion = packetBuf.readString(32767);
+		if (Syncmatica.checkPartnerVersion(partnerVersion)) {
+			LogManager.getLogger(VersionHandshakeServer.class).info("Syncmatica client joining with local version {} and client version {}", Syncmatica.VERSION, partnerVersion);
 			PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
 			Collection<ServerPlacement> l = Syncmatica.getSyncmaticManager().getAll();
 			newBuf.writeInt(l.size());
@@ -33,6 +37,7 @@ public class VersionHandshakeServer extends AbstractExchange {
 			getPartner().sendPacket(PacketType.CONFIRM_USER.IDENTIFIER, newBuf);
 			succeed();
 		} else {
+			LogManager.getLogger(VersionHandshakeServer.class).info("Denying syncmatica join due to outdated client with local version {} and client version {}", Syncmatica.VERSION, partnerVersion);
 			// same as client - avoid further packets
 			close(false);
 		}

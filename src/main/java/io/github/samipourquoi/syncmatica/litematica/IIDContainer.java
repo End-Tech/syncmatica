@@ -1,4 +1,4 @@
-package io.github.samipourquoi.syncmatica.litematica.gui;
+package io.github.samipourquoi.syncmatica.litematica;
 
 import java.util.UUID;
 

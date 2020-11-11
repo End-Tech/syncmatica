@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-
 import io.github.samipourquoi.syncmatica.IFileStorage;
 import io.github.samipourquoi.syncmatica.LocalLitematicState;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
@@ -25,7 +23,6 @@ import io.github.samipourquoi.syncmatica.communication.Exchange.UploadExchange;
 import io.github.samipourquoi.syncmatica.communication.Exchange.VersionHandshakeServer;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 public class ServerCommunicationManager extends CommunicationManager {
@@ -81,11 +78,9 @@ public class ServerCommunicationManager extends CommunicationManager {
 				if (!Syncmatica.getFileStorage().getLocalState(placement).isLocalFileReady()) {
 					// special edge case because files are transmitted by placement rather than file names/hashes
 					if (Syncmatica.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
-						LogManager.getLogger(ServerPlayNetworkHandler.class).info("Continued existing download");
 						downloadingFile.computeIfAbsent(placement.getHash(), (key)->new ArrayList<>()).add(placement);
 						return;
 					}
-					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Started downloading litematic");
 					try {
 						download(placement, source);
 					} catch (NoSuchAlgorithmException e) {
@@ -96,7 +91,6 @@ public class ServerCommunicationManager extends CommunicationManager {
 						e.printStackTrace();
 					}
 				} else {
-					LogManager.getLogger(ServerPlayNetworkHandler.class).info("Added placement directly due to existing file");
 					addPlacement(source, placement);
 				}
 			} else {
