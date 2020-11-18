@@ -33,8 +33,8 @@ This will be the first full release.
 Many features are not implemented yet that I want to have implemented.
 Most of the last update focused on updating the mod to a state that makes it very useable.
 
-As of now there is no way to remove placements from the server or modify the placements on the server.
-Those features are planned in a future release.  
+As of now there is no way to modify placements on the server.
+That feature is planned in  the next release.  
 
 The MaterialGatherings button is supposed to be for the task of collecting the materials as a group.
 It should synchronize and simplify the collection of material across the server.
