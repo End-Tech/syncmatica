@@ -10,7 +10,9 @@
 		"MixinWidgetListSchematicPlacement",
 		"MixinSchematicPlacement",
 		"MixinWidgetSchematicPlacement",
-		"MixinGuiBase"
+		"MixinGuiBase",
+		"MixinSchematicHolder",
+		"MixinButtonBase"
 	 ],
 	"server": [],
 

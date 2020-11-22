@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.PacketByteBuf;

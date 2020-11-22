@@ -24,7 +24,7 @@ public class Syncmatica {
 	public static final String VERSION = "0.1.1";
 	public static final String MOD_ID = "syncmatica";
 	public static final String SERVER_PATH = "."+File.separator+"syncmatics";
-	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+".sync";
+	public static final String CLIENT_PATH = "."+File.separator+"schematics"+File.separator+"sync";
 	
 	private static CommunicationManager comms;
 	private static IFileStorage data;

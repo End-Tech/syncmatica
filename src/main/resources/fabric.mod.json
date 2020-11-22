@@ -5,10 +5,11 @@
 	"name": "Syncmatica",
 	"description": "Server-wide shared litematics.",
 	"authors": [
+		"nnnik",
 		"samipourquoi"
 	],
 	"contact": {
-		"sources": "https://github.com/samipourquoi/syncmatica"
+		"sources": "https://github.com/endtech/syncmatica"
 	},
 	"license": "CC0-1.0",
 	"environment": "*",

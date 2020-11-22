@@ -4,8 +4,8 @@ Syncmatica is a mod which aims to mod into litematica so that schematics and the
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.1.1) is a mod for both Minecraft client and server.  
-It's made for [Minecraft Fabric 1.16.3](https://fabricmc.net/).  
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.1.2) is a mod for both Minecraft client and server.  
+It's made for [Minecraft Fabric 1.16.x](https://fabricmc.net/).  
 It relies on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/?mcver=1.16.3) to provide all client features.  
 
 ### Client
@@ -29,9 +29,8 @@ Another is in your schematic placement overview and allows you to share your own
 
 ## Project Status & Road Map
 
-This will be the first full release.
-Many features are not implemented yet that I want to have implemented.
-Most of the last update focused on updating the mod to a state that makes it very useable.
+The current update focused on interactions with litematica and restoring ease of use.
+I pushed out these changes before finally starting on a longer update with regards to modifying the placement on the server and making some backend changes.
 
 As of now there is no way to remove placements from the server or modify the placements on the server.
 Those features are planned in a future release.  

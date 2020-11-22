@@ -6,7 +6,7 @@ import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
