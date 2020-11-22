@@ -7,11 +7,11 @@ import java.util.UUID;
 
 import io.github.samipourquoi.syncmatica.IFileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
+import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
+import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
+import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.exchange.VersionHandshakeClient;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.communication.Exchange.DownloadExchange;
-import io.github.samipourquoi.syncmatica.communication.Exchange.Exchange;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
-import io.github.samipourquoi.syncmatica.communication.Exchange.VersionHandshakeClient;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;

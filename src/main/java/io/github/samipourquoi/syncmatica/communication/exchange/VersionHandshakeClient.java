@@ -1,4 +1,4 @@
-package io.github.samipourquoi.syncmatica.communication.Exchange;
+package io.github.samipourquoi.syncmatica.communication.exchange;
 
 import org.apache.logging.log4j.LogManager;
 

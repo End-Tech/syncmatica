@@ -14,7 +14,7 @@ import io.github.samipourquoi.syncmatica.LocalLitematicState;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.netty.buffer.Unpooled;
 import io.github.samipourquoi.syncmatica.ServerPlacement;

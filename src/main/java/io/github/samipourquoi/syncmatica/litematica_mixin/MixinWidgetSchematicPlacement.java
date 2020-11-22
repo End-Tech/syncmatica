@@ -9,8 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicPlacements;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import io.github.samipourquoi.syncmatica.Syncmatica;
@@ -33,10 +35,24 @@ public abstract class MixinWidgetSchematicPlacement extends WidgetListEntryBase<
 	@Inject(method = "<init>", at = @At("TAIL"), remap = false)
 	public void addUploadButton(int x, int y, int width, int height, boolean isOdd,
 			SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, CallbackInfo ci) {
+		int i = 0;
 		if (LitematicManager.getInstance().isSyncmatic(placement)) {
 			for (WidgetBase base: this.subWidgets) {
 				if (base instanceof ButtonBase) {
-					((ButtonBase) base).setEnabled(false);
+					ButtonBase button = (ButtonBase)base;
+					if (++i == 1) {
+						IButtonActionListener oldAction = ((MixinButtonBase)button).getActionListener();
+						button.setActionListener((b,k)-> {
+							if (GuiBase.isShiftDown()) {
+								LitematicManager.getInstance().unrenderSchematicPlacement(placement);
+								return;
+							}
+							oldAction.actionPerformedWithButton(b, k);
+						});
+						
+					} else if (i == 3) { 
+						((ButtonBase) base).setEnabled(false);
+					}
 				}
 			}
 		}

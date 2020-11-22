@@ -9,6 +9,7 @@ import java.util.UUID;
 
 
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
@@ -55,7 +56,7 @@ public class LitematicManager {
 		}
 		File file = Syncmatica.getFileStorage().getLocalLitematic(placement);
 
-		LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName());
+		LitematicaSchematic schematic = (LitematicaSchematic) SchematicHolder.getInstance().getOrLoad(file);
 		
 		if (schematic == null) {
 			throw new RuntimeException("Could not create schematic from file");
@@ -172,5 +173,24 @@ public class LitematicManager {
 			}
 		}
 		preLoadList = null;
+	}
+	
+	public void unrenderSchematic(LitematicaSchematic l) {
+		rendering.entrySet().removeIf(e ->{
+			if (e.getValue().getSchematic() == l) {
+				Syncmatica.getSyncmaticManager().updateServerPlacement(e.getKey());
+				return true;
+			}
+			return false;
+		});
+	}
+
+	public void unrenderSchematicPlacement(SchematicPlacement placement) {
+		UUID id = ((IIDContainer)placement).getServerId();
+		ServerPlacement p = Syncmatica.getSyncmaticManager().getPlacement(id);
+		if (p != null) {
+			unrenderSyncmatic(p);
+		}
+		
 	}
 }

@@ -7,8 +7,8 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ExchangeTarget;
-import io.github.samipourquoi.syncmatica.communication.Exchange.ShareLitematicExchange;
+import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.exchange.ShareLitematicExchange;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 
