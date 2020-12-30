@@ -9,8 +9,9 @@ import java.security.DigestOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
@@ -22,8 +23,8 @@ public class DownloadExchange extends AbstractExchange {
 	private final OutputStream outputStream;
 	private final MessageDigest md5;
 	
-	public DownloadExchange(ServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, CommunicationManager manager) throws IOException, NoSuchAlgorithmException {
-		super(partner, manager);
+	public DownloadExchange(ServerPlacement syncmatic, File downloadFile, ExchangeTarget partner, Context context) throws IOException, NoSuchAlgorithmException {
+		super(partner, context);
 		OutputStream os = new FileOutputStream(downloadFile);
 		toDownload = syncmatic;
 		md5 = MessageDigest.getInstance("MD5");

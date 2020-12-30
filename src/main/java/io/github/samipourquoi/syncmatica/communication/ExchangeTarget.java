@@ -1,5 +1,9 @@
-package io.github.samipourquoi.syncmatica.communication.exchange;
+package io.github.samipourquoi.syncmatica.communication;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -13,6 +17,9 @@ import net.minecraft.util.Identifier;
 public class ExchangeTarget {
 	private ClientPlayNetworkHandler server = null; 
 	private ServerPlayNetworkHandler client = null;
+	
+	private FeatureSet features;
+	private Collection<Exchange> ongoingExchanges = new ArrayList<>();
 	
 	public ExchangeTarget(ClientPlayNetworkHandler server) {
 		this.server = server;
@@ -35,4 +42,17 @@ public class ExchangeTarget {
 	}
 	
 	// removed equals code due to issues with Collection.contains
+
+	public FeatureSet getFeatureSet() {
+		return features;
+	}
+	
+	public void setFeatureSet(FeatureSet f) {
+		features = f;
+	}
+	
+	public Collection<Exchange> getExchanges() {
+		return ongoingExchanges;
+	}
+	
 }

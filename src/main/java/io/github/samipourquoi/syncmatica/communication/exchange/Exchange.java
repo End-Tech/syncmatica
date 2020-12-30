@@ -1,6 +1,7 @@
 package io.github.samipourquoi.syncmatica.communication.exchange;
 
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.Context;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -24,7 +25,7 @@ public interface Exchange {
 	
 	// in case an exchange starts another exchange they need to be able to reach for
 	// the manager
-	public CommunicationManager getManager();
+	public Context getContext();
 	
 	// looks into the received packet and returns
 	// whether this exchange handles the packet or not

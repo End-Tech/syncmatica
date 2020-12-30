@@ -6,7 +6,7 @@ import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -30,14 +30,17 @@ public abstract class MixinClientPlayNetworkHandler {
 	
 	@Unique
 	private ExchangeTarget exTarget = null;
+	@Unique
+	private CommunicationManager clientCommunication;
 	
 	@Inject(method = "<init>", at= @At("TAIL"))
 	private void startupClient(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo ci) {
 		IFileStorage data = new RedirectFileStorage();
 		SyncmaticManager man = new SyncmaticManager();
 		exTarget = new ExchangeTarget((ClientPlayNetworkHandler)(Object)this);
-		CommunicationManager comms = new ClientCommunicationManager(data, man, exTarget);
+		CommunicationManager comms = new ClientCommunicationManager(exTarget);
 		Syncmatica.initClient(comms, data, man);
+		clientCommunication = comms;
 		ScreenUpdater.init();
 	}
 	
@@ -47,10 +50,9 @@ public abstract class MixinClientPlayNetworkHandler {
 			return; //only execute packet on main thread
 		}
 		Identifier id = packet.getChannel();
-		PacketByteBuf buf = packet.getData();
-		CommunicationManager comms = Syncmatica.getCommunicationManager();
-		if (comms.handlePacket(exTarget, id, buf)) {
-			comms.onPacket(exTarget, id, buf);
+		PacketByteBuf buf = packet.getData();;
+		if (clientCommunication.handlePacket(exTarget, id, buf)) {
+			clientCommunication.onPacket(exTarget, id, buf);
 			ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
 		}
 	}

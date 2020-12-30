@@ -10,11 +10,11 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.LocalLitematicState;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.netty.buffer.Unpooled;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
@@ -57,7 +57,8 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
         		,()-> false, new ButtonListener(null, null)));
         multi.add(new BaseButtonType("syncmatica.gui.button.download"
         		,()-> {
-        			LocalLitematicState state = Syncmatica.getFileStorage().getLocalState(placement);
+        			Context con = LitematicManager.getInstance().getActiveContext();
+        			LocalLitematicState state = con.getFileStorage().getLocalState(placement);
         			return !state.isLocalFileReady()&&state.isReadyForDownload();
         }, new ButtonListener(ButtonListener.Type.DOWNLOAD, this)));
         multi.add(new BaseButtonType("syncmatica.gui.button.load"
@@ -133,12 +134,13 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			DOWNLOAD() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					ExchangeTarget server = ((ClientCommunicationManager)Syncmatica.getCommunicationManager()).getServer();
-					if (Syncmatica.getCommunicationManager().getDownloadState(placement.placement)) {
+					Context con = LitematicManager.getInstance().getActiveContext();
+					ExchangeTarget server = ((ClientCommunicationManager)con.getCommunicationManager()).getServer();
+					if (con.getCommunicationManager().getDownloadState(placement.placement)) {
 						return;
 					}
 					try {
-						Syncmatica.getCommunicationManager().download(placement.placement, server);
+						con.getCommunicationManager().download(placement.placement, server);
 					} catch (NoSuchAlgorithmException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -149,7 +151,8 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
 			REMOVE() {
 				@Override
 				void onAction(WidgetSyncmaticaServerPlacementEntry placement) {
-					ExchangeTarget server = ((ClientCommunicationManager)Syncmatica.getCommunicationManager()).getServer();
+					Context con = LitematicManager.getInstance().getActiveContext();
+					ExchangeTarget server = ((ClientCommunicationManager)con.getCommunicationManager()).getServer();
 					PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
 					packetBuf.writeUuid(placement.placement.getId());
 					server.sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, packetBuf);

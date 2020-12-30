@@ -7,9 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.PacketByteBuf;
@@ -27,18 +28,20 @@ public abstract class MixinServerPlayNetworkHandler {
 	
 	@Unique
 	private ExchangeTarget exTarget = null;
+	@Unique
+	private ServerCommunicationManager comManager = null;
 	
 	@Shadow
 	private ServerPlayerEntity player;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-		((ServerCommunicationManager)Syncmatica.getCommunicationManager()).onPlayerJoin(getExchangeTarget());
+		getCommunicationManager().onPlayerJoin(getExchangeTarget());
 	}
 	
 	@Inject(method = "onDisconnected", at = @At("HEAD"))
 	public void onDisconnected(Text reason, CallbackInfo ci) {
-		((ServerCommunicationManager)Syncmatica.getCommunicationManager()).onPlayerLeave(getExchangeTarget());
+		getCommunicationManager().onPlayerLeave(getExchangeTarget());
 	}
 	
 	@Inject(method = "onCustomPayload", at = @At("HEAD"))
@@ -46,7 +49,7 @@ public abstract class MixinServerPlayNetworkHandler {
 		NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler)(Object)this, (ServerWorld)this.player.getServerWorld());
 		Identifier id = ((MixinCustomPayloadC2SPacket)packet).getChannel();
 		PacketByteBuf packetBuf = ((MixinCustomPayloadC2SPacket)packet).getData();
-		Syncmatica.getCommunicationManager().onPacket(getExchangeTarget(), id, packetBuf);
+		getCommunicationManager().onPacket(getExchangeTarget(), id, packetBuf);
 	}
 	
 	private ExchangeTarget getExchangeTarget() {
@@ -54,5 +57,15 @@ public abstract class MixinServerPlayNetworkHandler {
 			exTarget = new ExchangeTarget((ServerPlayNetworkHandler)(Object)this);
 		}
 		return exTarget;
+	}
+	
+	private ServerCommunicationManager getCommunicationManager() {
+		if (comManager == null) {
+			Context con = Syncmatica.getContext(Syncmatica.SERVER_CONTEXT);
+			if (con != null) {
+				comManager = (ServerCommunicationManager)con.getCommunicationManager();
+			}
+		}
+		return comManager;
 	}
 }

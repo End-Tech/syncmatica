@@ -12,10 +12,10 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
@@ -32,6 +32,7 @@ public class LitematicManager {
 	// specific client
 	private final Map<ServerPlacement, SchematicPlacement> rendering;
 	private Collection<SchematicPlacement> preLoadList = new ArrayList<>();
+	private Context context;
 	
 	public static LitematicManager getInstance() {
 		if (instance == null) {
@@ -48,13 +49,26 @@ public class LitematicManager {
 		rendering = new HashMap<>();
 	}
 	
+	// sets the active context for the gui side of things
+	public void setActiveContext(Context con) {
+		if (con.isServer()) {
+			throw new RuntimeException("Applied server context where client context was expected");
+		}
+		context = con;
+		ScreenUpdater.getInstance().setActiveContext(con);
+	}
+	
+	public Context getActiveContext() {
+		return context;
+	}
+	
 	// 1st case syncmatic placement is present and is now enabled from GUI
 	// or another source
 	public void renderSyncmatic(ServerPlacement placement) {
 		if (rendering.containsKey(placement)) {
 			return;
 		}
-		File file = Syncmatica.getFileStorage().getLocalLitematic(placement);
+		File file = context.getFileStorage().getLocalLitematic(placement);
 
 		LitematicaSchematic schematic = (LitematicaSchematic) SchematicHolder.getInstance().getOrLoad(file);
 		
@@ -75,7 +89,7 @@ public class LitematicManager {
 		litematicaPlacement.toggleLocked();
 
 		DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, true);
-		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
+		context.getSyncmaticManager().updateServerPlacement(placement);
 	}
 	
 	// 2nd case litematic placement is present but gets turned into ServerPlacement
@@ -121,7 +135,7 @@ public class LitematicManager {
 		litematicaPlacement.setRotation(placement.getRotation(), null);
 		litematicaPlacement.setMirror(placement.getMirror(), null);
 		litematicaPlacement.toggleLocked();
-		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
+		context.getSyncmaticManager().updateServerPlacement(placement);
 		if (addToRendering) {
 			DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, false);
 		}
@@ -133,7 +147,7 @@ public class LitematicManager {
 		}
 		DataManager.getSchematicPlacementManager().removeSchematicPlacement(rendering.get(placement));
 		rendering.remove(placement);
-		Syncmatica.getSyncmaticManager().updateServerPlacement(placement);
+		context.getSyncmaticManager().updateServerPlacement(placement);
 	}
 	
 	public boolean isRendered(ServerPlacement placement) {
@@ -148,9 +162,9 @@ public class LitematicManager {
 	// its responsible for keeping the litematics that got loaded in such a way
 	// until a time where the server has told the client which syncmatics actually are still loaded
 	public void preLoad(SchematicPlacement schem) {
-		if (Syncmatica.isStarted()) {
+		if (context != null && context.isStarted()) {
 			UUID id = ((IIDContainer)schem).getServerId();
-			ServerPlacement p = Syncmatica.getSyncmaticManager().getPlacement(id);
+			ServerPlacement p = context.getSyncmaticManager().getPlacement(id);
 			if (isRendered(p)) {
 				rendering.put(p, schem);
 				DataManager.getSchematicPlacementManager().addSchematicPlacement(schem, false);
@@ -161,13 +175,13 @@ public class LitematicManager {
 	}
 	
 	public void commitLoad() {
-		SyncmaticManager man = Syncmatica.getSyncmaticManager();
+		SyncmaticManager man = context.getSyncmaticManager();
 		for (SchematicPlacement schem: preLoadList) {
 			UUID id = ((IIDContainer)schem).getServerId();
 			ServerPlacement p = man.getPlacement(id);
 			if (p != null) {
-				if (Syncmatica.getFileStorage().getLocalLitematic(p) != schem.getSchematicFile()) {
-					((RedirectFileStorage)Syncmatica.getFileStorage()).addRedirect(schem.getSchematicFile());
+				if (context.getFileStorage().getLocalLitematic(p) != schem.getSchematicFile()) {
+					((RedirectFileStorage)context.getFileStorage()).addRedirect(schem.getSchematicFile());
 				}
 				renderSyncmatic(p, schem, true);
 			}
@@ -178,7 +192,7 @@ public class LitematicManager {
 	public void unrenderSchematic(LitematicaSchematic l) {
 		rendering.entrySet().removeIf(e ->{
 			if (e.getValue().getSchematic() == l) {
-				Syncmatica.getSyncmaticManager().updateServerPlacement(e.getKey());
+				context.getSyncmaticManager().updateServerPlacement(e.getKey());
 				return true;
 			}
 			return false;
@@ -187,7 +201,7 @@ public class LitematicManager {
 
 	public void unrenderSchematicPlacement(SchematicPlacement placement) {
 		UUID id = ((IIDContainer)placement).getServerId();
-		ServerPlacement p = Syncmatica.getSyncmaticManager().getPlacement(id);
+		ServerPlacement p = context.getSyncmaticManager().getPlacement(id);
 		if (p != null) {
 			unrenderSyncmatic(p);
 		}

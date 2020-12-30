@@ -44,11 +44,20 @@ public enum PacketType {
 	// if it can function with the version on the server then it will respond with a version of its own 
 	// if the server can handle the client version the server will send
 	
-	CONFIRM_USER("syncmatica:confirm_user");
+	CONFIRM_USER("syncmatica:confirm_user"),
 	// the confirm user packet
 	// send after a successful version exchange
 	// fully starts up syncmatica on the clients end
 	// sends all server placements along to the client
+	
+	FEATURE_REQUEST("syncmatica:feature_request"),
+	// requests the partner to send a list of its features
+	
+	FEATURE("syncmatica:feature");
+	// sends feature set to the partner
+	// send during a version exchange to check if the 2 versions are compatible and there is no
+	// default feature set available for the transmitted version
+	// afterwards the feature set is used to communicate to the partner
 	
 	public final Identifier IDENTIFIER;
 

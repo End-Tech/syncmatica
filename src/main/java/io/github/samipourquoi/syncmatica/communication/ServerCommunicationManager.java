@@ -11,13 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.IFileStorage;
 import io.github.samipourquoi.syncmatica.LocalLitematicState;
-import io.github.samipourquoi.syncmatica.SyncmaticManager;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.exchange.UploadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.VersionHandshakeServer;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
@@ -29,24 +25,23 @@ public class ServerCommunicationManager extends CommunicationManager {
 	
 	private final Map<UUID, List<ServerPlacement>> downloadingFile = new HashMap<>();
 
-	public ServerCommunicationManager(IFileStorage data, SyncmaticManager schematicManager) {
-		super(data, schematicManager);
+	public ServerCommunicationManager() {
+		super();
 	}
 	
 	public void onPlayerJoin(ExchangeTarget newPlayer) {
-		VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer, this);
+		VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer, context);
 		startExchangeUnchecked(hi);
 	}
 	
 	public void onPlayerLeave(ExchangeTarget oldPlayer) {
-		Collection<Exchange> potentialMessageTarget = openExchange.get(oldPlayer);
+		Collection<Exchange> potentialMessageTarget = oldPlayer.getExchanges();
 		if (potentialMessageTarget != null) {
 			for (Exchange target: potentialMessageTarget) {
 				target.close(false);
 				handleExchange(target);
 			}
 		}
-		openExchange.remove(oldPlayer);
 		broadcastTargets.remove(oldPlayer);
 	}
 
@@ -54,14 +49,14 @@ public class ServerCommunicationManager extends CommunicationManager {
 	protected void handle(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)) {
 			UUID syncmaticaId = packetBuf.readUuid();
-			ServerPlacement placement = schematicManager.getPlacement(syncmaticaId);
+			ServerPlacement placement = context.getSyncmaticManager().getPlacement(syncmaticaId);
 			if (placement == null) {
 				return;
 			}
-			File toUpload = fileStorage.getLocalLitematic(placement);
+			File toUpload = context.getFileStorage().getLocalLitematic(placement);
 			UploadExchange upload = null;
 			try {
-				 upload = new UploadExchange(placement, toUpload, source, this);
+				 upload = new UploadExchange(placement, toUpload, source, context);
 			} catch (FileNotFoundException e) {
 				// should be fine
 				e.printStackTrace();
@@ -74,10 +69,10 @@ public class ServerCommunicationManager extends CommunicationManager {
 		}
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
 			ServerPlacement placement = receiveMetaData(packetBuf);
-			if (schematicManager.getPlacement(placement.getId()) == null) {
-				if (!Syncmatica.getFileStorage().getLocalState(placement).isLocalFileReady()) {
+			if (context.getSyncmaticManager().getPlacement(placement.getId()) == null) {
+				if (!context.getFileStorage().getLocalState(placement).isLocalFileReady()) {
 					// special edge case because files are transmitted by placement rather than file names/hashes
-					if (Syncmatica.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
+					if (context.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
 						downloadingFile.computeIfAbsent(placement.getHash(), (key)->new ArrayList<>()).add(placement);
 						return;
 					}
@@ -100,9 +95,9 @@ public class ServerCommunicationManager extends CommunicationManager {
 		}
 		if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
 			UUID placementId = packetBuf.readUuid();
-			ServerPlacement placement = schematicManager.getPlacement(placementId);
+			ServerPlacement placement = context.getSyncmaticManager().getPlacement(placementId);
 			if (placement != null) {
-				schematicManager.removePlacement(placement);
+				context.getSyncmaticManager().removePlacement(placement);
 				for (ExchangeTarget client: broadcastTargets) {
 					PacketByteBuf newPacketBuf = new PacketByteBuf(Unpooled.buffer());
 					newPacketBuf.writeUuid(placement.getId());
@@ -142,11 +137,11 @@ public class ServerCommunicationManager extends CommunicationManager {
 	}
 	
 	private void addPlacement(ExchangeTarget t, ServerPlacement placement) {
-		if (schematicManager.getPlacement(placement.getId()) != null) {
+		if (context.getSyncmaticManager().getPlacement(placement.getId()) != null) {
 			cancelShare(t, placement);
 			return;
 		}
-		schematicManager.addPlacement(placement);
+		context.getSyncmaticManager().addPlacement(placement);
 		for (ExchangeTarget target: broadcastTargets) {
 			sendMetaData(placement, target);
 		}

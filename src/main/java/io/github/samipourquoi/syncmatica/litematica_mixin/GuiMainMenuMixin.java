@@ -5,7 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.Context;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerChangeMenu;
 import io.github.samipourquoi.syncmatica.litematica.gui.MainMenuButtonType;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
@@ -31,7 +32,8 @@ public class GuiMainMenuMixin extends GuiBase {
     private ButtonGeneric createChangeMenuButton(int x, int y, int width, MainMenuButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getTranslatedKey(), type.getIcon());
-        button.setEnabled(Syncmatica.isStarted());
+        Context con = LitematicManager.getInstance().getActiveContext(); 
+        button.setEnabled(con != null && con.isStarted());
         addButton(button, new ButtonListenerChangeMenu(type, this));
         return button;
     }

@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
-import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.gui.ButtonListenerShare;
 
@@ -58,7 +58,8 @@ public abstract class MixinWidgetSchematicPlacement extends WidgetListEntryBase<
 		}
 	
 		ButtonGeneric shareButton = new ButtonGeneric(buttonsStartX, y+1, -1, true, "syncmatica.gui.button.share");
-		boolean buttonEnabled = Syncmatica.isStarted() && !LitematicManager.getInstance().isSyncmatic(placement);
+		Context con = LitematicManager.getInstance().getActiveContext();
+		boolean buttonEnabled = con != null && con.isStarted() && !LitematicManager.getInstance().isSyncmatic(placement);
 		shareButton.setEnabled(buttonEnabled);
 		addButton(shareButton, new ButtonListenerShare(placement));
 		buttonsStartX = shareButton.getX()-1;

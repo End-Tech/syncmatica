@@ -5,11 +5,8 @@ import java.util.HashSet;
 import java.util.UUID;
 
 
-import io.github.samipourquoi.syncmatica.IFileStorage;
-import io.github.samipourquoi.syncmatica.SyncmaticManager;
 import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.exchange.VersionHandshakeClient;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
@@ -21,12 +18,12 @@ public class ClientCommunicationManager extends CommunicationManager {
 	private final ExchangeTarget server;
 	private final Collection<ServerPlacement> sharing;
 	
-	public ClientCommunicationManager(IFileStorage storage, SyncmaticManager schematicManager, ExchangeTarget server) {
-		super(storage, schematicManager);
+	public ClientCommunicationManager(ExchangeTarget server) {
+		super();
 		this.server = server;
 		broadcastTargets.add(server);
 		sharing = new HashSet<>();
-		VersionHandshakeClient hi = new VersionHandshakeClient(server, this);
+		VersionHandshakeClient hi = new VersionHandshakeClient(server, context);
 		startExchangeUnchecked(hi);
 	}
 	
@@ -38,13 +35,13 @@ public class ClientCommunicationManager extends CommunicationManager {
 	protected void handle(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
 			ServerPlacement placement = receiveMetaData(packetBuf);
-			schematicManager.addPlacement(placement);
+			context.getSyncmaticManager().addPlacement(placement);
 		}
 		if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
 			UUID placementId = packetBuf.readUuid();
-			ServerPlacement placement = schematicManager.getPlacement(placementId);
+			ServerPlacement placement = context.getSyncmaticManager().getPlacement(placementId);
 			if (placement != null) {
-				schematicManager.removePlacement(placement);
+				context.getSyncmaticManager().removePlacement(placement);
 				if (LitematicManager.getInstance().isRendered(placement)) {
 					LitematicManager.getInstance().unrenderSyncmatic(placement);
 				}
@@ -63,7 +60,7 @@ public class ClientCommunicationManager extends CommunicationManager {
 	public void setDownloadState(ServerPlacement syncmatic, boolean state) {
 		downloadState.put(syncmatic.getHash(), state);
 		if (state) { //change client behavior so that the Load button doesn't show up naturally
-			schematicManager.updateServerPlacement(syncmatic);
+			context.getSyncmaticManager().updateServerPlacement(syncmatic);
 		}
 	}
 	

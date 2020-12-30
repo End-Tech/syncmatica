@@ -1,5 +1,6 @@
 package io.github.samipourquoi.syncmatica.mixin;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.FileStorage;
 import io.github.samipourquoi.syncmatica.IFileStorage;
 import io.github.samipourquoi.syncmatica.SyncmaticManager;
@@ -22,17 +23,17 @@ public class MixinMinecraftServer {
 		
 		IFileStorage data = new FileStorage();
 		SyncmaticManager man = new SyncmaticManager();
-		CommunicationManager comms = new ServerCommunicationManager(data, man);
+		CommunicationManager comms = new ServerCommunicationManager();
 		
 		Syncmatica.initServer(comms, data, man);
-		Syncmatica.startup();
-		Syncmatica.loadServer();
+		Context con = Syncmatica.getContext(Syncmatica.SERVER_CONTEXT);
+		con.startup();
 	}
 	
 	// at 
 	@Inject(method = "shutdown", at = @At("TAIL"))
 	public void shutdownSyncmatica(CallbackInfo ci) {
-		Syncmatica.saveServer();
-		Syncmatica.shutdown();
+		Context con = Syncmatica.getContext(Syncmatica.SERVER_CONTEXT);
+		con.shutdown();
 	}
 }

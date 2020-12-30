@@ -4,9 +4,10 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.Syncmatica;
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
@@ -14,8 +15,8 @@ import net.minecraft.util.Identifier;
 
 public class VersionHandshakeServer extends AbstractExchange {
 
-	public VersionHandshakeServer(ExchangeTarget partner, CommunicationManager manager) {
-		super(partner, manager);
+	public VersionHandshakeServer(ExchangeTarget partner, Context con) {
+		super(partner, con);
 	}
 
 	@Override
@@ -26,10 +27,10 @@ public class VersionHandshakeServer extends AbstractExchange {
 	@Override
 	public void handle(Identifier id, PacketByteBuf packetBuf) {
 		String partnerVersion = packetBuf.readString(32767);
-		if (Syncmatica.checkPartnerVersion(partnerVersion)) {
+		if (getContext().checkPartnerVersion(partnerVersion)) {
 			LogManager.getLogger(VersionHandshakeServer.class).info("Syncmatica client joining with local version {} and client version {}", Syncmatica.VERSION, partnerVersion);
 			PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
-			Collection<ServerPlacement> l = Syncmatica.getSyncmaticManager().getAll();
+			Collection<ServerPlacement> l = getContext().getSyncmaticManager().getAll();
 			newBuf.writeInt(l.size());
 			for (ServerPlacement p: l) {
 				getManager().putMetaData(p, newBuf);

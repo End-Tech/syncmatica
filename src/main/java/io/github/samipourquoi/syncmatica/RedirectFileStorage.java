@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
 // pretty sure this is some kind of pattern 
@@ -60,8 +59,8 @@ public class RedirectFileStorage implements IFileStorage {
 	}
 
 	@Override
-	public void setCommunitcationManager(CommunicationManager man) {
-		fs.setCommunitcationManager(man);
+	public void setContext(Context con) {
+		fs.setContext(con);
 	}
 	
 	private class RedirectData {

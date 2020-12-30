@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import net.minecraft.network.PacketByteBuf;
@@ -20,8 +20,8 @@ public class ShareLitematicExchange extends AbstractExchange {
 	private final ServerPlacement toShare;
 	private final File toUpload;
 	
-	public ShareLitematicExchange(SchematicPlacement schem, ExchangeTarget partner, CommunicationManager manager) {
-		super(partner, manager);
+	public ShareLitematicExchange(SchematicPlacement schem, ExchangeTarget partner, Context con) {
+		super(partner, con);
 		this.schem = schem;
 		toShare = LitematicManager.getInstance().syncmaticFromSchematic(schem);
 		toUpload = schem.getSchematicFile();
@@ -43,7 +43,7 @@ public class ShareLitematicExchange extends AbstractExchange {
 			packetBuf.readUuid();
 			UploadExchange upload = null;
 			try {
-				upload = new UploadExchange(toShare, toUpload, getPartner(), getManager());
+				upload = new UploadExchange(toShare, toUpload, getPartner(), getContext());
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -54,10 +54,10 @@ public class ShareLitematicExchange extends AbstractExchange {
 			return;
 		}
 		if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
-			RedirectFileStorage redirect = (RedirectFileStorage)Syncmatica.getFileStorage();
+			RedirectFileStorage redirect = (RedirectFileStorage)getContext().getFileStorage();
 			redirect.addRedirect(toUpload);
 			LitematicManager.getInstance().renderSyncmatic(toShare, schem, false);
-			Syncmatica.getSyncmaticManager().addPlacement(toShare);
+			getContext().getSyncmaticManager().addPlacement(toShare);
 			return;
 		}
 		if (id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {
@@ -68,7 +68,7 @@ public class ShareLitematicExchange extends AbstractExchange {
 	@Override
 	public void init() {
 		((ClientCommunicationManager) getManager()).setSharingState(toShare, true);
-		Syncmatica.getSyncmaticManager().updateServerPlacement(toShare);
+		getContext().getSyncmaticManager().updateServerPlacement(toShare);
 		getManager().sendMetaData(toShare, getPartner());
 	}
 	
