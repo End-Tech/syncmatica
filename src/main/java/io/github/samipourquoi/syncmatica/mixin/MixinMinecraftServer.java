@@ -8,6 +8,7 @@ import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.communication.ServerCommunicationManager;
 import net.minecraft.server.MinecraftServer;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +21,6 @@ import java.util.function.Function;
 public class MixinMinecraftServer {
 	@Inject(method = "startServer", at = @At("TAIL"))
 	private static <S extends MinecraftServer> void initSyncmatica(Function<Thread, S> serverFactory, CallbackInfoReturnable<S> ci) {
-		
 		IFileStorage data = new FileStorage();
 		SyncmaticManager man = new SyncmaticManager();
 		CommunicationManager comms = new ServerCommunicationManager();

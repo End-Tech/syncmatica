@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import io.github.samipourquoi.syncmatica.Feature;
 
 // a class representing what kind of features a syncmatica instance supports
+// or has enabled/disabled
 
 public class FeatureSet {
 	
@@ -64,7 +65,6 @@ public class FeatureSet {
 	static {
 		versionFeatures = new HashMap<>();
 		versionFeatures.put("0.1", new FeatureSet(Arrays.asList(Feature.CORE)));
-		versionFeatures.put("0.2", new FeatureSet(Arrays.asList(Feature.CORE, Feature.FEATURE, Feature.MODIFY)));
 	}
 
 }

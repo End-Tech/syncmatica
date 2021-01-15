@@ -8,6 +8,7 @@ import java.util.UUID;
 import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.VersionHandshakeClient;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import net.minecraft.network.PacketByteBuf;
@@ -23,8 +24,6 @@ public class ClientCommunicationManager extends CommunicationManager {
 		this.server = server;
 		broadcastTargets.add(server);
 		sharing = new HashSet<>();
-		VersionHandshakeClient hi = new VersionHandshakeClient(server, context);
-		startExchangeUnchecked(hi);
 	}
 	
 	public ExchangeTarget getServer() {
@@ -76,6 +75,13 @@ public class ClientCommunicationManager extends CommunicationManager {
 	
 	public boolean getSharingState(ServerPlacement placement) {
 		return sharing.contains(placement);
+	}
+	
+	@Override
+	public void setContext(Context con) {
+		super.setContext(con);
+		VersionHandshakeClient hi = new VersionHandshakeClient(server, context);
+		startExchangeUnchecked(hi);
 	}
 
 }

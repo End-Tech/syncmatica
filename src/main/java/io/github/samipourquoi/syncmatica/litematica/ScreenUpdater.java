@@ -36,9 +36,7 @@ public class ScreenUpdater {
 		instance = null;
 	}
 	
-	public ScreenUpdater() {
-		attatch();
-	}
+	public ScreenUpdater() {}
 	
 	public void setActiveContext(Context con) {
 		detatch();
@@ -63,7 +61,9 @@ public class ScreenUpdater {
 	}
 	
 	private void detatch() {
-		context.getSyncmaticManager().removeServerPlacementConsumer(updateListener);
+		if (context != null) {
+			context.getSyncmaticManager().removeServerPlacementConsumer(updateListener);
+		}
 	}
 	
 
