@@ -13,7 +13,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class VersionHandshakeClient extends AbstractExchange {
+public class VersionHandshakeClient extends FeatureExchange {
 	
 	private String partnerVersion;
 	
@@ -25,7 +25,7 @@ public class VersionHandshakeClient extends AbstractExchange {
 	public boolean checkPacket(Identifier id, PacketByteBuf packetBuf) {
 		return id.equals(PacketType.CONFIRM_USER.IDENTIFIER)
 				||id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)
-				||id.equals(PacketType.FEATURE_REQUEST.IDENTIFIER);
+				||super.checkPacket(id, packetBuf);
 	}
 
 	@Override
@@ -36,22 +36,17 @@ public class VersionHandshakeClient extends AbstractExchange {
 				// any further packets are risky so no further packets should get send
 				LogManager.getLogger(VersionHandshakeClient.class).info("Denying syncmatica join due to outdated server with local version {} and server version {}", Syncmatica.VERSION, partnerVersion);
 				close(false);
-			} else if (id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)) {
+			} else {
 				this.partnerVersion = partnerVersion;
 				FeatureSet fs = FeatureSet.fromVersionString(partnerVersion);
 				if (fs == null) {
-					getPartner().sendPacket(PacketType.FEATURE_REQUEST.IDENTIFIER, new PacketByteBuf(Unpooled.buffer()));
+					requestFeatureSet();
 				} else {
-					PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
-					newBuf.writeString(Syncmatica.VERSION);
-					getPartner().sendPacket(PacketType.REGISTER_VERSION.IDENTIFIER, newBuf);
+					getPartner().setFeatureSet(fs);
+					onFeatureSetReceive();
 				}
-			} else if (id.equals(PacketType.FEATURE_REQUEST.IDENTIFIER)) {
-				PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
-				newBuf.writeString(Syncmatica.VERSION);
 			}
-		} else
-		if (id.equals(PacketType.CONFIRM_USER.IDENTIFIER)) {
+		} else if (id.equals(PacketType.CONFIRM_USER.IDENTIFIER)) {
 			int placementCount = packetBuf.readInt();
 			for (int i =0; i<placementCount; i++) {
 				ServerPlacement p = getManager().receiveMetaData(packetBuf);
@@ -60,7 +55,17 @@ public class VersionHandshakeClient extends AbstractExchange {
 			LogManager.getLogger(VersionHandshakeClient.class).info("Joining syncmatica server with local version {} and server version {}", Syncmatica.VERSION, partnerVersion);
 			LitematicManager.getInstance().commitLoad();
 			getContext().startup();
+			succeed();
+		} else {
+			super.handle(id, packetBuf);
 		}
+	}
+	
+	@Override
+	public void onFeatureSetReceive() {
+		PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
+		newBuf.writeString(Syncmatica.VERSION);
+		getPartner().sendPacket(PacketType.REGISTER_VERSION.IDENTIFIER, newBuf);
 	}
 
 	@Override

@@ -50,11 +50,14 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
         len = this.getStringWidth(text) + 10;
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.MATERIAL_GATHERING, this);
-        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
+        ButtonGeneric matGathering = new ButtonGeneric(posX, y, len, 20, text);
+        matGathering.setEnabled(false);
+        this.addButton(matGathering, listener);
         
         ArrayList<IButtonType> multi = new ArrayList<>();
         multi.add(new BaseButtonType("syncmatica.gui.button.downloading"
-        		,()-> false, new ButtonListener(null, null)));
+        		,()-> LitematicManager.getInstance().getActiveContext().getCommunicationManager().getDownloadState(placement)
+        		, null));
         multi.add(new BaseButtonType("syncmatica.gui.button.download"
         		,()-> {
         			Context con = LitematicManager.getInstance().getActiveContext();

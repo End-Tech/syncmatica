@@ -41,7 +41,6 @@ public abstract class CommunicationManager {
 	}
 	
 	public void onPacket(ExchangeTarget source, Identifier id, PacketByteBuf packetBuf) {
-		// TODO: Timeout Exchanges
 		Exchange handler = null;
 		// id is one of the syncmatica packet types
 		if (!handlePacket(source, id, packetBuf)) {
@@ -140,6 +139,10 @@ public abstract class CommunicationManager {
 	protected void startExchangeUnchecked(Exchange newExchange) {
 		newExchange.getPartner().getExchanges().add(newExchange);
 		newExchange.init();
+		if (newExchange.isFinished()) {
+			newExchange.getPartner().getExchanges().remove(newExchange);
+			handleExchange(newExchange);
+		}
 	}
 	
 	public void setContext(Context con) {
