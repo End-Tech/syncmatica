@@ -7,26 +7,25 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
 import io.github.samipourquoi.syncmatica.util.SyncmaticaUtil;
 
 public class FileStorage implements IFileStorage {
 	
 	private HashMap<ServerPlacement, Long> buffer = new HashMap<>();
-	private CommunicationManager manager = null;
+	private Context context = null;
 	
 	public FileStorage() {}
 	
-	public void setCommunitcationManager(CommunicationManager man) {
-		if (manager == null) {
-			manager = man;
+	public void setContext(Context con) {
+		if (context == null) {
+			context = con;
 		} else {
-			throw new RuntimeException("Duplicate CommunicationManager assignment");
+			throw new RuntimeException("Duplicate Context assignment");
 		}
 	}
 	
 	public LocalLitematicState getLocalState(ServerPlacement placement) {
-		File localFile = new File(Syncmatica.getSchematicPath(placement));
+		File localFile = getSchematicPath(placement);
 		if (localFile.isFile()) {
 			if (isDownloading(placement)) {
 				return LocalLitematicState.DOWNLOADING_LITEMATIC;
@@ -40,15 +39,15 @@ public class FileStorage implements IFileStorage {
 	}
 	
 	private boolean isDownloading(ServerPlacement placement) {
-		if (manager == null) {
+		if (context == null) {
 			throw new RuntimeException("No CommunicationManager has been set yet - cannot determ litematic state");
 		}
-		return manager.getDownloadState(placement);
+		return context.getCommunicationManager().getDownloadState(placement);
 	}
 
 	public File getLocalLitematic(ServerPlacement placement) {
 		if (getLocalState(placement).isLocalFileReady()) {
-			return new File(Syncmatica.getSchematicPath(placement));
+			return getSchematicPath(placement);
 		} else {
 			return null;
 		}
@@ -59,7 +58,7 @@ public class FileStorage implements IFileStorage {
 		if (getLocalState(placement).isLocalFileReady()) {
 			throw new IllegalArgumentException("");
 		}
-		File file = new File(Syncmatica.getSchematicPath(placement));
+		File file = getSchematicPath(placement);
 		if (file.exists()) {
 			file.delete();
 		}
@@ -90,5 +89,13 @@ public class FileStorage implements IFileStorage {
 			return true;
 		}
 		return false;
+	}
+	
+	private File getSchematicPath(ServerPlacement placement) {
+		File litematicPath = context.getLitematicFolder();
+		if (context.isServer()) {
+			return new File(litematicPath,placement.getHash().toString()+".litematic");
+		}
+		return new File(litematicPath,placement.getName().toString()+".litematic");
 	}
 }

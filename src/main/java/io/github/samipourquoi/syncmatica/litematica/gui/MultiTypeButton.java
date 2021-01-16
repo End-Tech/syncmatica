@@ -35,7 +35,7 @@ public class MultiTypeButton extends ButtonGeneric {
 		if (type.getHoverStrings() != null) {
 			setHoverStrings((String[]) type.getHoverStrings().toArray());
 		}
-		setEnabled(type.isActive());
+		setEnabled(type.getButtonListener() != null);
 	}
 
 	private void updateType() {
@@ -85,7 +85,7 @@ public class MultiTypeButton extends ButtonGeneric {
 		@Override
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
 			update();
-			if (type.isActive()) {
+			if (type.getButtonListener() != null) {
 				type.getButtonListener().actionPerformedWithButton(button, mouseButton);
 			}
 		}

@@ -6,8 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.PacketType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
@@ -26,8 +27,8 @@ public class UploadExchange extends AbstractExchange {
 	private final InputStream inputStream;
 	private byte[] buffer = new byte[BUFFER_SIZE];
 	
-	public UploadExchange(ServerPlacement syncmatic, File uploadFile,ExchangeTarget partner, CommunicationManager manager) throws FileNotFoundException {
-		super(partner, manager);
+	public UploadExchange(ServerPlacement syncmatic, File uploadFile,ExchangeTarget partner, Context con) throws FileNotFoundException {
+		super(partner, con);
 		toUpload = syncmatic;
 		inputStream = new FileInputStream(uploadFile);
 	}

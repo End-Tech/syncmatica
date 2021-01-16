@@ -15,7 +15,6 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 
 @Mixin(WidgetListSchematicPlacements.class)
@@ -32,8 +31,6 @@ public abstract class MixinWidgetListSchematicPlacement extends WidgetListBase<S
 	@Inject(method = "<init>", at = @At("TAIL"), remap = false)
 	public void setupListener(int x, int y, int width, int height, GuiSchematicPlacementsList parent, CallbackInfo ci) {
 		ScreenUpdater.getInstance().setCurrentWidget(this);
-		updateListener = (p) -> this.refreshBrowserEntries();
-		Syncmatica.getSyncmaticManager().addServerPlacementConsumer(updateListener);
 	}
 
 }

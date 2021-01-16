@@ -4,8 +4,8 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
 import java.util.function.Consumer;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.Syncmatica;
 
 public class ScreenUpdater {
 	
@@ -13,6 +13,7 @@ public class ScreenUpdater {
 	
 	private Consumer<ServerPlacement> updateListener;
 	private WidgetListBase<?,?> currentWidget = null;
+	private Context context;
 	
 	public static ScreenUpdater getInstance() {
 		if (instance == null) {
@@ -23,21 +24,25 @@ public class ScreenUpdater {
 	
 	public static void init() {
 		if (instance != null) {
-			instance.closeInstance();
+			instance.detatch();
 		}
 		instance = new ScreenUpdater();
 	}
 	
 	public static void close() {
 		if (instance != null) {
-			instance.closeInstance();
+			instance.detatch();
 		}
 		instance = null;
 	}
 	
-	public ScreenUpdater() {
-		updateListener = (p) -> updateCurrentScreen();
-		Syncmatica.getSyncmaticManager().addServerPlacementConsumer(updateListener);
+	public ScreenUpdater() {}
+	
+	public void setActiveContext(Context con) {
+		detatch();
+		context = con;
+		attatch();
+		updateCurrentScreen();
 	}
 	
 	public void setCurrentWidget(WidgetListBase<?,?> w) {
@@ -50,8 +55,15 @@ public class ScreenUpdater {
 		}
 	}
 	
-	private void closeInstance() {
-		Syncmatica.getSyncmaticManager().removeServerPlacementConsumer(updateListener);
+	private void attatch() {
+		updateListener = (p) -> updateCurrentScreen();
+		context.getSyncmaticManager().addServerPlacementConsumer(updateListener);
+	}
+	
+	private void detatch() {
+		if (context != null) {
+			context.getSyncmaticManager().removeServerPlacementConsumer(updateListener);
+		}
 	}
 	
 

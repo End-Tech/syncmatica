@@ -2,7 +2,9 @@ package io.github.samipourquoi.syncmatica.communication.exchange;
 
 import java.util.UUID;
 
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.communication.CommunicationManager;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import net.minecraft.network.PacketByteBuf;
 
 public abstract class AbstractExchange implements Exchange {
@@ -10,11 +12,11 @@ public abstract class AbstractExchange implements Exchange {
 	private boolean success = false;
 	private boolean finished = false;
 	private final ExchangeTarget partner;
-	private final CommunicationManager manager;
+	private final Context context;
 	
-	public AbstractExchange(ExchangeTarget partner, CommunicationManager manager) {
+	public AbstractExchange(ExchangeTarget partner, Context con) {
 		this.partner = partner;
-		this.manager = manager;
+		this.context = con;
 	}
 	
 	@Override
@@ -23,8 +25,8 @@ public abstract class AbstractExchange implements Exchange {
 	}
 	
 	@Override
-	public CommunicationManager getManager() {
-		return manager;
+	public Context getContext() {
+		return context;
 	}
 	
 	@Override
@@ -45,6 +47,10 @@ public abstract class AbstractExchange implements Exchange {
 		if (notifyPartner) {
 			sendCancelPacket();
 		}
+	}
+	
+	public CommunicationManager getManager() {
+		return context.getCommunicationManager();
 	}
 	
 	protected abstract void sendCancelPacket();

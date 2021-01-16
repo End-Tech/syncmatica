@@ -1,16 +1,13 @@
 package io.github.samipourquoi.syncmatica.litematica.gui;
 
-import org.apache.logging.log4j.LogManager;
-
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.communication.ClientCommunicationManager;
-import io.github.samipourquoi.syncmatica.communication.exchange.ExchangeTarget;
+import io.github.samipourquoi.syncmatica.communication.ExchangeTarget;
 import io.github.samipourquoi.syncmatica.communication.exchange.ShareLitematicExchange;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 
 public class ButtonListenerShare implements IButtonActionListener {
 	
@@ -26,11 +23,10 @@ public class ButtonListenerShare implements IButtonActionListener {
 			return;
 		}
 		button.setEnabled(false);
-		LogManager.getLogger(ClientPlayNetworkHandler.class).info("Started sharing litematic");
-		ClientCommunicationManager comms = (ClientCommunicationManager) Syncmatica.getCommunicationManager();
-		ExchangeTarget server = comms.getServer();
-		ShareLitematicExchange ex = new ShareLitematicExchange(schem, server, comms);
-		comms.startExchange(ex);
+		Context con = LitematicManager.getInstance().getActiveContext();
+		ExchangeTarget server = ((ClientCommunicationManager)con.getCommunicationManager()).getServer();
+		ShareLitematicExchange ex = new ShareLitematicExchange(schem, server, con);
+		con.getCommunicationManager().startExchange(ex);
 	}
 
 }

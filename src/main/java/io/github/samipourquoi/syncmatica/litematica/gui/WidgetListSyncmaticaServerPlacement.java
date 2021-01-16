@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.Syncmatica;
+import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -117,6 +117,6 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 	
     @Override
     protected Collection<ServerPlacement> getAllEntries() {
-        return Syncmatica.getSyncmaticManager().getAll();
+        return LitematicManager.getInstance().getActiveContext().getSyncmaticManager().getAll();
     }
 }
