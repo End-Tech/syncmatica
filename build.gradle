@@ -23,8 +23,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Litematica
-    modImplementation "curse.maven:litematica-${project.minecraft_version}:${project.litematica_fileid}"
-    modImplementation "curse.maven:malilib-${project.minecraft_version}:${project.malilib_fileid}"
+    modImplementation "curse.maven:litematica-${project.litematica_minecraft_version}-308892:${project.litematica_fileid}"
+    modImplementation "curse.maven:malilib-${project.litematica_minecraft_version}-303119:${project.malilib_fileid}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     // modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
