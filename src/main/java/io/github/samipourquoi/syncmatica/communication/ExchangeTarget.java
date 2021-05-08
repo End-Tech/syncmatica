@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.communication;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -19,7 +20,7 @@ public class ExchangeTarget {
 	private ServerPlayNetworkHandler client = null;
 	
 	private FeatureSet features;
-	private Collection<Exchange> ongoingExchanges = new ArrayList<>();
+	private List<Exchange> ongoingExchanges = new ArrayList<>(); // implicity relies on priority
 	
 	public ExchangeTarget(ClientPlayNetworkHandler server) {
 		this.server = server;

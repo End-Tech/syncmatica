@@ -8,7 +8,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 
 @Mixin(ButtonBase.class)
 public interface MixinButtonBase {
-
-	@Accessor("actionListener")
+	@Accessor(value="actionListener", remap=false)
 	IButtonActionListener getActionListener();
 }

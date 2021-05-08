@@ -53,16 +53,30 @@ public enum PacketType {
 	FEATURE_REQUEST("syncmatica:feature_request"),
 	// requests the partner to send a list of its features
 	
-	FEATURE("syncmatica:feature");
+	FEATURE("syncmatica:feature"),
 	// sends feature set to the partner
 	// send during a version exchange to check if the 2 versions are compatible and there is no
 	// default feature set available for the transmitted version
 	// afterwards the feature set is used to communicate to the partner
 	
+	MODIFY("syncmatica:modify"),
+	// sends updated placement data to the client or vice versa
+	
+	MODIFY_REQUEST("syncmatica:modify_request"),
+	// send from client to server to request the editing of placement values
+	// used to ensure that only one person can edit at a time thus preventing all kinds of stuff
+	
+	MODIFY_REQUEST_DENY("syncmatica:modify_request_deny"),
+	MODIFY_REQUEST_ACCEPT("syncmatica:modify_request_accept"),
+	
+	MODIFY_FINISH("syncmatica:modify_finish");
+	// send from client to server to mark that the editing of placement values has concluded
+	// sends along the final data of the placement
+	
 	public final Identifier IDENTIFIER;
 
 	PacketType(String id) {
-		this.IDENTIFIER = new Identifier(id);
+		IDENTIFIER = new Identifier(id);
 	}
 	
 	public static boolean containsIdentifier(Identifier id) {
