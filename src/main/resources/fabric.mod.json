@@ -19,12 +19,11 @@
 		"syncmatica.litematica_mixin.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.7.4",
+		"fabricloader": ">=0.11.0",
 		"minecraft": "1.16.x"
 	},
 	"suggests": {
 		"litematica": "*",
 		"malilib": "*"
-	},
-	"accessWidener" : "syncmatica.accesswidener"
+	}
 }

@@ -1,13 +1,9 @@
 package io.github.samipourquoi.syncmatica.litematica.gui;
 
 
-
-import java.util.Collection;
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
-
 import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
@@ -16,61 +12,63 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
-import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
+import io.github.samipourquoi.syncmatica.litematica.ScreenHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Collection;
+import java.util.List;
+
+
 public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
-	
+
     private final int infoWidth;
     private final int infoHeight;
     private final GuiSyncmaticaServerPlacementList parent;
-	
-	public WidgetListSyncmaticaServerPlacement(int x, int y, int width, int height, GuiSyncmaticaServerPlacementList parent,
-			ISelectionListener<ServerPlacement> selectionListener) {
-		super(x, y, width, height, selectionListener);
-		this.browserEntryHeight = 22;
-        this.infoWidth = 170;
-        this.infoHeight = 290;
-		this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
-        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+
+    public WidgetListSyncmaticaServerPlacement(final int x, final int y, final int width, final int height, final GuiSyncmaticaServerPlacementList parent,
+                                               final ISelectionListener<ServerPlacement> selectionListener) {
+        super(x, y, width, height, selectionListener);
+        browserEntryHeight = 22;
+        infoWidth = 170;
+        infoHeight = 290;
+        widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        browserEntriesOffsetY = widgetSearchBar.getHeight() + 3;
         this.parent = parent;
-        this.setSize(width, height);
-        ScreenUpdater.getInstance().setCurrentWidget(this);
-	}
-	
+        setSize(width, height);
+        ScreenHelper.ifPresent((s) -> s.setCurrentGui(parent));
+    }
+
     @Override
-    public void setSize(int width, int height)
-    {
+    public void setSize(final int width, final int height) {
         super.setSize(width, height);
 
-        this.browserWidth = this.getBrowserWidthForTotalWidth(width);
-        this.browserEntryWidth = this.browserWidth - 14;
+        browserWidth = getBrowserWidthForTotalWidth(width);
+        browserEntryWidth = browserWidth - 14;
     }
-	
-    
-    protected int getBrowserWidthForTotalWidth(int width)
-    {
-        return width - 6 - this.infoWidth;
+
+
+    protected int getBrowserWidthForTotalWidth(final int width) {
+        return width - 6 - infoWidth;
     }
-	
-	// source: WidgetFileBrowserBase
+
+    // source: WidgetFileBrowserBase
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void drawContents(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
         // Draw an outline around the entire widget
-        RenderUtils.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(posX, posY, browserWidth, browserHeight, 0xB0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
         super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
 
-        this.drawPlacementInfo(this.getLastSelectedEntry(), matrixStack);
+        drawPlacementInfo(getLastSelectedEntry(), matrixStack);
     }
 
-    private void drawPlacementInfo(ServerPlacement placement, MatrixStack matrixStack) {
-        int x = this.posX + this.totalWidth - this.infoWidth;
-        int y = this.posY;
-        int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
+    private void drawPlacementInfo(final ServerPlacement placement, final MatrixStack matrixStack) {
+        int x = posX + totalWidth - infoWidth;
+        int y = posY;
+        final int height = Math.min(infoHeight, parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
         if (placement == null) {
             return;
@@ -80,15 +78,15 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 
         x += 3;
         y += 3;
-        int textColor = 0xC0C0C0C0;
-        int valueColor = 0xFFFFFFFF;
-        
+        final int textColor = 0xC0C0C0C0;
+        final int valueColor = 0xFFFFFFFF;
+
         String str = StringUtils.translate("syncmatica.gui.label.placement_info.file_name");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
         drawString(matrixStack, placement.getName(), x + 4, y, valueColor);
         y += 12;
-        
+
         str = StringUtils.translate("syncmatica.gui.label.placement_info.dimension_id");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
@@ -98,23 +96,23 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         str = StringUtils.translate("syncmatica.gui.label.placement_info.position");
         drawString(matrixStack, str, x, y, textColor);
         y += 12;
-        BlockPos origin = placement.getPosition();
-        String tmp = String.format("%d %d %d", origin.getX(), origin.getY(), origin.getZ());
-        this.drawString(matrixStack, tmp, x + 4, y, valueColor);
+        final BlockPos origin = placement.getPosition();
+        final String tmp = String.format("%d %d %d", origin.getX(), origin.getY(), origin.getZ());
+        drawString(matrixStack, tmp, x + 4, y, valueColor);
         y += 12;
     }
-	
+
     @Override
-    protected List<String> getEntryStringsForFilter(ServerPlacement entry) {
-        String metaName = entry.getName().toLowerCase();
+    protected List<String> getEntryStringsForFilter(final ServerPlacement entry) {
+        final String metaName = entry.getName().toLowerCase();
         return ImmutableList.of(metaName);
     }
 
-	@Override
-	protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ServerPlacement entry) {
-		return new WidgetSyncmaticaServerPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), entry, listIndex);
-	}
-	
+    @Override
+    protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(final int x, final int y, final int listIndex, final boolean isOdd, final ServerPlacement entry) {
+        return new WidgetSyncmaticaServerPlacementEntry(x, y, browserEntryWidth, getBrowserEntryHeightFor(entry), entry, listIndex);
+    }
+
     @Override
     protected Collection<ServerPlacement> getAllEntries() {
         return LitematicManager.getInstance().getActiveContext().getSyncmaticManager().getAll();

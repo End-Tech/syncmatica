@@ -3,7 +3,6 @@
 	"minVersion": "0.8",
 	"package": "io.github.samipourquoi.syncmatica.litematica_mixin",
 	"compatibilityLevel": "JAVA_8",
-
 	"mixins": [],
 	"client": [
 		"GuiMainMenuMixin",
@@ -12,10 +11,12 @@
 		"MixinWidgetSchematicPlacement",
 		"MixinGuiBase",
 		"MixinSchematicHolder",
-		"MixinButtonBase"
-	 ],
+		"MixinButtonBase",
+		"MixinWidgetSchematicPlacement",
+		"MixinGuiPlacementConfiguration",
+		"MixinWidgetPlacementSubRegion"
+	],
 	"server": [],
-
 	"injectors": {
 		"defaultRequire": 1
 	}

@@ -1,22 +1,29 @@
 package io.github.samipourquoi.syncmatica.litematica_mixin;
 
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
+import io.github.samipourquoi.syncmatica.litematica.ScreenHelper;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import fi.dy.masa.malilib.gui.GuiBase;
-import io.github.samipourquoi.syncmatica.litematica.ScreenUpdater;
+import java.util.List;
 
 @Mixin(GuiBase.class)
-public class MixinGuiBase {
+public abstract class MixinGuiBase {
 
-	public MixinGuiBase() {
-	}
-	
-	@Inject(method = "removed()V", at = @At("TAIL"))
-	public void removeScreenUpdater(CallbackInfo ci) {
-		ScreenUpdater.getInstance().setCurrentWidget(null);
-	}
+    @Shadow(remap = false)
+    private List<ButtonBase> buttons;
+
+    public List<ButtonBase> getButtons() {
+        return buttons;
+    }
+
+    @Inject(method = "removed()V", at = @At("TAIL"))
+    public void removeScreenUpdater(final CallbackInfo ci) {
+        ScreenHelper.ifPresent((s) -> s.setCurrentGui(null));
+    }
 
 }

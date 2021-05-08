@@ -49,7 +49,7 @@ public class RedirectFileStorage implements IFileStorage {
 		UUID hashId = placement.getHash();
 		if (redirect.containsKey(hashId)) {
 			RedirectData red = redirect.get(hashId);
-			if (hashId.equals(red.getHash())) {
+			if (red.exists() && hashId.equals(red.getHash())) {
 				return red.redirect;
 			} else {
 				redirect.remove(hashId);
@@ -88,6 +88,10 @@ public class RedirectFileStorage implements IFileStorage {
 			}
 			hashTimeStamp = redirect.lastModified();
 			return hash;
+		}
+
+		boolean exists() {
+			return redirect.exists() && redirect.canRead();
 		}
 	}
 

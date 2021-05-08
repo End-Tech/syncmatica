@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import io.github.samipourquoi.syncmatica.Feature;
 
 // a class representing what kind of features a syncmatica instance supports
@@ -17,8 +15,7 @@ public class FeatureSet {
 	
 	private static Map<String,FeatureSet> versionFeatures;	
 	private Collection<Feature> features;
-	
-	@Nullable
+
 	public static FeatureSet fromVersionString(String version) {
 		if (version.matches("^\\d+(\\.\\d+){2,}$")) {
 			final int minSize = version.indexOf(".");
