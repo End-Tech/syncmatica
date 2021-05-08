@@ -25,6 +25,7 @@ public class Context {
 		synMan.setContext(this);
 		server = isServer;
 		this.litematicFolder = litematicFolder;
+		litematicFolder.mkdirs();
 	}
 	
 	public IFileStorage getFileStorage() {return files;}
