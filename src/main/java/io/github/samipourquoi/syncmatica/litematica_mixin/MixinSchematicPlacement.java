@@ -27,7 +27,7 @@ public abstract class MixinSchematicPlacement implements IIDContainer {
 	@Unique
 	UUID serverId;
 	
-	public MixinSchematicPlacement() {
+	private MixinSchematicPlacement() {
 	}
 	
 	@Inject(method="toJson", at = @At("RETURN"), remap=false)
@@ -44,9 +44,11 @@ public abstract class MixinSchematicPlacement implements IIDContainer {
 	private static void loadSyncmatic(JsonObject obj, CallbackInfoReturnable<SchematicPlacement> cir) {
 		if (JsonUtils.hasString(obj, "syncmatica_uuid")) {
 			SchematicPlacement newInstance = cir.getReturnValue();
-			((IIDContainer)newInstance).setServerId(UUID.fromString(obj.get("syncmatica_uuid").getAsString()));
-			cir.setReturnValue(null);
-			LitematicManager.getInstance().preLoad(newInstance);
+			if (newInstance != null) {
+				((IIDContainer) newInstance).setServerId(UUID.fromString(obj.get("syncmatica_uuid").getAsString()));
+				cir.setReturnValue(null);
+				LitematicManager.getInstance().preLoad(newInstance);
+			}
 		}
 	}
 	
@@ -64,7 +66,4 @@ public abstract class MixinSchematicPlacement implements IIDContainer {
 	public UUID getServerId() {
 		return serverId;
 	}
-	
-	
-
 }
