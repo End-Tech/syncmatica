@@ -4,6 +4,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.Message;
 import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.RedirectFileStorage;
@@ -75,7 +76,8 @@ public class LitematicManager {
         final LitematicaSchematic schematic = (LitematicaSchematic) SchematicHolder.getInstance().getOrLoad(file);
 
         if (schematic == null) {
-            throw new RuntimeException("Could not create schematic from file");
+            ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.failed_to_load"));
+            return;
         }
 
         final BlockPos origin = placement.getPosition();
@@ -110,6 +112,15 @@ public class LitematicManager {
         }
         try {
             final File placementFile = schem.getSchematicFile();
+            final FileType fileType = FileType.fromFile(placementFile);
+            if (fileType == FileType.VANILLA_STRUCTURE || fileType == FileType.SCHEMATICA_SCHEMATIC) {
+                ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_incompatible_schematic"));
+                return null;
+            } else if (fileType != FileType.LITEMATICA_SCHEMATIC) {
+                ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.invalid_file"));
+                return null;
+            }
+
             final ServerPlacement placement = new ServerPlacement(UUID.randomUUID(), placementFile);
             // thanks miniHUD
             final String dimension = MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
