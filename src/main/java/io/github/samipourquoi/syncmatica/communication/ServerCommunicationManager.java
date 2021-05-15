@@ -6,24 +6,39 @@ import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.exchange.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class ServerCommunicationManager extends CommunicationManager {
 
     private final Map<UUID, List<ServerPlacement>> downloadingFile = new HashMap<>();
+    private final Map<ExchangeTarget, ServerPlayerEntity> playerMap = new HashMap<>();
 
     public ServerCommunicationManager() {
         super();
     }
 
-    public void onPlayerJoin(final ExchangeTarget newPlayer) {
+    public void sendMessage(final ExchangeTarget client, final MessageType type, final String identifier) {
+        if (client.getFeatureSet().hasFeature(Feature.MESSAGE)) {
+            final PacketByteBuf newPacketBuf = new PacketByteBuf(Unpooled.buffer());
+            newPacketBuf.writeString(type.toString());
+            newPacketBuf.writeString(identifier);
+            client.sendPacket(PacketType.MESSAGE.IDENTIFIER, newPacketBuf);
+        } else if (playerMap.containsKey(client)) {
+            final ServerPlayerEntity player = playerMap.get(client);
+            player.sendSystemMessage(new LiteralText("Syncmatica " + type.toString() + " " + identifier), Util.NIL_UUID);
+        }
+    }
+
+    public void onPlayerJoin(final ExchangeTarget newPlayer, final ServerPlayerEntity player) {
         final VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer, context);
+        playerMap.put(newPlayer, player);
         startExchangeUnchecked(hi);
     }
 
@@ -36,6 +51,7 @@ public class ServerCommunicationManager extends CommunicationManager {
             }
         }
         broadcastTargets.remove(oldPlayer);
+        playerMap.remove(oldPlayer);
     }
 
     @Override
@@ -47,14 +63,12 @@ public class ServerCommunicationManager extends CommunicationManager {
                 return;
             }
             final File toUpload = context.getFileStorage().getLocalLitematic(placement);
-            UploadExchange upload = null;
+            final UploadExchange upload;
             try {
                 upload = new UploadExchange(placement, toUpload, source, context);
             } catch (final FileNotFoundException e) {
                 // should be fine
                 e.printStackTrace();
-            }
-            if (upload == null) {
                 return;
             }
             startExchange(upload);
@@ -66,15 +80,11 @@ public class ServerCommunicationManager extends CommunicationManager {
                 if (!context.getFileStorage().getLocalState(placement).isLocalFileReady()) {
                     // special edge case because files are transmitted by placement rather than file names/hashes
                     if (context.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
-                        downloadingFile.computeIfAbsent(placement.getHash(), (key) -> new ArrayList<>()).add(placement);
+                        downloadingFile.computeIfAbsent(placement.getHash(), key -> new ArrayList<>()).add(placement);
                         return;
                     }
                     try {
                         download(placement, source);
-                    } catch (final NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (final IOException e) {
-                        e.printStackTrace();
                     } catch (final Exception e) {
                         e.printStackTrace();
                     }

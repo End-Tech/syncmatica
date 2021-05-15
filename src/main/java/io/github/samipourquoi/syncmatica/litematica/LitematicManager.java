@@ -76,7 +76,7 @@ public class LitematicManager {
         final LitematicaSchematic schematic = (LitematicaSchematic) SchematicHolder.getInstance().getOrLoad(file);
 
         if (schematic == null) {
-            ScreenHelper.addMessage(Message.MessageType.ERROR, "syncmatica.error.failed_to_load", file.getAbsolutePath());
+            ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.failed_to_load", file.getAbsolutePath()));
             return;
         }
 

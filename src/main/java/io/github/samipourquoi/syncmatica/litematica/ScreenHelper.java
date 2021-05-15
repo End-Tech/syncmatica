@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.litematica;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.InfoUtils;
 import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 
@@ -50,9 +51,7 @@ public class ScreenHelper {
     }
 
     public void addMessage(final Message.MessageType type, final String messageKey, final Object... args) {
-        if (currentGui != null) {
-            currentGui.addMessage(type, messageKey, args);
-        }
+        InfoUtils.showGuiOrInGameMessage(type, messageKey, args);
     }
 
     private void updateCurrentScreen() {

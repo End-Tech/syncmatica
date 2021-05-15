@@ -1,11 +1,13 @@
 package io.github.samipourquoi.syncmatica.communication;
 
+import fi.dy.masa.malilib.gui.Message;
 import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
 import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.VersionHandshakeClient;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
+import io.github.samipourquoi.syncmatica.litematica.ScreenHelper;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -34,6 +36,7 @@ public class ClientCommunicationManager extends CommunicationManager {
         if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
             final ServerPlacement placement = receiveMetaData(packetBuf);
             context.getSyncmaticManager().addPlacement(placement);
+            return;
         }
         if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
             final UUID placementId = packetBuf.readUuid();
@@ -49,6 +52,7 @@ public class ClientCommunicationManager extends CommunicationManager {
                     LitematicManager.getInstance().unrenderSyncmatic(placement);
                 }
             }
+            return;
         }
         if (id.equals(PacketType.MODIFY.IDENTIFIER)) {
             final UUID placementId = packetBuf.readUuid();
@@ -56,6 +60,13 @@ public class ClientCommunicationManager extends CommunicationManager {
             receivePositionData(toModify, packetBuf);
             LitematicManager.getInstance().updateRendered(toModify);
             context.getSyncmaticManager().updateServerPlacement(toModify);
+            return;
+        }
+        if (id.equals(PacketType.MESSAGE.IDENTIFIER)) {
+            final Message.MessageType type = mapMessageType(MessageType.valueOf(packetBuf.readString(32767)));
+            final String text = packetBuf.readString(32767);
+            ScreenHelper.ifPresent(s -> s.addMessage(type, text));
+            return;
         }
     }
 
@@ -91,5 +102,18 @@ public class ClientCommunicationManager extends CommunicationManager {
         super.setContext(con);
         final VersionHandshakeClient hi = new VersionHandshakeClient(server, context);
         startExchangeUnchecked(hi);
+    }
+
+    private Message.MessageType mapMessageType(final MessageType m) {
+        switch (m) {
+            case SUCCESS:
+                return Message.MessageType.SUCCESS;
+            case WARNING:
+                return Message.MessageType.WARNING;
+            case ERROR:
+                return Message.MessageType.ERROR;
+            default:
+                return Message.MessageType.INFO;
+        }
     }
 }
