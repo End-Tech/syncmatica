@@ -19,5 +19,6 @@
 	"syncmatica.error.create_from_schematic": "Error creating Syncmatic from schematic: {}",
 	"syncmatica.error.share_incompatible_schematic": "Convert this file using the Schematic Manager from the main menu to share it",
 	"syncmatica.error.invalid_file": "Cannot share this type of file",
+	"syncmatica.error.failed_to_load": "Failed to load litematic {}",
 	"syncmatica.success.modification_accepted": "Modification request accept - Lock the placement again to share the results to the server"
 }
