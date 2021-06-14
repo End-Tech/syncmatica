@@ -2,6 +2,7 @@ package io.github.samipourquoi.syncmatica.communication;
 
 import io.github.samipourquoi.syncmatica.Context;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
+import io.github.samipourquoi.syncmatica.Syncmatica;
 import io.github.samipourquoi.syncmatica.communication.exchange.DownloadExchange;
 import io.github.samipourquoi.syncmatica.communication.exchange.Exchange;
 import io.netty.buffer.Unpooled;
@@ -10,6 +11,7 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +41,7 @@ public abstract class CommunicationManager {
     }
 
     public void onPacket(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
+        LogManager.getLogger(Syncmatica.class).info("Syncmatica - received package:[type={}]", id);
         Exchange handler = null;
         // id is one of the syncmatica packet types
         if (!handlePacket(source, id, packetBuf)) {

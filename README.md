@@ -9,18 +9,20 @@ you feel confident that your users won't abuse it too heavily.
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.2.2) is a mod for both Minecraft client and
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.2.4) is a mod for both Minecraft client and
 server.  
 It's made for [Minecraft Fabric 1.16.x](https://fabricmc.net/).  
 It relies on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/?mcver=1.16.4) to provide all client
-features.
+features. Please make sure to update litematica, malilib and other potentially conflicting mods like Multiconnect before
+making a bug report about Syncmaticas functionality :)
 
 ### Client
 
 You first need to install fabric and add the litematica and malilib mods to your client. The next step is to move the
 Syncmatica mod file to the mod folder. Now you are ready to go.
 
-As of now I am unaware of any incompatible litematica versions.
+Versions as old as v0.0.0-dev.20210106.181551 appear to cause issues due to a field renaming or not existing or being
+invisible. If you have versions as old as that you will have to update or Syncmatica may not function properly.
 
 ### Server
 
@@ -43,19 +45,11 @@ with everyone.
 
 ## Project Status & Road Map
 
-With this update we will fix an issue with shared nbt schematics, allow the server to send you messages and add a server
-sided quota for uploads. This is mostly an update for the Server the client only receives minor updates.
-
-* Sharing NBT schematics is now impossible instead of leading to a crash - NBT schematics are just too different to
-  litematics to make good use of them in the mod.
-* The server is now able to send you pretty messages via a protocol - if you are on an outdated client it will just send
-  you chat messages instead.
-* Quota - one of the security issues of syncmatica is that you are able to share files of arbitrary size with no actual
-  limit. Server quotas fix this issue by adding a limit to how much a player can upload between restarts Of course this
-  is not the perfect safety feature and users can still probably find ways to misuse this mod so be cautious.
+Minor update added additional logging to debug issues. Right now installing this version of Syncmatica will log extra
+messages to help me debug any sort of issues that may arise within setups.
 
 This update delays the updates that synchronise subRegions. I have also seen that many servers have a problem with the
 amount of syncmatics that are persistently shared. I imagine I should also add a fix for that.
 
-The MaterialGatherings button is supposed to be for the task of collecting the materials as a group. It should
-synchronize and simplify the collection of material across the server. As of now it does nothing.
+The MaterialGatherings button is supposed, to aid with collecting the materials as a group. It should synchronize and
+simplify the collection of material across the server. As of now it does nothing.
