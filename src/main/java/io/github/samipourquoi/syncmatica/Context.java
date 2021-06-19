@@ -112,8 +112,9 @@ public class Context {
     }
 
     public File getAndCreateConfigFile() throws Exception {
+        getConfigFolder().mkdirs();
         final File configFile = getConfigFile();
-        final boolean success = configFile.createNewFile(); //NOSONAR
+        configFile.createNewFile(); //NOSONAR
         return configFile;
     }
 
