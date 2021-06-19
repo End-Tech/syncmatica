@@ -4,15 +4,17 @@ import io.github.samipourquoi.syncmatica.Context;
 
 public interface IService {
 
-    public void setContext(Context context);
+    void setContext(Context context);
 
-    public Context getContext();
+    Context getContext();
 
-    public void getDefaultConfiguration(IServiceConfiguration configuration);
+    void getDefaultConfiguration(IServiceConfiguration configuration);
 
-    public String getConfigKey();
+    String getConfigKey();
 
-    public void startup(IServiceConfiguration configuration);
+    void configure(IServiceConfiguration configuration);
 
-    public void shutdown();
+    void startup();
+
+    void shutdown();
 }

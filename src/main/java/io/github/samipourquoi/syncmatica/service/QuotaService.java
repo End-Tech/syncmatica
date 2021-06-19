@@ -42,9 +42,13 @@ public class QuotaService extends AbstractService {
     }
 
     @Override
-    public void startup(final IServiceConfiguration configuration) {
+    public void configure(final IServiceConfiguration configuration) {
         configuration.loadBoolean("enabled", b -> isEnabled = b);
         configuration.loadInteger("limit", i -> limit = i);
+    }
+
+    @Override
+    public void startup() { // NOSONAR
     }
 
     @Override

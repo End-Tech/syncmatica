@@ -44,7 +44,7 @@ public class ModifyExchangeClient extends AbstractExchange {
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
         if (id.equals(PacketType.MODIFY_REQUEST_DENY.IDENTIFIER)) {
             packetBuf.readUuid();
-			close(false);
+            close(false);
             if (!litematic.isLocked()) {
                 litematic.setOrigin(placement.getPosition(), null);
                 litematic.setRotation(placement.getRotation(), null);
@@ -73,7 +73,7 @@ public class ModifyExchangeClient extends AbstractExchange {
         if (getPartner().getFeatureSet().hasFeature(Feature.MODIFY)) {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getPartner().sendPacket(PacketType.MODIFY_REQUEST.IDENTIFIER, buf);
+            getPartner().sendPacket(PacketType.MODIFY_REQUEST.IDENTIFIER, buf, getContext());
         } else {
             acceptModification();
         }
@@ -102,13 +102,13 @@ public class ModifyExchangeClient extends AbstractExchange {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
             getContext().getCommunicationManager().putPositionData(placement, buf);
-            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf);
+            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf, getContext());
             succeed();
             getContext().getCommunicationManager().notifyClose(this);
         } else {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getPartner().sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, buf);
+            getPartner().sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, buf, getContext());
             expectRemove = true;
         }
     }
@@ -119,7 +119,7 @@ public class ModifyExchangeClient extends AbstractExchange {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
             getContext().getCommunicationManager().putPositionData(placement, buf);
-            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf);
+            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf, getContext());
         }
     }
 
