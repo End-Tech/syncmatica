@@ -9,12 +9,11 @@ you feel confident that your users won't abuse it too heavily.
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.2.4) is a mod for both Minecraft client and
-server.  
-It's made for [Minecraft Fabric 1.16.x](https://fabricmc.net/).  
-It relies on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/?mcver=1.16.4) to provide all client
-features. Please make sure to update litematica, malilib and other potentially conflicting mods like Multiconnect before
-making a bug report about Syncmaticas functionality :)
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.2.5) is a mod for both Minecraft client and server.
+The mod works for Minecraft 1.16 to 1.17. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
+on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide all client features. Please make sure to
+update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
+Syncmaticas functionality :)
 
 ### Client
 
@@ -45,8 +44,8 @@ with everyone.
 
 ## Project Status & Road Map
 
-Minor update added additional logging to debug issues. Right now installing this version of Syncmatica will log extra
-messages to help me debug any sort of issues that may arise within setups.
+The debug logging from the last version is now configurable. Syncmatica is apparently also compatible with Minecraft
+1.17 without any changes so feel free to use it there.
 
 This update delays the updates that synchronise subRegions. I have also seen that many servers have a problem with the
 amount of syncmatics that are persistently shared. I imagine I should also add a fix for that.
