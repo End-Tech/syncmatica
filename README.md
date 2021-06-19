@@ -52,3 +52,7 @@ amount of syncmatics that are persistently shared. I imagine I should also add a
 
 The MaterialGatherings button is supposed, to aid with collecting the materials as a group. It should synchronize and
 simplify the collection of material across the server. As of now it does nothing.
+
+### Contact
+
+Feel free to join me on [Discord](https://discord.gg/6NPDVNMZ3T) for more information and help on the mod.
