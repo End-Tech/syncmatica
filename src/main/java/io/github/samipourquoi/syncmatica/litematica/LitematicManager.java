@@ -6,10 +6,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.Message;
-import io.github.samipourquoi.syncmatica.Context;
-import io.github.samipourquoi.syncmatica.RedirectFileStorage;
-import io.github.samipourquoi.syncmatica.ServerPlacement;
-import io.github.samipourquoi.syncmatica.SyncmaticManager;
+import io.github.samipourquoi.syncmatica.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
@@ -245,6 +242,22 @@ public class LitematicManager {
         if (p != null) {
             unrenderSyncmatic(p);
         }
+    }
 
+    public ServerPosition getPlayerPosition() {
+        if (MinecraftClient.getInstance().getCameraEntity() != null) {
+            final BlockPos blockPos = MinecraftClient.getInstance().getCameraEntity().getBlockPos();
+            final String dimensionId = getPlayerDimension();
+            return new ServerPosition(blockPos, dimensionId);
+        }
+        return new ServerPosition(new BlockPos(0, 0, 0), ServerPosition.OVERWORLD_DIMENSION_ID);
+    }
+
+    public String getPlayerDimension() {
+        if (MinecraftClient.getInstance().getCameraEntity() != null) {
+            return MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
+        } else {
+            return ServerPosition.OVERWORLD_DIMENSION_ID;
+        }
     }
 }

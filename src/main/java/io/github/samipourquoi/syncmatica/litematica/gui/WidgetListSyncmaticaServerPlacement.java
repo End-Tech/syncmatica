@@ -11,13 +11,16 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.github.samipourquoi.syncmatica.ServerPlacement;
+import io.github.samipourquoi.syncmatica.ServerPosition;
 import io.github.samipourquoi.syncmatica.litematica.LitematicManager;
 import io.github.samipourquoi.syncmatica.litematica.ScreenHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
@@ -115,6 +118,108 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 
     @Override
     protected Collection<ServerPlacement> getAllEntries() {
-        return LitematicManager.getInstance().getActiveContext().getSyncmaticManager().getAll();
+        final ServerPosition playerPosition = LitematicManager.getInstance().getPlayerPosition();
+        final Collection<ServerPlacement> serverPlacements = LitematicManager.getInstance().getActiveContext().getSyncmaticManager().getAll();
+        return serverPlacements.stream().sorted(new PlayerDistanceComparator(playerPosition)).collect(Collectors.toList());
+    }
+
+    public static class PlayerDistanceComparator implements Comparator<ServerPlacement> {
+        // should have probably turned this into multiple comparators rather than one big thing
+
+        private final String playerDimension;
+        private final BlockPos playerPosition;
+        private final BlockPos playerPositionOverworld;
+        private final BlockPos playerPositionNether;
+
+        PlayerDistanceComparator(final ServerPosition playerPosition) {
+            this.playerPosition = playerPosition.getBlockPosition();
+            playerDimension = playerPosition.getDimensionId();
+
+            if (playerPosition.getDimensionId().equals(ServerPosition.OVERWORLD_DIMENSION_ID)) {
+                playerPositionNether = new BlockPos(
+                        this.playerPosition.getX() << 3,
+                        this.playerPosition.getY() << 3,
+                        this.playerPosition.getZ() << 3
+                );
+            } else {
+                playerPositionNether = this.playerPosition;
+            }
+            if (playerPosition.getDimensionId().equals(ServerPosition.NETHER_DIMENSION_ID)) {
+                playerPositionOverworld = new BlockPos(
+                        this.playerPosition.getX() >> 3,
+                        this.playerPosition.getY() >> 3,
+                        this.playerPosition.getZ() >> 3
+                );
+            } else {
+                playerPositionOverworld = this.playerPosition;
+            }
+        }
+
+        @Override
+        public int compare(final ServerPlacement serverPlacement1, final ServerPlacement serverPlacement2) {
+            final String dimension1 = serverPlacement1.getDimension();
+            final String dimension2 = serverPlacement2.getDimension();
+
+            final boolean equalDimension1 = compareDimensions(dimension1, playerDimension);
+            final boolean equalDimension2 = compareDimensions(dimension2, playerDimension);
+
+            if (equalDimension1 ^ equalDimension2) {
+                return equalDimension1 ? -1 : 1;
+            }
+
+            final boolean linkedDimensions1 = areInLinkedDimensions(dimension1, playerDimension);
+            final boolean linkedDimensions2 = areInLinkedDimensions(dimension2, playerDimension);
+
+            if (linkedDimensions1 ^ linkedDimensions2) {
+                return linkedDimensions1 ? -1 : 1;
+            }
+
+            return Double.compare(
+                    getDimensionDistanceSquared(serverPlacement1.getOrigin()),
+                    getDimensionDistanceSquared(serverPlacement2.getOrigin())
+            );
+        }
+
+        private double getDimensionDistanceSquared(final ServerPosition position) {
+            if (position.getDimensionId().equals(ServerPosition.OVERWORLD_DIMENSION_ID)) {
+                return position.getBlockPosition().getSquaredDistance(
+                        playerPositionOverworld.getX(),
+                        playerPositionOverworld.getY(),
+                        playerPositionOverworld.getZ(),
+                        false
+                );
+            }
+            if (position.getDimensionId().equals(ServerPosition.NETHER_DIMENSION_ID)) {
+                return position.getBlockPosition().getSquaredDistance(
+                        playerPositionNether.getX(),
+                        playerPositionNether.getY(),
+                        playerPositionNether.getZ(),
+                        false
+                );
+            }
+            return position.getBlockPosition().getSquaredDistance(
+                    playerPosition.getX(),
+                    playerPosition.getY(),
+                    playerPosition.getZ(),
+                    false
+            );
+        }
+
+        private boolean compareDimensions(final String dimensionId1, final String dimensionId2) {
+            return dimensionId1.equals(dimensionId2);
+        }
+
+        private boolean areInLinkedDimensions(final String dimension1, final String dimension2) {
+            return (isOverworld(dimension1) && isNether(dimension2))
+                    || (isNether(dimension1) && isOverworld(dimension2));
+        }
+
+        private boolean isNether(final String dimensionId) {
+            return dimensionId.equals(ServerPosition.NETHER_DIMENSION_ID);
+        }
+
+        private boolean isOverworld(final String dimensionId) {
+            return dimensionId.equals(ServerPosition.OVERWORLD_DIMENSION_ID);
+        }
     }
 }
