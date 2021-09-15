@@ -10,18 +10,18 @@ import java.util.List;
 // its text and icon
 
 public interface IButtonType {
-    IGuiIcon getIcon();
+	IGuiIcon getIcon();
 
-    // returns the key when it is already translated
-    // allows for the most freedom in the implementation
-    String getTranslatedKey();
+	// returns the key when it is already translated
+	// allows for the most freedom in the implementation
+	String getTranslatedKey();
 
-    List<String> getHoverStrings();
+	List<String> getHoverStrings();
 
-    IButtonActionListener getButtonListener();
+	IButtonActionListener getButtonListener();
 
-    // returns whether a button type is active or not
-    // for MultiTypeButtons this check essentially checks which type is selected
-    boolean isActive();
+	// returns whether a button type is active or not
+	// for MultiTypeButtons this check essentially checks which type is selected
+	boolean isActive();
 
 }
