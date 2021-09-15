@@ -23,5 +23,6 @@
 	"suggests": {
 		"litematica": "*",
 		"malilib": "*"
-	}
+	},
+	"icon": "assets/syncmatica/icon/logo.png"
 }
