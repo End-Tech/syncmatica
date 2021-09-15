@@ -1,11 +1,11 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "io.github.samipourquoi.syncmatica.litematica_mixin",
+	"package": "ch.endte.syncmatica.litematica_mixin",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [],
 	"client": [
-		"GuiMainMenuMixin",
+		"MixinGuiMainMenu",
 		"MixinWidgetListSchematicPlacement",
 		"MixinSchematicPlacement",
 		"MixinWidgetSchematicPlacement",
