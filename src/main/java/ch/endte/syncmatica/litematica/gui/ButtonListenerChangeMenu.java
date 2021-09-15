@@ -7,31 +7,31 @@ import net.minecraft.client.gui.screen.Screen;
 
 public class ButtonListenerChangeMenu implements IButtonActionListener {
 
-    private final MainMenuButtonType type;
-    private final Screen parent;
+	private final MainMenuButtonType type;
+	private final Screen parent;
 
-    public ButtonListenerChangeMenu(final MainMenuButtonType type, final Screen parent) {
-        this.type = type;
-        this.parent = parent;
-    }
+	public ButtonListenerChangeMenu(final MainMenuButtonType type, final Screen parent) {
+		this.type = type;
+		this.parent = parent;
+	}
 
-    @Override
-    public void actionPerformedWithButton(final ButtonBase arg0, final int arg1) {
-        GuiBase gui = null;
-        switch (type) {
-            case MATERIAL_GATHERINGS:
-                System.out.println("Opened Material Gatherings GUI - currently unsupported operation");
-                break;
-            case VIEW_SYNCMATICS:
-                gui = new GuiSyncmaticaServerPlacementList();
-                break;
-            default:
-                break;
-        }
-        if (gui != null) {
-            gui.setParent(parent);
-            GuiBase.openGui(gui);
-        }
-    }
+	@Override
+	public void actionPerformedWithButton(final ButtonBase arg0, final int arg1) {
+		GuiBase gui = null;
+		switch (type) {
+			case MATERIAL_GATHERINGS:
+				System.out.println("Opened Material Gatherings GUI - currently unsupported operation");
+				break;
+			case VIEW_SYNCMATICS:
+				gui = new GuiSyncmaticaServerPlacementList();
+				break;
+			default:
+				break;
+		}
+		if (gui != null) {
+			gui.setParent(parent);
+			GuiBase.openGui(gui);
+		}
+	}
 
 }
