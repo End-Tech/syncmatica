@@ -46,10 +46,10 @@ public class LitematicManager {
     // sets the active context for the gui side of things
     public void setActiveContext(final Context con) {
         if (con.isServer()) {
-            throw new RuntimeException("Applied server context where client context was expected");
+            throw new Context.ContextMismatchException("Applied server context where client context was expected");
         }
         context = con;
-        ScreenHelper.ifPresent((s) -> s.setActiveContext(con));
+        ScreenHelper.ifPresent(s -> s.setActiveContext(con));
     }
 
     public Context getActiveContext() {
@@ -70,7 +70,7 @@ public class LitematicManager {
         }
         final File file = context.getFileStorage().getLocalLitematic(placement);
 
-        final LitematicaSchematic schematic = (LitematicaSchematic) SchematicHolder.getInstance().getOrLoad(file);
+        final LitematicaSchematic schematic = SchematicHolder.getInstance().getOrLoad(file);
 
         if (schematic == null) {
             ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.failed_to_load", file.getAbsolutePath()));

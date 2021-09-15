@@ -4,7 +4,6 @@ import ch.endte.syncmatica.util.SyncmaticaUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,20 +13,17 @@ public class FileStorage implements IFileStorage {
     private final HashMap<ServerPlacement, Long> buffer = new HashMap<>();
     private Context context = null;
 
-    public FileStorage() {
-    }
-
     @Override
-	public void setContext(final Context con) {
+    public void setContext(final Context con) {
         if (context == null) {
             context = con;
         } else {
-            throw new RuntimeException("Duplicate Context assignment");
+            throw new Context.DuplicateContextAssignmentException("Duplicate Context assignment");
         }
     }
 
     @Override
-	public LocalLitematicState getLocalState(final ServerPlacement placement) {
+    public LocalLitematicState getLocalState(final ServerPlacement placement) {
         final File localFile = getSchematicPath(placement);
         if (localFile.isFile()) {
             if (isDownloading(placement)) {
@@ -43,13 +39,13 @@ public class FileStorage implements IFileStorage {
 
     private boolean isDownloading(final ServerPlacement placement) {
         if (context == null) {
-            throw new RuntimeException("No CommunicationManager has been set yet - cannot determ litematic state");
+            throw new RuntimeException("No CommunicationManager has been set yet - cannot get litematic state");
         }
         return context.getCommunicationManager().getDownloadState(placement);
     }
 
     @Override
-	public File getLocalLitematic(final ServerPlacement placement) {
+    public File getLocalLitematic(final ServerPlacement placement) {
         if (getLocalState(placement).isLocalFileReady()) {
             return getSchematicPath(placement);
         } else {
@@ -59,16 +55,16 @@ public class FileStorage implements IFileStorage {
 
     // method for creating an empty file for the litematic data
     @Override
-	public File createLocalLitematic(final ServerPlacement placement) {
+    public File createLocalLitematic(final ServerPlacement placement) {
         if (getLocalState(placement).isLocalFileReady()) {
             throw new IllegalArgumentException("");
         }
         final File file = getSchematicPath(placement);
         if (file.exists()) {
-            file.delete();
+            file.delete(); // NOSONAR
         }
         try {
-            file.createNewFile();
+            file.createNewFile(); // NOSONAR
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -79,13 +75,11 @@ public class FileStorage implements IFileStorage {
         UUID hash = null;
         try {
             hash = SyncmaticaUtil.createChecksum(new FileInputStream(localFile));
-        } catch (final FileNotFoundException e) {
+        } catch (final Exception e) {
             // can be safely ignored since we established that file has been found
             e.printStackTrace();
-        } catch (final Exception e) {
-            // wtf just exception?
-            e.printStackTrace();
-        }
+        }// wtf just exception?
+
         if (hash == null) {
             return false;
         }
@@ -101,6 +95,6 @@ public class FileStorage implements IFileStorage {
         if (context.isServer()) {
             return new File(litematicPath, placement.getHash().toString() + ".litematic");
         }
-        return new File(litematicPath, placement.getName().toString() + ".litematic");
+        return new File(litematicPath, placement.getName() + ".litematic");
     }
 }

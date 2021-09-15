@@ -16,13 +16,11 @@ import net.minecraft.util.Identifier;
 
 public class ModifyExchangeClient extends AbstractExchange {
 
-    //bad practice but valid for communiction with deprecated systems
+    //bad practice but valid for communication with deprecated systems
     private boolean expectRemove = false;
 
     private final ServerPlacement placement;
     private final SchematicPlacement litematic;
-
-    private ShareLitematicExchange legacyModify;
 
     public ModifyExchangeClient(final ServerPlacement placement, final ExchangeTarget partner, final Context con) {
         super(partner, con);
@@ -32,9 +30,9 @@ public class ModifyExchangeClient extends AbstractExchange {
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.MODIFY_REQUEST_DENY.IDENTIFIER)
-                || id.equals(PacketType.MODIFY_REQUEST_ACCEPT.IDENTIFIER)
-                || (expectRemove && id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER))) {
+        if (id.equals(PacketType.MODIFY_REQUEST_DENY.identifier)
+                || id.equals(PacketType.MODIFY_REQUEST_ACCEPT.identifier)
+                || (expectRemove && id.equals(PacketType.REMOVE_SYNCMATIC.identifier))) {
             return checkUUID(packetBuf, placement.getId());
         }
         return false;
@@ -42,7 +40,7 @@ public class ModifyExchangeClient extends AbstractExchange {
 
     @Override
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.MODIFY_REQUEST_DENY.IDENTIFIER)) {
+        if (id.equals(PacketType.MODIFY_REQUEST_DENY.identifier)) {
             packetBuf.readUuid();
             close(false);
             if (!litematic.isLocked()) {
@@ -52,12 +50,12 @@ public class ModifyExchangeClient extends AbstractExchange {
                 litematic.toggleLocked();
             }
             ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.SUCCESS, "syncmatica.error.modification_deny"));
-        } else if (id.equals(PacketType.MODIFY_REQUEST_ACCEPT.IDENTIFIER)) {
+        } else if (id.equals(PacketType.MODIFY_REQUEST_ACCEPT.identifier)) {
             packetBuf.readUuid();
             acceptModification();
-        } else if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
+        } else if (id.equals(PacketType.REMOVE_SYNCMATIC.identifier)) {
             packetBuf.readUuid();
-            legacyModify = new ShareLitematicExchange(litematic, getPartner(), getContext(), placement);
+            final ShareLitematicExchange legacyModify = new ShareLitematicExchange(litematic, getPartner(), getContext(), placement);
             getContext().getCommunicationManager().startExchange(legacyModify);
             succeed(); // the adding portion of this is handled by the ShareLitematicExchange
         }
@@ -73,7 +71,7 @@ public class ModifyExchangeClient extends AbstractExchange {
         if (getPartner().getFeatureSet().hasFeature(Feature.MODIFY)) {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getPartner().sendPacket(PacketType.MODIFY_REQUEST.IDENTIFIER, buf, getContext());
+            getPartner().sendPacket(PacketType.MODIFY_REQUEST.identifier, buf, getContext());
         } else {
             acceptModification();
         }
@@ -102,13 +100,13 @@ public class ModifyExchangeClient extends AbstractExchange {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
             getContext().getCommunicationManager().putPositionData(placement, buf);
-            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf, getContext());
+            getPartner().sendPacket(PacketType.MODIFY_FINISH.identifier, buf, getContext());
             succeed();
             getContext().getCommunicationManager().notifyClose(this);
         } else {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getPartner().sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, buf, getContext());
+            getPartner().sendPacket(PacketType.REMOVE_SYNCMATIC.identifier, buf, getContext());
             expectRemove = true;
         }
     }
@@ -119,7 +117,7 @@ public class ModifyExchangeClient extends AbstractExchange {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
             getContext().getCommunicationManager().putPositionData(placement, buf);
-            getPartner().sendPacket(PacketType.MODIFY_FINISH.IDENTIFIER, buf, getContext());
+            getPartner().sendPacket(PacketType.MODIFY_FINISH.identifier, buf, getContext());
         }
     }
 

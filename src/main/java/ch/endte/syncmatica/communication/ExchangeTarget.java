@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-// since Client/Server PlayNetworkHandler are 2 different classes but I want to use exchanges
+// since Client/Server PlayNetworkHandler are 2 different classes, but I want to use exchanges
 // on both without having to recode them individually I have an adapter class here
 
 public class ExchangeTarget {
@@ -23,7 +23,7 @@ public class ExchangeTarget {
     private final String persistentName;
 
     private FeatureSet features;
-    private final List<Exchange> ongoingExchanges = new ArrayList<>(); // implicity relies on priority
+    private final List<Exchange> ongoingExchanges = new ArrayList<>(); // implicitly relies on priority
 
     public ExchangeTarget(final ClientPlayNetworkHandler server) {
         this.server = server;

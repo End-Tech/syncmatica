@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class SyncmaticManager {
+    public static final String PLACEMENTS_JSON_KEY = "placements";
     private final Map<UUID, ServerPlacement> schematics = new HashMap<>();
     private final Collection<Consumer<ServerPlacement>> consumers = new ArrayList<>();
 
@@ -19,7 +20,7 @@ public class SyncmaticManager {
         if (context == null) {
             context = con;
         } else {
-            throw new RuntimeException("Duplicate Context assignment");
+            throw new Context.DuplicateContextAssignmentException("Duplicate Context assignment");
         }
     }
 
@@ -75,29 +76,19 @@ public class SyncmaticManager {
             arr.add(p.toJson());
         }
 
-        obj.add("placements", arr);
+        obj.add(PLACEMENTS_JSON_KEY, arr);
         final File f = new File(context.getConfigFolder(), "placements.json");
 
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(f);
+        try (final FileWriter writer = new FileWriter(f)) {
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
         } catch (final IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
     private void loadServer() {
         final File f = new File(context.getConfigFolder(), "placements.json");
-        if (f != null && f.exists() && f.isFile() && f.canRead()) {
+        if (f.exists() && f.isFile() && f.canRead()) {
             JsonElement element = null;
             try {
                 final JsonParser parser = new JsonParser();
@@ -109,20 +100,23 @@ public class SyncmaticManager {
             } catch (final Exception e) {
                 e.printStackTrace();
             }
+            if (element == null) {
+                
+
+                return;
+            }
             try {
                 final JsonObject obj = element.getAsJsonObject();
-                if (!obj.has("placements")) {
+                if (obj == null || !obj.has(PLACEMENTS_JSON_KEY)) {
                     return;
                 }
-                final JsonArray arr = obj.getAsJsonArray("placements");
+                final JsonArray arr = obj.getAsJsonArray(PLACEMENTS_JSON_KEY);
                 for (final JsonElement elem : arr) {
                     final ServerPlacement p = ServerPlacement.fromJson(elem.getAsJsonObject());
                     addPlacement(p);
                 }
 
-            } catch (final IllegalStateException e) {
-                e.printStackTrace();
-            } catch (final NullPointerException e) {
+            } catch (final IllegalStateException | NullPointerException e) {
                 e.printStackTrace();
             }
         }

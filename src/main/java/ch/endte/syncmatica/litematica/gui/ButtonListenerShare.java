@@ -13,31 +13,31 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 
 public class ButtonListenerShare implements IButtonActionListener {
 
-    private final SchematicPlacement schem;
+    private final SchematicPlacement schematicPlacement;
     private final GuiBase messageDisplay;
 
     public ButtonListenerShare(final SchematicPlacement placement, final GuiBase messageDisplay) {
-        schem = placement;
+        schematicPlacement = placement;
         this.messageDisplay = messageDisplay;
     }
 
     @Override
     public void actionPerformedWithButton(final ButtonBase button, final int mouseButton) {
-        if (LitematicManager.getInstance().isSyncmatic(schem)) {
+        if (LitematicManager.getInstance().isSyncmatic(schematicPlacement)) {
             return;
         }
         if (!GuiBase.isShiftDown()) {
             messageDisplay.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_without_shift");
             return;
         }
-        if (schem.isRegionPlacementModified()) {
+        if (schematicPlacement.isRegionPlacementModified()) {
             messageDisplay.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
             return;
         }
         button.setEnabled(false);
         final Context con = LitematicManager.getInstance().getActiveContext();
         final ExchangeTarget server = ((ClientCommunicationManager) con.getCommunicationManager()).getServer();
-        final ShareLitematicExchange ex = new ShareLitematicExchange(schem, server, con);
+        final ShareLitematicExchange ex = new ShareLitematicExchange(schematicPlacement, server, con);
         con.getCommunicationManager().startExchange(ex);
     }
 

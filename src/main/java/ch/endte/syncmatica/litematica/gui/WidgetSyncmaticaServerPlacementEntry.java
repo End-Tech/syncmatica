@@ -14,9 +14,9 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -64,14 +64,12 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
             final LocalLitematicState state = con.getFileStorage().getLocalState(placement);
             return !state.isLocalFileReady() && state.isReadyForDownload();
         }, new ButtonListener(ButtonListener.Type.DOWNLOAD, this)));
-        multi.add(new BaseButtonType("syncmatica.gui.button.load"
-                , () -> {
-            return !LitematicManager.getInstance().isRendered(placement);
-        }, new ButtonListener(ButtonListener.Type.LOAD, this)));
-        multi.add(new BaseButtonType("syncmatica.gui.button.unload"
-                , () -> {
-            return LitematicManager.getInstance().isRendered(placement);
-        }, new ButtonListener(ButtonListener.Type.UNLOAD, this)));
+        multi.add(new BaseButtonType("syncmatica.gui.button.load",
+                () -> !LitematicManager.getInstance().isRendered(placement),
+                new ButtonListener(ButtonListener.Type.LOAD, this)));
+        multi.add(new BaseButtonType("syncmatica.gui.button.unload",
+                () -> LitematicManager.getInstance().isRendered(placement),
+                new ButtonListener(ButtonListener.Type.UNLOAD, this)));
 
         final ButtonGeneric button = new MultiTypeButton(posX, y, true, multi);
         addButton(button, null);
@@ -117,11 +115,10 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
             type.onAction(placement);
         }
 
-        public static enum Type {
+        public enum Type {
             LOAD() {
                 @Override
                 void onAction(final WidgetSyncmaticaServerPlacementEntry placement) {
-                    final String dimension = MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
                     LitematicManager.getInstance().renderSyncmatic(placement.placement);
                 }
             },
@@ -141,9 +138,7 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
                     }
                     try {
                         con.getCommunicationManager().download(placement.placement, server);
-                    } catch (final NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (final IOException e) {
+                    } catch (final NoSuchAlgorithmException | IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -155,14 +150,13 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
                     final ExchangeTarget server = ((ClientCommunicationManager) con.getCommunicationManager()).getServer();
                     final PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
                     packetBuf.writeUuid(placement.placement.getId());
-                    server.sendPacket(PacketType.REMOVE_SYNCMATIC.IDENTIFIER, packetBuf, LitematicManager.getInstance().getActiveContext());
+                    server.sendPacket(PacketType.REMOVE_SYNCMATIC.identifier, packetBuf, LitematicManager.getInstance().getActiveContext());
                 }
             },
             MATERIAL_GATHERING() {
                 @Override
                 void onAction(final WidgetSyncmaticaServerPlacementEntry placement) {
-                    // TODO: Material Gatherings
-                    System.out.println("DISPLAY MATERIAL GATHERINGS");
+                    LogManager.getLogger().info("Opened Material Gatherings GUI - currently unsupported operation");
                 }
             };
 

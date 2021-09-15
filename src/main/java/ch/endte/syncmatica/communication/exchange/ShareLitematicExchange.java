@@ -16,26 +16,26 @@ import java.io.FileNotFoundException;
 
 public class ShareLitematicExchange extends AbstractExchange {
 
-    private final SchematicPlacement schem;
+    private final SchematicPlacement schematicPlacement;
     private final ServerPlacement toShare;
     private final File toUpload;
 
-    public ShareLitematicExchange(final SchematicPlacement schem, final ExchangeTarget partner, final Context con) {
-        this(schem, partner, con, null);
+    public ShareLitematicExchange(final SchematicPlacement schematicPlacement, final ExchangeTarget partner, final Context con) {
+        this(schematicPlacement, partner, con, null);
     }
 
-    public ShareLitematicExchange(final SchematicPlacement schem, final ExchangeTarget partner, final Context con, final ServerPlacement p) {
+    public ShareLitematicExchange(final SchematicPlacement schematicPlacement, final ExchangeTarget partner, final Context con, final ServerPlacement p) {
         super(partner, con);
-        this.schem = schem;
-        toShare = p == null ? LitematicManager.getInstance().syncmaticFromSchematic(schem) : p;
-        toUpload = schem.getSchematicFile();
+        this.schematicPlacement = schematicPlacement;
+        toShare = p == null ? LitematicManager.getInstance().syncmaticFromSchematic(schematicPlacement) : p;
+        toUpload = schematicPlacement.getSchematicFile();
     }
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)
-                || id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)
-                || id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {
+        if (id.equals(PacketType.REQUEST_LITEMATIC.identifier)
+                || id.equals(PacketType.REGISTER_METADATA.identifier)
+                || id.equals(PacketType.CANCEL_SHARE.identifier)) {
             return AbstractExchange.checkUUID(packetBuf, toShare.getId());
         }
         return false;
@@ -43,28 +43,27 @@ public class ShareLitematicExchange extends AbstractExchange {
 
     @Override
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.REQUEST_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.REQUEST_LITEMATIC.identifier)) {
             packetBuf.readUuid();
-            UploadExchange upload = null;
+            final UploadExchange upload;
             try {
                 upload = new UploadExchange(toShare, toUpload, getPartner(), getContext());
             } catch (final FileNotFoundException e) {
                 e.printStackTrace();
-            }
-            if (upload == null) {
+
                 return;
             }
             getManager().startExchange(upload);
             return;
         }
-        if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
+        if (id.equals(PacketType.REGISTER_METADATA.identifier)) {
             final RedirectFileStorage redirect = (RedirectFileStorage) getContext().getFileStorage();
             redirect.addRedirect(toUpload);
-            LitematicManager.getInstance().renderSyncmatic(toShare, schem, false);
+            LitematicManager.getInstance().renderSyncmatic(toShare, schematicPlacement, false);
             getContext().getSyncmaticManager().addPlacement(toShare);
             return;
         }
-        if (id.equals(PacketType.CANCEL_SHARE.IDENTIFIER)) {
+        if (id.equals(PacketType.CANCEL_SHARE.identifier)) {
             close(false);
         }
     }
@@ -83,9 +82,5 @@ public class ShareLitematicExchange extends AbstractExchange {
     @Override
     public void onClose() {
         ((ClientCommunicationManager) getManager()).setSharingState(toShare, false);
-    }
-
-    @Override
-    protected void sendCancelPacket() {
     }
 }

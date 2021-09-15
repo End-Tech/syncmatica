@@ -51,7 +51,7 @@ public abstract class MixinClientPlayNetworkHandler {
         }
         final Identifier id = packet.getChannel();
         final PacketByteBuf buf = packet.getData();
-        if (clientCommunication.handlePacket(exTarget, id, buf)) {
+        if (clientCommunication.handlePacket(id)) {
             clientCommunication.onPacket(exTarget, id, buf);
             ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
         }

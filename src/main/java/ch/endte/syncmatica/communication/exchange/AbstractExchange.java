@@ -14,7 +14,7 @@ public abstract class AbstractExchange implements Exchange {
     private final ExchangeTarget partner;
     private final Context context;
 
-    public AbstractExchange(final ExchangeTarget partner, final Context con) {
+    protected AbstractExchange(final ExchangeTarget partner, final Context con) {
         this.partner = partner;
         context = con;
     }
@@ -53,10 +53,10 @@ public abstract class AbstractExchange implements Exchange {
         return context.getCommunicationManager();
     }
 
-    protected abstract void sendCancelPacket();
+    protected void sendCancelPacket() {
+    }
 
     protected void onClose() {
-        return;
     }
 
     protected void succeed() {

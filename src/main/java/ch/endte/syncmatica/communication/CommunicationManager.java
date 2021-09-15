@@ -4,6 +4,7 @@ import ch.endte.syncmatica.Context;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.exchange.DownloadExchange;
 import ch.endte.syncmatica.communication.exchange.Exchange;
+import ch.endte.syncmatica.util.SyncmaticaUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.BlockMirror;
@@ -28,23 +29,19 @@ public abstract class CommunicationManager {
     protected static final BlockRotation[] rotOrdinals = BlockRotation.values();
     protected static final BlockMirror[] mirOrdinals = BlockMirror.values();
 
-    public CommunicationManager() {
+    protected CommunicationManager() {
         broadcastTargets = new ArrayList<>();
         downloadState = new HashMap<>();
         modifyState = new HashMap<>();
     }
 
-    public boolean handlePacket(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
+    public boolean handlePacket(final Identifier id) {
         return PacketType.containsIdentifier(id);
     }
 
     public void onPacket(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
         context.getDebugService().logReceivePacket(id);
         Exchange handler = null;
-        // id is one of the syncmatica packet types
-        if (!handlePacket(source, id, packetBuf)) {
-            return;
-        }
         final Collection<Exchange> potentialMessageTarget = source.getExchanges();
         if (potentialMessageTarget != null) {
             for (final Exchange target : potentialMessageTarget) {
@@ -71,13 +68,13 @@ public abstract class CommunicationManager {
     public void sendMetaData(final ServerPlacement metaData, final ExchangeTarget target) {
         final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         putMetaData(metaData, buf);
-        target.sendPacket(PacketType.REGISTER_METADATA.IDENTIFIER, buf, context);
+        target.sendPacket(PacketType.REGISTER_METADATA.identifier, buf, context);
     }
 
     public void putMetaData(final ServerPlacement metaData, final PacketByteBuf buf) {
         buf.writeUuid(metaData.getId());
 
-        buf.writeString(sanitizeFileName(metaData.getName()));
+        buf.writeString(SyncmaticaUtil.sanitizeFileName(metaData.getName()));
         buf.writeUuid(metaData.getHash());
 
         putPositionData(metaData, buf);
@@ -97,7 +94,7 @@ public abstract class CommunicationManager {
     public ServerPlacement receiveMetaData(final PacketByteBuf buf) {
         final UUID id = buf.readUuid();
 
-        final String fileName = sanitizeFileName(buf.readString(32767));
+        final String fileName = SyncmaticaUtil.sanitizeFileName(buf.readString(32767));
         final UUID hash = buf.readUuid();
         final ServerPlacement placement = new ServerPlacement(id, fileName, hash);
 
@@ -162,7 +159,7 @@ public abstract class CommunicationManager {
         if (context == null) {
             context = con;
         } else {
-            throw new RuntimeException("Duplicate Context assignment");
+            throw new Context.DuplicateContextAssignmentException("Duplicate Context Assignment");
         }
     }
 
@@ -171,30 +168,5 @@ public abstract class CommunicationManager {
         handleExchange(e);
     }
 
-    // taken from stackoverflow
-    final static int[] illegalChars = {34, 60, 62, 124, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 58, 42, 63, 92, 47};
-    final static String illegalPatterns = "(^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\\..*)?$)|(^\\.\\.*$)";
-
-    static {
-        Arrays.sort(illegalChars);
-    }
-
-    private static String sanitizeFileName(final String badFileName) {
-        final StringBuilder sanitized = new StringBuilder();
-        final int len = badFileName.codePointCount(0, badFileName.length());
-
-        for (int i = 0; i < len; i++) {
-            final int c = badFileName.codePointAt(i);
-            if (Arrays.binarySearch(illegalChars, c) < 0) {
-                sanitized.appendCodePoint(c);
-                if (sanitized.length() == 255) { //make sure .length stays below 255
-                    break;
-                }
-            }
-        }
-        // ^ sanitizes unique characters
-        // v sanatizes entire patterns
-        return sanitized.toString().replaceAll(illegalPatterns, "_");
-    }
 
 }

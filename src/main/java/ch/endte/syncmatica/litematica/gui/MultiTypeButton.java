@@ -6,21 +6,20 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 
 import java.util.List;
 
-// FIXME: Icons
 // Not sure how to add Icon support to this without a problematic implementation
 // Icon assumes final in its field - we cannot change the fact that the rendering probably
 // executes based on this assumption
-// for now I will leave the icons alone and pretend they dont exist
+// for now I will leave the icons alone and pretend they don't exist
 // actually upon reading the code there might not be a problem with this.
 public class MultiTypeButton extends ButtonGeneric {
 
-    IButtonType type;
+    IButtonType activeType;
     List<IButtonType> types;
 
     public MultiTypeButton(final int x, final int y, final boolean rightAligned, final List<IButtonType> types) {
         super(x, y, 1, 20, "");
         this.types = types;
-        type = types.get(0);
+        activeType = types.get(0);
         update();
         width = calculateWidth();
         if (rightAligned) {
@@ -31,27 +30,27 @@ public class MultiTypeButton extends ButtonGeneric {
 
     public void update() {
         updateType();
-        displayString = type.getTranslatedKey();
-        if (type.getHoverStrings() != null) {
-            final List<String> hoverStrings = type.getHoverStrings();
-            setHoverStrings(hoverStrings.toArray(new String[hoverStrings.size()]));
+        displayString = activeType.getTranslatedKey();
+        if (activeType.getHoverStrings() != null) {
+            final List<String> hoverStrings = activeType.getHoverStrings();
+            setHoverStrings(hoverStrings.toArray(new String[0]));
         }
-        setEnabled(type.getButtonListener() != null);
+        setEnabled(activeType.getButtonListener() != null);
     }
 
     private void updateType() {
         for (final IButtonType type : types) {
             if (type.isActive()) {
-                this.type = type;
+                activeType = type;
                 return;
             }
         }
         // default type is 0
-        type = types.get(0);
+        activeType = types.get(0);
     }
 
     public IButtonType getActiveType() {
-        return type;
+        return activeType;
     }
 
     private int calculateWidth() {
@@ -87,8 +86,8 @@ public class MultiTypeButton extends ButtonGeneric {
         @Override
         public void actionPerformedWithButton(final ButtonBase button, final int mouseButton) {
             update();
-            if (type.getButtonListener() != null) {
-                type.getButtonListener().actionPerformedWithButton(button, mouseButton);
+            if (activeType.getButtonListener() != null) {
+                activeType.getButtonListener().actionPerformedWithButton(button, mouseButton);
             }
         }
 

@@ -16,7 +16,7 @@ import java.io.*;
 public class UploadExchange extends AbstractExchange {
 
     // The maximum buffer size for CustomPayloadPackets is actually 32767
-    // so 32768 is a bad value to send - thus adjusted it to 16384 - exactly halfed
+    // so 32768 is a bad value to send - thus adjusted it to 16384 - exactly halved
     private static final int BUFFER_SIZE = 16384;
 
     private final ServerPlacement toUpload;
@@ -31,8 +31,8 @@ public class UploadExchange extends AbstractExchange {
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)
-                || id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.RECEIVED_LITEMATIC.identifier)
+                || id.equals(PacketType.CANCEL_LITEMATIC.identifier)) {
             return checkUUID(packetBuf, toUpload.getId());
         }
         return false;
@@ -42,17 +42,17 @@ public class UploadExchange extends AbstractExchange {
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
 
         packetBuf.readUuid(); // uncertain if the data has to be consumed
-        if (id.equals(PacketType.RECEIVED_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.RECEIVED_LITEMATIC.identifier)) {
             send();
         }
-        if (id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.CANCEL_LITEMATIC.identifier)) {
             close(false);
         }
     }
 
     private void send() {
         // might fail when an empty file is attempted to be transmitted
-        int bytesRead = -1;
+        final int bytesRead;
         try {
             bytesRead = inputStream.read(buffer);
         } catch (final IOException e) {
@@ -72,13 +72,13 @@ public class UploadExchange extends AbstractExchange {
         packetByteBuf.writeUuid(toUpload.getId());
         packetByteBuf.writeInt(bytesRead);
         packetByteBuf.writeBytes(buffer, 0, bytesRead);
-        getPartner().sendPacket(PacketType.SEND_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+        getPartner().sendPacket(PacketType.SEND_LITEMATIC.identifier, packetByteBuf, getContext());
     }
 
     private void sendFinish() {
         final PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeUuid(toUpload.getId());
-        getPartner().sendPacket(PacketType.FINISHED_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+        getPartner().sendPacket(PacketType.FINISHED_LITEMATIC.identifier, packetByteBuf, getContext());
         succeed();
     }
 
@@ -100,7 +100,7 @@ public class UploadExchange extends AbstractExchange {
     protected void sendCancelPacket() {
         final PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeUuid(toUpload.getId());
-        getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+        getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.identifier, packetByteBuf, getContext());
     }
 
 }

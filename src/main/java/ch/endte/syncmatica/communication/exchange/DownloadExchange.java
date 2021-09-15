@@ -38,9 +38,9 @@ public class DownloadExchange extends AbstractExchange {
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)
-                || id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)
-                || id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.SEND_LITEMATIC.identifier)
+                || id.equals(PacketType.FINISHED_LITEMATIC.identifier)
+                || id.equals(PacketType.CANCEL_LITEMATIC.identifier)) {
             return checkUUID(packetBuf, toDownload.getId());
         }
         return false;
@@ -49,18 +49,16 @@ public class DownloadExchange extends AbstractExchange {
     @Override
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
         packetBuf.readUuid(); //skips the UUID
-        if (id.equals(PacketType.SEND_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.SEND_LITEMATIC.identifier)) {
             final int size = packetBuf.readInt();
             bytesSent += size;
-            if (getContext().isServer()) {
-                if (getContext().getQuotaService().isOverQuota(getPartner(), bytesSent)) {
-                    close(true);
-                    ((ServerCommunicationManager) getContext().getCommunicationManager()).sendMessage(
-                            getPartner(),
-                            MessageType.ERROR,
-                            "syncmatica.error.cancelled_transmit_exceed_quota"
-                    );
-                }
+            if (getContext().isServer() && getContext().getQuotaService().isOverQuota(getPartner(), bytesSent)) {
+                close(true);
+                ((ServerCommunicationManager) getContext().getCommunicationManager()).sendMessage(
+                        getPartner(),
+                        MessageType.ERROR,
+                        "syncmatica.error.cancelled_transmit_exceed_quota"
+                );
             }
             try {
                 packetBuf.readBytes(outputStream, size);
@@ -71,10 +69,10 @@ public class DownloadExchange extends AbstractExchange {
             }
             final PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
             packetByteBuf.writeUuid(toDownload.getId());
-            getPartner().sendPacket(PacketType.RECEIVED_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+            getPartner().sendPacket(PacketType.RECEIVED_LITEMATIC.identifier, packetByteBuf, getContext());
             return;
         }
-        if (id.equals(PacketType.FINISHED_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.FINISHED_LITEMATIC.identifier)) {
             try {
                 outputStream.flush();
             } catch (final IOException e) {
@@ -91,7 +89,7 @@ public class DownloadExchange extends AbstractExchange {
             }
             return;
         }
-        if (id.equals(PacketType.CANCEL_LITEMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.CANCEL_LITEMATIC.identifier)) {
             close(false);
         }
     }
@@ -100,7 +98,7 @@ public class DownloadExchange extends AbstractExchange {
     public void init() {
         final PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeUuid(toDownload.getId());
-        getPartner().sendPacket(PacketType.REQUEST_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+        getPartner().sendPacket(PacketType.REQUEST_LITEMATIC.identifier, packetByteBuf, getContext());
     }
 
     @Override
@@ -114,10 +112,8 @@ public class DownloadExchange extends AbstractExchange {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (!isSuccessful()) {
-            if (downloadFile.exists()) {
-                downloadFile.delete(); //..but I dont want to do anything with it?
-            }
+        if (!isSuccessful() && downloadFile.exists()) {
+            downloadFile.delete(); // NOSONAR
         }
     }
 
@@ -125,7 +121,7 @@ public class DownloadExchange extends AbstractExchange {
     protected void sendCancelPacket() {
         final PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeUuid(toDownload.getId());
-        getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.IDENTIFIER, packetByteBuf, getContext());
+        getPartner().sendPacket(PacketType.CANCEL_LITEMATIC.identifier, packetByteBuf, getContext());
     }
 
     public ServerPlacement getPlacement() {
