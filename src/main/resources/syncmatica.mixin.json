@@ -1,20 +1,18 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "io.github.samipourquoi.syncmatica.mixin",
+	"package": "ch.endte.syncmatica.mixin",
 	"compatibilityLevel": "JAVA_8",
-
 	"mixins": [],
 	"client": [
 		"MixinClientPlayNetworkHandler",
 		"MixinMinecraftClient"
 	],
 	"server": [
+		"MixinCustomPayloadC2SPacket",
 		"MixinMinecraftServer",
-		"MixinServerPlayNetworkHandler",
-		"MixinCustomPayloadC2SPacket"
+		"MixinServerPlayNetworkHandler"
 	],
-
 	"injectors": {
 		"defaultRequire": 1
 	}
