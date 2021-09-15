@@ -33,12 +33,12 @@ public class ClientCommunicationManager extends CommunicationManager {
 
     @Override
     protected void handle(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.REGISTER_METADATA.IDENTIFIER)) {
+        if (id.equals(PacketType.REGISTER_METADATA.identifier)) {
             final ServerPlacement placement = receiveMetaData(packetBuf);
             context.getSyncmaticManager().addPlacement(placement);
             return;
         }
-        if (id.equals(PacketType.REMOVE_SYNCMATIC.IDENTIFIER)) {
+        if (id.equals(PacketType.REMOVE_SYNCMATIC.identifier)) {
             final UUID placementId = packetBuf.readUuid();
             final ServerPlacement placement = context.getSyncmaticManager().getPlacement(placementId);
             if (placement != null) {
@@ -54,7 +54,7 @@ public class ClientCommunicationManager extends CommunicationManager {
             }
             return;
         }
-        if (id.equals(PacketType.MODIFY.IDENTIFIER)) {
+        if (id.equals(PacketType.MODIFY.identifier)) {
             final UUID placementId = packetBuf.readUuid();
             final ServerPlacement toModify = context.getSyncmaticManager().getPlacement(placementId);
             receivePositionData(toModify, packetBuf);
@@ -62,7 +62,7 @@ public class ClientCommunicationManager extends CommunicationManager {
             context.getSyncmaticManager().updateServerPlacement(toModify);
             return;
         }
-        if (id.equals(PacketType.MESSAGE.IDENTIFIER)) {
+        if (id.equals(PacketType.MESSAGE.identifier)) {
             final Message.MessageType type = mapMessageType(MessageType.valueOf(packetBuf.readString(32767)));
             final String text = packetBuf.readString(32767);
             ScreenHelper.ifPresent(s -> s.addMessage(type, text));

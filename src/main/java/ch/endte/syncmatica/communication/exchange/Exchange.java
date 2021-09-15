@@ -12,40 +12,40 @@ import net.minecraft.util.Identifier;
 // another thing of note is that an Exchange is only one half of the entire exchange
 // thus only encompasses half of the entire behavior of an exchange
 // e.g. there could be a class receiveData and a class sendData creating
-// the 2 halves of a transmit data exchange
+// the 2 halves of a TRANSMIT_DATA_EXCHANGE
 
 
 public interface Exchange {
 
     // uniquely identifies the partner of this exchange
-    public ExchangeTarget getPartner();
+    ExchangeTarget getPartner();
 
     // in case an exchange starts another exchange they need to be able to reach for
     // the manager
-    public Context getContext();
+    Context getContext();
 
     // looks into the received packet and returns
     // whether this exchange handles the packet or not
     // this test should have no side effects.
     // doesn't handle packets directly
-    public boolean checkPacket(Identifier id, PacketByteBuf packetBuf);
+    boolean checkPacket(Identifier id, PacketByteBuf packetBuf);
 
     // handles the data of this specific packet
-    public void handle(Identifier id, PacketByteBuf packetBuf);
+    void handle(Identifier id, PacketByteBuf packetBuf);
 
     // marks an exchange that has terminated
-    public boolean isFinished();
+    boolean isFinished();
 
     // marks a successfully finished exchange
-    public boolean isSuccessful();
+    boolean isSuccessful();
 
     // marks an external unsuccessful close
     // upon a close the exchange might send a cancel packet for this request
     // if the notifyPartner boolean is set to true
     // otherwise this will not happen
-    public void close(boolean notifyPartner);
+    void close(boolean notifyPartner);
 
     // initializes the actual Exchange
-    public void init();
+    void init();
 
 }

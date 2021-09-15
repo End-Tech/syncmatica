@@ -15,7 +15,7 @@ public class QuotaService extends AbstractService {
     Integer limit = QUOTA_LIMIT_DEFAULT;
 
     public Boolean isOverQuota(final ExchangeTarget sender, final Integer newData) {
-        if (!isEnabled) {
+        if (!Boolean.TRUE.equals(isEnabled)) {
             return false;
         }
         int curValue = progress.getOrDefault(sender.getPersistentName(), 0);
@@ -24,7 +24,7 @@ public class QuotaService extends AbstractService {
     }
 
     public void progressQuota(final ExchangeTarget sender, final Integer newData) {
-        if (isEnabled) {
+        if (Boolean.TRUE.equals(isEnabled)) {
             final int curValue = progress.getOrDefault(sender.getPersistentName(), 0);
             progress.put(sender.getPersistentName(), curValue + newData);
         }

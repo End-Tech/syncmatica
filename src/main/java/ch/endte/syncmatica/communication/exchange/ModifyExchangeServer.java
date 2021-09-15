@@ -23,13 +23,13 @@ public class ModifyExchangeServer extends AbstractExchange {
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        return id.equals(PacketType.MODIFY_FINISH.IDENTIFIER) && checkUUID(packetBuf, placement.getId());
+        return id.equals(PacketType.MODIFY_FINISH.identifier) && checkUUID(packetBuf, placement.getId());
     }
 
     @Override
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
         packetBuf.readUuid(); // consume uuid
-        if (id.equals(PacketType.MODIFY_FINISH.IDENTIFIER)) {
+        if (id.equals(PacketType.MODIFY_FINISH.identifier)) {
             getContext().getCommunicationManager().receivePositionData(placement, packetBuf);
             succeed();
         }
@@ -47,7 +47,7 @@ public class ModifyExchangeServer extends AbstractExchange {
     private void accept() {
         final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeUuid(placement.getId());
-        getPartner().sendPacket(PacketType.MODIFY_REQUEST_ACCEPT.IDENTIFIER, buf, getContext());
+        getPartner().sendPacket(PacketType.MODIFY_REQUEST_ACCEPT.identifier, buf, getContext());
         getContext().getCommunicationManager().setModifier(placement, this);
     }
 
@@ -55,7 +55,7 @@ public class ModifyExchangeServer extends AbstractExchange {
     protected void sendCancelPacket() {
         final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeUuid(placementId);
-        getPartner().sendPacket(PacketType.MODIFY_REQUEST_DENY.IDENTIFIER, buf, getContext());
+        getPartner().sendPacket(PacketType.MODIFY_REQUEST_DENY.identifier, buf, getContext());
     }
 
     public ServerPlacement getPlacement() {

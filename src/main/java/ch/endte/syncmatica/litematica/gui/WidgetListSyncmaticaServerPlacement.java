@@ -39,7 +39,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         browserEntriesOffsetY = widgetSearchBar.getHeight() + 3;
         this.parent = parent;
         setSize(width, height);
-        ScreenHelper.ifPresent((s) -> s.setCurrentGui(parent));
+        ScreenHelper.ifPresent(s -> s.setCurrentGui(parent));
     }
 
     @Override
@@ -102,7 +102,6 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         final BlockPos origin = placement.getPosition();
         final String tmp = String.format("%d %d %d", origin.getX(), origin.getY(), origin.getZ());
         drawString(matrixStack, tmp, x + 4, y, valueColor);
-        y += 12;
     }
 
     @Override

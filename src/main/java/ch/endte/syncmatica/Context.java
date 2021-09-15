@@ -111,10 +111,10 @@ public class Context {
         return new File(getConfigFolder(), "config.json");
     }
 
-    public File getAndCreateConfigFile() throws Exception {
+    public File getAndCreateConfigFile() throws IOException {
         getConfigFolder().mkdirs();
         final File configFile = getConfigFile();
-        configFile.createNewFile(); //NOSONAR
+        configFile.createNewFile();
         return configFile;
     }
 
@@ -134,7 +134,7 @@ public class Context {
         needsRewrite |= loadConfigurationForService(debugService, configuration, attemptToLoad);
         if (needsRewrite) {
             try (
-                    final Writer writer = new BufferedWriter(new FileWriter(getAndCreateConfigFile()));
+                    final Writer writer = new BufferedWriter(new FileWriter(getAndCreateConfigFile()))
             ) {
                 final Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 final String jsonString = gson.toJson(configuration);
@@ -192,5 +192,21 @@ public class Context {
             quota.shutdown();
         }
         debugService.shutdown();
+    }
+
+    public static class DuplicateContextAssignmentException extends RuntimeException {
+        private static final long serialVersionUID = -5147544661160756303L;
+
+        public DuplicateContextAssignmentException(final String reason) {
+            super(reason);
+        }
+    }
+
+    public static class ContextMismatchException extends RuntimeException {
+        private static final long serialVersionUID = 2769376183212635479L;
+
+        public ContextMismatchException(final String reason) {
+            super(reason);
+        }
     }
 }

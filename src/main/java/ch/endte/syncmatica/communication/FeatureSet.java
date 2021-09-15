@@ -13,7 +13,7 @@ public class FeatureSet {
     private final Collection<Feature> features;
 
     public static FeatureSet fromVersionString(String version) {
-        if (version.matches("^\\d+(\\.\\d+){2,}$")) {
+        if (version.matches("^\\d+(\\.\\d+){2,4}$")) {
             final int minSize = version.indexOf(".");
             while (version.length() > minSize) {
                 if (versionFeatures.containsKey(version)) {
@@ -38,7 +38,7 @@ public class FeatureSet {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         final StringBuilder output = new StringBuilder();
         boolean b = false;
         for (final Feature feature : features) {
@@ -58,7 +58,7 @@ public class FeatureSet {
 
     static {
         versionFeatures = new HashMap<>();
-        versionFeatures.put("0.1", new FeatureSet(Arrays.asList(Feature.CORE)));
+        versionFeatures.put("0.1", new FeatureSet(Collections.singletonList(Feature.CORE)));
     }
 
 }

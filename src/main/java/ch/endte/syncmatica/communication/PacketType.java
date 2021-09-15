@@ -5,7 +5,7 @@ import net.minecraft.util.Identifier;
 public enum PacketType {
 
     REGISTER_METADATA("syncmatica:register_metadata"),
-    // one packet will be responsible for sending the entire meta data of a syncmatic
+    // one packet will be responsible for sending the entire metadata of a syncmatic
     // it marks the creation of a syncmatic - for now it also is responsible
     // for changing the syncmatic server and client side
 
@@ -18,12 +18,12 @@ public enum PacketType {
     // litematic starting with a download request
 
     SEND_LITEMATIC("syncmatica:send_litematic"),
-    // a packet responsible for sending a bit of a litematic (16kbits to be precise (half of what minecraft can send in one packet at most))
+    // a packet responsible for sending a bit of a litematic (16 kilo-bytes to be precise (half of what minecraft can send in one packet at most))
 
     RECEIVED_LITEMATIC("syncmatica:received_litematic"),
     // a packet responsible for triggering another send for a litematic
-    // by waiting until a response is send I hope we can ensure
-    // that we do not overwhelm the clients connection to the server
+    // by waiting until a response is sent I hope we can ensure
+    // that we do not overwhelm the clients' connection to the server
 
     FINISHED_LITEMATIC("syncmatica:finished_litematic"),
     // a packet responsible for marking the end of a litematic
@@ -34,18 +34,18 @@ public enum PacketType {
     // will be sent in several cases - upon errors mostly
 
     REMOVE_SYNCMATIC("syncmatica:remove_syncmatic"),
-    // a packet that will be send to clients when a syncmatic got removed
+    // a packet that will be sent to clients when a syncmatic got removed
     // send to the server by a client if a specific client intends to remove a litematic from the server
 
     REGISTER_VERSION("syncmatica:register_version"),
-    // this packet will be send to the client when it joins the server
+    // this packet will be sent to the client when it joins the server
     // upon receiving this packet the client will check the server version
     // initializes syncmatica on the clients end
     // if it can function with the version on the server then it will respond with a version of its own
     // if the server can handle the client version the server will send
 
     CONFIRM_USER("syncmatica:confirm_user"),
-    // the confirm user packet
+    // the confirm-user packet
     // send after a successful version exchange
     // fully starts up syncmatica on the clients end
     // sends all server placements along to the client
@@ -75,16 +75,17 @@ public enum PacketType {
 
     MESSAGE("syncmatica:mesage");
     // sends a message from client to server - allows for future compatability
+    // can't fix the typo here lol
 
-    public final Identifier IDENTIFIER;
+    public final Identifier identifier;
 
     PacketType(final String id) {
-        IDENTIFIER = new Identifier(id);
+        identifier = new Identifier(id);
     }
 
     public static boolean containsIdentifier(final Identifier id) {
         for (final PacketType p : PacketType.values()) {
-            if (id.equals(p.IDENTIFIER)) { // this took I kid you not 4-5 hours to find
+            if (id.equals(p.identifier)) { // this took I kid you not 4-5 hours to find
                 return true;
             }
         }

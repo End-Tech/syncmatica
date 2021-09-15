@@ -22,22 +22,22 @@ public class VersionHandshakeClient extends FeatureExchange {
 
     @Override
     public boolean checkPacket(final Identifier id, final PacketByteBuf packetBuf) {
-        return id.equals(PacketType.CONFIRM_USER.IDENTIFIER)
-                || id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)
+        return id.equals(PacketType.CONFIRM_USER.identifier)
+                || id.equals(PacketType.REGISTER_VERSION.identifier)
                 || super.checkPacket(id, packetBuf);
     }
 
     @Override
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
-        if (id.equals(PacketType.REGISTER_VERSION.IDENTIFIER)) {
-            final String partnerVersion = packetBuf.readString(32767);
-            if (!getContext().checkPartnerVersion(partnerVersion)) {
+        if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
+            final String version = packetBuf.readString(32767);
+            if (!getContext().checkPartnerVersion(version)) {
                 // any further packets are risky so no further packets should get send
-                LogManager.getLogger(VersionHandshakeClient.class).info("Denying syncmatica join due to outdated server with local version {} and server version {}", Syncmatica.VERSION, partnerVersion);
+                LogManager.getLogger(VersionHandshakeClient.class).info("Denying syncmatica join due to outdated server with local version {} and server version {}", Syncmatica.VERSION, version);
                 close(false);
             } else {
-                this.partnerVersion = partnerVersion;
-                final FeatureSet fs = FeatureSet.fromVersionString(partnerVersion);
+                partnerVersion = version;
+                final FeatureSet fs = FeatureSet.fromVersionString(version);
                 if (fs == null) {
                     requestFeatureSet();
                 } else {
@@ -45,7 +45,7 @@ public class VersionHandshakeClient extends FeatureExchange {
                     onFeatureSetReceive();
                 }
             }
-        } else if (id.equals(PacketType.CONFIRM_USER.IDENTIFIER)) {
+        } else if (id.equals(PacketType.CONFIRM_USER.identifier)) {
             final int placementCount = packetBuf.readInt();
             for (int i = 0; i < placementCount; i++) {
                 final ServerPlacement p = getManager().receiveMetaData(packetBuf);
@@ -64,15 +64,12 @@ public class VersionHandshakeClient extends FeatureExchange {
     public void onFeatureSetReceive() {
         final PacketByteBuf newBuf = new PacketByteBuf(Unpooled.buffer());
         newBuf.writeString(Syncmatica.VERSION);
-        getPartner().sendPacket(PacketType.REGISTER_VERSION.IDENTIFIER, newBuf, getContext());
+        getPartner().sendPacket(PacketType.REGISTER_VERSION.identifier, newBuf, getContext());
     }
 
     @Override
     public void init() {
-    }
-
-    @Override
-    protected void sendCancelPacket() {
+        // Not required - just await message from the server
     }
 
 }
