@@ -46,7 +46,7 @@ public abstract class MixinServerPlayNetworkHandler {
 
     @Inject(method = "onCustomPayload", at = @At("HEAD"))
     public void onCustomPayload(final CustomPayloadC2SPacket packet, final CallbackInfo ci) {
-        NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler) (Object) this, player.getServerWorld());
+        NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler) (Object) this, player.getWorld());
         final Identifier id = ((MixinCustomPayloadC2SPacket) packet).getChannel();
         final PacketByteBuf packetBuf = ((MixinCustomPayloadC2SPacket) packet).getData();
         operateComms(sm -> sm.onPacket(getExchangeTarget(), id, packetBuf));

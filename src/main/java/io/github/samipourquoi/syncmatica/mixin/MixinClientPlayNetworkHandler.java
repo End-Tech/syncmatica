@@ -13,6 +13,7 @@ import io.github.samipourquoi.syncmatica.litematica.ScreenHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.util.telemetry.TelemetrySender;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -33,7 +34,7 @@ public abstract class MixinClientPlayNetworkHandler {
     private CommunicationManager clientCommunication;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void startupClient(final MinecraftClient client, final Screen screen, final ClientConnection connection, final GameProfile profile, final CallbackInfo ci) {
+    private void startupClient(final MinecraftClient client, final Screen screen, final ClientConnection connection, final GameProfile profile, TelemetrySender telemetrySender, final CallbackInfo ci) {
         final IFileStorage data = new RedirectFileStorage();
         final SyncmaticManager man = new SyncmaticManager();
         exTarget = new ExchangeTarget((ClientPlayNetworkHandler) (Object) this);

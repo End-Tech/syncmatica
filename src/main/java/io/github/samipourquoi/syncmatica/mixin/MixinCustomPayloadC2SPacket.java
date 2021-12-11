@@ -11,9 +11,9 @@ import net.minecraft.util.Identifier;
 public interface MixinCustomPayloadC2SPacket {
 	
     @Accessor("channel")
-    public Identifier getChannel();
+    Identifier getChannel();
     
     @Accessor("data")
-    public PacketByteBuf getData();
+    PacketByteBuf getData();
     
 }
