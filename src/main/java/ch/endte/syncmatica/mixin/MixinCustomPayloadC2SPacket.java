@@ -14,5 +14,4 @@ public interface MixinCustomPayloadC2SPacket {
 
     @Accessor("data")
     public PacketByteBuf getData();
-
 }
