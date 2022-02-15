@@ -102,6 +102,18 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         final BlockPos origin = placement.getPosition();
         final String tmp = String.format("%d %d %d", origin.getX(), origin.getY(), origin.getZ());
         drawString(matrixStack, tmp, x + 4, y, valueColor);
+        y += 12;
+
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.owner");
+        drawString(matrixStack, str, x, y, textColor);
+        y += 12;
+        drawString(matrixStack, placement.getOwner().getName(), x + 4, y, valueColor);
+        y += 12;
+
+        str = StringUtils.translate("syncmatica.gui.label.placement_info.last_modified");
+        drawString(matrixStack, str, x, y, textColor);
+        y += 12;
+        drawString(matrixStack, placement.getLastModifiedBy().getName(), x + 4, y, valueColor);
     }
 
     @Override

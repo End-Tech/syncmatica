@@ -14,7 +14,8 @@
 		"MixinButtonBase",
 		"MixinWidgetSchematicPlacement",
 		"MixinGuiPlacementConfiguration",
-		"MixinWidgetPlacementSubRegion"
+		"MixinSubregionPlacement",
+		"MixinSchematicPlacementManager"
 	],
 	"server": [],
 	"injectors": {

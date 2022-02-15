@@ -48,7 +48,7 @@ public class VersionHandshakeClient extends FeatureExchange {
         } else if (id.equals(PacketType.CONFIRM_USER.identifier)) {
             final int placementCount = packetBuf.readInt();
             for (int i = 0; i < placementCount; i++) {
-                final ServerPlacement p = getManager().receiveMetaData(packetBuf);
+                final ServerPlacement p = getManager().receiveMetaData(packetBuf, getPartner());
                 getContext().getSyncmaticManager().addPlacement(p);
             }
             LogManager.getLogger(VersionHandshakeClient.class).info("Joining syncmatica server with local version {} and server version {}", Syncmatica.VERSION, partnerVersion);

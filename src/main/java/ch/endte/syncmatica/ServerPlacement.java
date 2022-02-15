@@ -1,5 +1,7 @@
 package ch.endte.syncmatica;
 
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
+import ch.endte.syncmatica.extended_core.SubRegionData;
 import ch.endte.syncmatica.material.SyncmaticaMaterialList;
 import ch.endte.syncmatica.util.SyncmaticaUtil;
 import com.google.gson.JsonObject;
@@ -17,23 +19,30 @@ public class ServerPlacement {
     private final UUID id;
 
     private final String fileName;
-    private final UUID hashValue; //UUID for the file contents
+    private final UUID hashValue; // UUID for the file contents
     // UUID since easier to transmit compare etc.
+
+    private PlayerIdentifier owner; // player that shared it
+    private PlayerIdentifier lastModifiedBy; // player that last modified it
 
     private ServerPosition origin;
     private BlockRotation rotation;
     private BlockMirror mirror;
 
+    private SubRegionData subRegionData = new SubRegionData();
+
     private SyncmaticaMaterialList matList;
 
-    public ServerPlacement(final UUID id, final String fileName, final UUID hashValue) {
+    public ServerPlacement(final UUID id, final String fileName, final UUID hashValue, final PlayerIdentifier owner) {
         this.id = id;
         this.fileName = fileName;
         this.hashValue = hashValue;
+        this.owner = owner;
+        lastModifiedBy = owner;
     }
 
-    public ServerPlacement(final UUID id, final File file) {
-        this(id, removeExtension(file), generateHash(file));
+    public ServerPlacement(final UUID id, final File file, final PlayerIdentifier owner) {
+        this(id, removeExtension(file), generateHash(file), owner);
     }
 
     public UUID getId() {
@@ -80,6 +89,28 @@ public class ServerPlacement {
         return this;
     }
 
+    public PlayerIdentifier getOwner() {
+        return owner;
+    }
+
+    public void selectOwner(final PlayerIdentifier playerIdentifier) {
+        if (owner.equals(PlayerIdentifier.MISSING_PLAYER)) {
+            owner = playerIdentifier;
+        }
+    }
+
+    public PlayerIdentifier getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(final PlayerIdentifier lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public SubRegionData getSubRegionData() {
+        return subRegionData;
+    }
+
     public SyncmaticaMaterialList getMaterialList() {
         return matList;
     }
@@ -119,10 +150,15 @@ public class ServerPlacement {
         obj.add("rotation", new JsonPrimitive(rotation.name()));
         obj.add("mirror", new JsonPrimitive(mirror.name()));
 
+        obj.add("owner", owner.toJson());
+        obj.add("lastModifiedBy", lastModifiedBy.toJson());
+
+        obj.add("subregionData", subRegionData.toJson());
+
         return obj;
     }
 
-    public static ServerPlacement fromJson(final JsonObject obj) {
+    public static ServerPlacement fromJson(final JsonObject obj, final Context context) {
         if (obj.has("id")
                 && obj.has("file_name")
                 && obj.has("hash")
@@ -133,7 +169,12 @@ public class ServerPlacement {
             final String name = obj.get("file_name").getAsString();
             final UUID hashValue = UUID.fromString(obj.get("hash").getAsString());
 
-            final ServerPlacement newPlacement = new ServerPlacement(id, name, hashValue);
+            PlayerIdentifier owner = PlayerIdentifier.MISSING_PLAYER;
+            if (obj.has("owner")) {
+                owner = context.getPlayerIdentifierProvider().fromJson(obj.get("owner").getAsJsonObject());
+            }
+
+            final ServerPlacement newPlacement = new ServerPlacement(id, name, hashValue, owner);
 
             final ServerPosition pos = ServerPosition.fromJson(obj.get("origin").getAsJsonObject());
             if (pos == null) {
@@ -143,10 +184,21 @@ public class ServerPlacement {
             newPlacement.rotation = BlockRotation.valueOf(obj.get("rotation").getAsString());
             newPlacement.mirror = BlockMirror.valueOf(obj.get("mirror").getAsString());
 
+            if (obj.has("lastModifiedBy")) {
+                newPlacement.lastModifiedBy = context.getPlayerIdentifierProvider()
+                        .fromJson(obj.get("lastModifiedBy").getAsJsonObject());
+            } else {
+                newPlacement.lastModifiedBy = PlayerIdentifier.MISSING_PLAYER;
+            }
+
+            if (obj.has("subregionData")) {
+                newPlacement.subRegionData = SubRegionData.fromJson(obj.getAsJsonObject("subregionData"));
+            }
+
             return newPlacement;
         }
+
         return null;
     }
-
 
 }

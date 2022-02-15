@@ -1,9 +1,14 @@
 package ch.endte.syncmatica.communication;
 
 import ch.endte.syncmatica.Context;
+import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.exchange.DownloadExchange;
 import ch.endte.syncmatica.communication.exchange.Exchange;
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
+import ch.endte.syncmatica.extended_core.PlayerIdentifierProvider;
+import ch.endte.syncmatica.extended_core.SubRegionData;
+import ch.endte.syncmatica.extended_core.SubRegionPlacementModification;
 import ch.endte.syncmatica.util.SyncmaticaUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
@@ -67,20 +72,27 @@ public abstract class CommunicationManager {
 
     public void sendMetaData(final ServerPlacement metaData, final ExchangeTarget target) {
         final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        putMetaData(metaData, buf);
+        putMetaData(metaData, buf, target);
         target.sendPacket(PacketType.REGISTER_METADATA.identifier, buf, context);
     }
 
-    public void putMetaData(final ServerPlacement metaData, final PacketByteBuf buf) {
+    public void putMetaData(final ServerPlacement metaData, final PacketByteBuf buf, final ExchangeTarget exchangeTarget) {
         buf.writeUuid(metaData.getId());
 
         buf.writeString(SyncmaticaUtil.sanitizeFileName(metaData.getName()));
         buf.writeUuid(metaData.getHash());
 
-        putPositionData(metaData, buf);
+        if (exchangeTarget.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+            buf.writeUuid(metaData.getOwner().uuid);
+            buf.writeString(metaData.getOwner().getName());
+            buf.writeUuid(metaData.getLastModifiedBy().uuid);
+            buf.writeString(metaData.getLastModifiedBy().getName());
+        }
+
+        putPositionData(metaData, buf, exchangeTarget);
     }
 
-    public void putPositionData(final ServerPlacement metaData, final PacketByteBuf buf) {
+    public void putPositionData(final ServerPlacement metaData, final PacketByteBuf buf, final ExchangeTarget exchangeTarget) {
         buf.writeBlockPos(metaData.getPosition());
         buf.writeString(metaData.getDimension());
         // one of the rare use cases for ordinal
@@ -89,26 +101,75 @@ public abstract class CommunicationManager {
         // of the ordinal values over time
         buf.writeInt(metaData.getRotation().ordinal());
         buf.writeInt(metaData.getMirror().ordinal());
+
+        if (exchangeTarget.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+            if (metaData.getSubRegionData().getModificationData() == null) {
+                buf.writeInt(0);
+
+                return;
+            }
+
+            final Collection<SubRegionPlacementModification> regionData = metaData.getSubRegionData().getModificationData().values();
+            buf.writeInt(regionData.size());
+
+            for (final SubRegionPlacementModification subPlacement : regionData) {
+                buf.writeString(subPlacement.name);
+                buf.writeBlockPos(subPlacement.position);
+                buf.writeInt(subPlacement.rotation.ordinal());
+                buf.writeInt(subPlacement.mirror.ordinal());
+            }
+        }
     }
 
-    public ServerPlacement receiveMetaData(final PacketByteBuf buf) {
+    public ServerPlacement receiveMetaData(final PacketByteBuf buf, final ExchangeTarget exchangeTarget) {
         final UUID id = buf.readUuid();
 
         final String fileName = SyncmaticaUtil.sanitizeFileName(buf.readString(32767));
         final UUID hash = buf.readUuid();
-        final ServerPlacement placement = new ServerPlacement(id, fileName, hash);
 
-        receivePositionData(placement, buf);
+        PlayerIdentifier owner = PlayerIdentifier.MISSING_PLAYER;
+        PlayerIdentifier lastModifiedBy = PlayerIdentifier.MISSING_PLAYER;
+
+        if (exchangeTarget.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+            final PlayerIdentifierProvider provider = context.getPlayerIdentifierProvider();
+            owner = provider.createOrGet(
+                    buf.readUuid(),
+                    buf.readString(32767)
+            );
+            lastModifiedBy = provider.createOrGet(
+                    buf.readUuid(),
+                    buf.readString(32767)
+            );
+        }
+
+        final ServerPlacement placement = new ServerPlacement(id, fileName, hash, owner);
+        placement.setLastModifiedBy(lastModifiedBy);
+
+        receivePositionData(placement, buf, exchangeTarget);
 
         return placement;
     }
 
-    public void receivePositionData(final ServerPlacement placement, final PacketByteBuf buf) {
+    public void receivePositionData(final ServerPlacement placement, final PacketByteBuf buf, final ExchangeTarget exchangeTarget) {
         final BlockPos pos = buf.readBlockPos();
         final String dimensionId = buf.readString(32767);
         final BlockRotation rot = rotOrdinals[buf.readInt()];
         final BlockMirror mir = mirOrdinals[buf.readInt()];
         placement.move(dimensionId, pos, rot, mir);
+
+        if (exchangeTarget.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+            final SubRegionData subRegionData = placement.getSubRegionData();
+            subRegionData.reset();
+            final int limit = buf.readInt();
+            for (int i = 0; i < limit; i++) {
+                subRegionData.modify(
+                        buf.readString(32767),
+                        buf.readBlockPos(),
+                        rotOrdinals[buf.readInt()],
+                        mirOrdinals[buf.readInt()]
+                );
+            }
+        }
     }
 
     public void download(final ServerPlacement syncmatic, final ExchangeTarget source) throws NoSuchAlgorithmException, IOException {
@@ -167,6 +228,4 @@ public abstract class CommunicationManager {
         e.getPartner().getExchanges().remove(e);
         handleExchange(e);
     }
-
-
 }

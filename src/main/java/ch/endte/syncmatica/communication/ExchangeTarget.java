@@ -65,5 +65,4 @@ public class ExchangeTarget {
     public String getPersistentName() {
         return persistentName;
     }
-
 }

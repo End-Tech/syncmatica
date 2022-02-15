@@ -1,13 +1,22 @@
 package ch.endte.syncmatica.litematica;
 
 import ch.endte.syncmatica.*;
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
+import ch.endte.syncmatica.extended_core.SubRegionData;
+import ch.endte.syncmatica.extended_core.SubRegionPlacementModification;
+import ch.endte.syncmatica.litematica_mixin.MixinSchematicPlacementManager;
+import ch.endte.syncmatica.litematica_mixin.MixinSubregionPlacement;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.Message;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
 import java.io.File;
@@ -18,6 +27,8 @@ import java.util.*;
 // shared from this client)
 
 public class LitematicManager {
+
+    private static final BlockPos SUBREGION_DEFAULT = BlockPos.ORIGIN;
 
     private static LitematicManager instance = null;
 
@@ -87,6 +98,7 @@ public class LitematicManager {
         }
         litematicaPlacement.setRotation(placement.getRotation(), null);
         litematicaPlacement.setMirror(placement.getMirror(), null);
+        transferSubregionDataToClientPlacement(placement, litematicaPlacement);
         litematicaPlacement.toggleLocked();
 
         DataManager.getSchematicPlacementManager().addSchematicPlacement(litematicaPlacement, true);
@@ -118,10 +130,15 @@ public class LitematicManager {
                 return null;
             }
 
-            final ServerPlacement placement = new ServerPlacement(UUID.randomUUID(), placementFile);
+            final PlayerIdentifier owner = context.getPlayerIdentifierProvider().createOrGet(
+                    MinecraftClient.getInstance().getSession().getProfile()
+            );
+
+            final ServerPlacement placement = new ServerPlacement(UUID.randomUUID(), placementFile, owner);
             // thanks miniHUD
             final String dimension = MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
             placement.move(dimension, schem.getOrigin(), schem.getRotation(), schem.getMirror());
+            transferSubregionDataToServerPlacement(schem, placement);
             return placement;
         } catch (final Exception e) {
             ScreenHelper.ifPresent(s -> s.addMessage(Message.MessageType.ERROR, "syncmatica.error.create_from_schematic", e.getMessage()));
@@ -129,6 +146,48 @@ public class LitematicManager {
         return null;
     }
 
+    private void transferSubregionDataToServerPlacement(final SchematicPlacement schem, final ServerPlacement placement) {
+        final Collection<SubRegionPlacement> subLitematica = schem.getAllSubRegionsPlacements();
+        final SubRegionData subRegionData = placement.getSubRegionData();
+        subRegionData.reset();
+        for (final SubRegionPlacement subRegionPlacement : subLitematica) {
+            if (isSubregionModified(subRegionPlacement)) {
+                subRegionData.modify(
+                        subRegionPlacement.getName(),
+                        subRegionPlacement.getPos(),
+                        subRegionPlacement.getRotation(),
+                        subRegionPlacement.getMirror()
+                );
+            }
+        }
+    }
+
+    private void transferSubregionDataToClientPlacement(final ServerPlacement placement, final SchematicPlacement schem) {
+        final Collection<SubRegionPlacement> subLitematica = schem.getAllSubRegionsPlacements();
+        final Map<String, SubRegionPlacementModification> modificationData = placement.getSubRegionData().getModificationData();
+        for (final SubRegionPlacement subRegionPlacement : subLitematica) {
+            final SubRegionPlacementModification modification = modificationData != null ?
+                    modificationData.get(subRegionPlacement.getName()) :
+                    null;
+
+            final SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+            final MixinSchematicPlacementManager mixinManager = (MixinSchematicPlacementManager) manager;
+            final MixinSubregionPlacement mutable = (MixinSubregionPlacement) subRegionPlacement;
+            if (modification != null) {
+                mixinManager.preSubregionChange(schem);
+                mutable.setBlockPosition(modification.position);
+                mutable.setBlockRotation(modification.rotation);
+                mutable.setBlockMirror(modification.mirror);
+                ((MovingFinisher) schem).onFinishedMoving(subRegionPlacement.getName(), manager);
+            } else {
+                if (isSubregionModified(subRegionPlacement)) {
+                    mixinManager.preSubregionChange(schem);
+                    resetSubRegion(subRegionPlacement);
+                    ((MovingFinisher) schem).onFinishedMoving(subRegionPlacement.getName(), manager);
+                }
+            }
+        }
+    }
 
     public SchematicPlacement schematicFromSyncmatic(final ServerPlacement p) {
         return rendering.get(p);
@@ -154,6 +213,7 @@ public class LitematicManager {
         litematicaPlacement.setOrigin(placement.getPosition(), null);
         litematicaPlacement.setRotation(placement.getRotation(), null);
         litematicaPlacement.setMirror(placement.getMirror(), null);
+        transferSubregionDataToClientPlacement(placement, litematicaPlacement);
         litematicaPlacement.toggleLocked();
         context.getSyncmaticManager().updateServerPlacement(placement);
         if (addToRendering) {
@@ -182,9 +242,20 @@ public class LitematicManager {
         litematicaPlacement.setOrigin(placement.getPosition(), null);
         litematicaPlacement.setRotation(placement.getRotation(), null);
         litematicaPlacement.setMirror(placement.getMirror(), null);
+        transferSubregionDataToClientPlacement(placement, litematicaPlacement);
         if (wasLocked) {
             litematicaPlacement.toggleLocked();
         }
+    }
+
+    public void updateServerPlacement(final SchematicPlacement placement, final ServerPlacement serverPlacement) {
+        serverPlacement.move(
+                serverPlacement.getDimension(), // dimension never changes
+                placement.getOrigin(),
+                placement.getRotation(),
+                placement.getMirror()
+        );
+        transferSubregionDataToServerPlacement(placement, serverPlacement);
     }
 
     public boolean isRendered(final ServerPlacement placement) {
@@ -193,6 +264,18 @@ public class LitematicManager {
 
     public boolean isSyncmatic(final SchematicPlacement schem) {
         return rendering.containsValue(schem);
+    }
+
+    public boolean isSubregionModified(final SubRegionPlacement subRegionPlacement) {
+        return subRegionPlacement.getMirror() != BlockMirror.NONE || subRegionPlacement.getRotation() != BlockRotation.NONE ||
+                !subRegionPlacement.getPos().equals(SUBREGION_DEFAULT);
+    }
+
+    public void resetSubRegion(final SubRegionPlacement subRegionPlacement) {
+        final MixinSubregionPlacement mutable = (MixinSubregionPlacement) subRegionPlacement;
+        mutable.setBlockMirror(BlockMirror.NONE);
+        mutable.setBlockRotation(BlockRotation.NONE);
+        mutable.setBlockPosition(SUBREGION_DEFAULT);
     }
 
     // gets called by code mixed into litematicas loading stage

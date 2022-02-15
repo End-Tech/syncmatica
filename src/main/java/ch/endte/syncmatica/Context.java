@@ -2,6 +2,7 @@ package ch.endte.syncmatica;
 
 import ch.endte.syncmatica.communication.CommunicationManager;
 import ch.endte.syncmatica.communication.FeatureSet;
+import ch.endte.syncmatica.extended_core.PlayerIdentifierProvider;
 import ch.endte.syncmatica.service.DebugService;
 import ch.endte.syncmatica.service.IService;
 import ch.endte.syncmatica.service.JsonConfiguration;
@@ -24,6 +25,7 @@ public class Context {
     private boolean isStarted = false;
     private final QuotaService quota;
     private final DebugService debugService;
+    private final PlayerIdentifierProvider playerIdentifierProvider;
 
     public Context(final IFileStorage fs, final CommunicationManager comMan, final SyncmaticManager synMan, final boolean isServer, final File litematicFolder) {
         files = fs;
@@ -38,10 +40,15 @@ public class Context {
         } else {
             quota = null;
         }
+        playerIdentifierProvider = new PlayerIdentifierProvider(this);
         debugService = new DebugService();
         this.litematicFolder = litematicFolder;
         litematicFolder.mkdirs();
         loadConfiguration();
+    }
+
+    public PlayerIdentifierProvider getPlayerIdentifierProvider() {
+        return playerIdentifierProvider;
     }
 
     public IFileStorage getFileStorage() {

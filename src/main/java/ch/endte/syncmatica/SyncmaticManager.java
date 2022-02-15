@@ -101,7 +101,7 @@ public class SyncmaticManager {
                 e.printStackTrace();
             }
             if (element == null) {
-                
+
 
                 return;
             }
@@ -112,7 +112,7 @@ public class SyncmaticManager {
                 }
                 final JsonArray arr = obj.getAsJsonArray(PLACEMENTS_JSON_KEY);
                 for (final JsonElement elem : arr) {
-                    final ServerPlacement p = ServerPlacement.fromJson(elem.getAsJsonObject());
+                    final ServerPlacement p = ServerPlacement.fromJson(elem.getAsJsonObject(), context);
                     addPlacement(p);
                 }
 
