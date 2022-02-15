@@ -153,7 +153,9 @@ public class ServerPlacement {
         obj.add("owner", owner.toJson());
         obj.add("lastModifiedBy", lastModifiedBy.toJson());
 
-        obj.add("subregionData", subRegionData.toJson());
+        if (subRegionData.isModified()) {
+            obj.add("subregionData", subRegionData.toJson());
+        }
 
         return obj;
     }
@@ -192,7 +194,7 @@ public class ServerPlacement {
             }
 
             if (obj.has("subregionData")) {
-                newPlacement.subRegionData = SubRegionData.fromJson(obj.getAsJsonObject("subregionData"));
+                newPlacement.subRegionData = SubRegionData.fromJson(obj.get("subregionData"));
             }
 
             return newPlacement;
@@ -200,5 +202,4 @@ public class ServerPlacement {
 
         return null;
     }
-
 }

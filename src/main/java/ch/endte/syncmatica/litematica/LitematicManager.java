@@ -27,9 +27,6 @@ import java.util.*;
 // shared from this client)
 
 public class LitematicManager {
-
-    private static final BlockPos SUBREGION_DEFAULT = BlockPos.ORIGIN;
-
     private static LitematicManager instance = null;
 
 
@@ -148,10 +145,12 @@ public class LitematicManager {
 
     private void transferSubregionDataToServerPlacement(final SchematicPlacement schem, final ServerPlacement placement) {
         final Collection<SubRegionPlacement> subLitematica = schem.getAllSubRegionsPlacements();
+        final Map<String, BlockPos> defaultPositionMap = schem.getSchematic().getAreaPositions();
         final SubRegionData subRegionData = placement.getSubRegionData();
         subRegionData.reset();
         for (final SubRegionPlacement subRegionPlacement : subLitematica) {
-            if (isSubregionModified(subRegionPlacement)) {
+            final BlockPos defaultPos = defaultPositionMap.get(subRegionPlacement.getName());
+            if (isSubregionModified(subRegionPlacement, defaultPos)) {
                 subRegionData.modify(
                         subRegionPlacement.getName(),
                         subRegionPlacement.getPos(),
@@ -164,12 +163,13 @@ public class LitematicManager {
 
     private void transferSubregionDataToClientPlacement(final ServerPlacement placement, final SchematicPlacement schem) {
         final Collection<SubRegionPlacement> subLitematica = schem.getAllSubRegionsPlacements();
+        final Map<String, BlockPos> defaultPositionMap = schem.getSchematic().getAreaPositions();
         final Map<String, SubRegionPlacementModification> modificationData = placement.getSubRegionData().getModificationData();
         for (final SubRegionPlacement subRegionPlacement : subLitematica) {
             final SubRegionPlacementModification modification = modificationData != null ?
                     modificationData.get(subRegionPlacement.getName()) :
                     null;
-
+            final BlockPos defaultPos = defaultPositionMap.get(subRegionPlacement.getName());
             final SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             final MixinSchematicPlacementManager mixinManager = (MixinSchematicPlacementManager) manager;
             final MixinSubregionPlacement mutable = (MixinSubregionPlacement) subRegionPlacement;
@@ -180,9 +180,9 @@ public class LitematicManager {
                 mutable.setBlockMirror(modification.mirror);
                 ((MovingFinisher) schem).onFinishedMoving(subRegionPlacement.getName(), manager);
             } else {
-                if (isSubregionModified(subRegionPlacement)) {
+                if (isSubregionModified(subRegionPlacement, defaultPos)) {
                     mixinManager.preSubregionChange(schem);
-                    resetSubRegion(subRegionPlacement);
+                    resetSubRegion(subRegionPlacement, defaultPos);
                     ((MovingFinisher) schem).onFinishedMoving(subRegionPlacement.getName(), manager);
                 }
             }
@@ -266,16 +266,16 @@ public class LitematicManager {
         return rendering.containsValue(schem);
     }
 
-    public boolean isSubregionModified(final SubRegionPlacement subRegionPlacement) {
+    public boolean isSubregionModified(final SubRegionPlacement subRegionPlacement, final BlockPos defaultPos) {
         return subRegionPlacement.getMirror() != BlockMirror.NONE || subRegionPlacement.getRotation() != BlockRotation.NONE ||
-                !subRegionPlacement.getPos().equals(SUBREGION_DEFAULT);
+                !subRegionPlacement.getPos().equals(defaultPos);
     }
 
-    public void resetSubRegion(final SubRegionPlacement subRegionPlacement) {
+    public void resetSubRegion(final SubRegionPlacement subRegionPlacement, final BlockPos defaultPos) {
         final MixinSubregionPlacement mutable = (MixinSubregionPlacement) subRegionPlacement;
         mutable.setBlockMirror(BlockMirror.NONE);
         mutable.setBlockRotation(BlockRotation.NONE);
-        mutable.setBlockPosition(SUBREGION_DEFAULT);
+        mutable.setBlockPosition(defaultPos);
     }
 
     // gets called by code mixed into litematicas loading stage
