@@ -151,7 +151,9 @@ public class ServerPlacement {
         obj.add("mirror", new JsonPrimitive(mirror.name()));
 
         obj.add("owner", owner.toJson());
-        obj.add("lastModifiedBy", lastModifiedBy.toJson());
+        if (!owner.equals(lastModifiedBy)) {
+            obj.add("lastModifiedBy", lastModifiedBy.toJson());
+        }
 
         if (subRegionData.isModified()) {
             obj.add("subregionData", subRegionData.toJson());
@@ -190,7 +192,7 @@ public class ServerPlacement {
                 newPlacement.lastModifiedBy = context.getPlayerIdentifierProvider()
                         .fromJson(obj.get("lastModifiedBy").getAsJsonObject());
             } else {
-                newPlacement.lastModifiedBy = PlayerIdentifier.MISSING_PLAYER;
+                newPlacement.lastModifiedBy = owner;
             }
 
             if (obj.has("subregionData")) {
