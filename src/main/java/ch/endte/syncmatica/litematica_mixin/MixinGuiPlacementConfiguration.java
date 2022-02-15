@@ -1,6 +1,7 @@
 package ch.endte.syncmatica.litematica_mixin;
 
 import ch.endte.syncmatica.Context;
+import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.ClientCommunicationManager;
 import ch.endte.syncmatica.communication.ExchangeTarget;
@@ -39,10 +40,6 @@ public abstract class MixinGuiPlacementConfiguration extends GuiBase {
             if (placement.isLocked()) {
                 requestModification();
             } else {
-                if (placement.isRegionPlacementModified()) {
-                    addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
-                    return;
-                }
                 finishModification();
             }
         });
@@ -53,13 +50,21 @@ public abstract class MixinGuiPlacementConfiguration extends GuiBase {
         final Context context = LitematicManager.getInstance().getActiveContext();
         final ExchangeTarget server = ((ClientCommunicationManager) context.getCommunicationManager()).getServer();
         final ServerPlacement serverPlacement = LitematicManager.getInstance().syncmaticFromSchematic(placement);
-
+        if (!server.getFeatureSet().hasFeature(Feature.CORE_EX) && placement.isRegionPlacementModified()) {
+            addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
+            return;
+        }
         final ModifyExchangeClient modifyExchange = new ModifyExchangeClient(serverPlacement, server, context);
         context.getCommunicationManager().startExchange(modifyExchange);
     }
 
     private void finishModification() {
         final Context context = LitematicManager.getInstance().getActiveContext();
+        final ExchangeTarget server = ((ClientCommunicationManager) context.getCommunicationManager()).getServer();
+        if (!server.getFeatureSet().hasFeature(Feature.CORE_EX) && placement.isRegionPlacementModified()) {
+            addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
+            return;
+        }
         final ServerPlacement serverPlacement = LitematicManager.getInstance().syncmaticFromSchematic(placement);
         final ModifyExchangeClient modifyExchange = (ModifyExchangeClient) context.getCommunicationManager().getModifier(serverPlacement);
         if (modifyExchange != null) {

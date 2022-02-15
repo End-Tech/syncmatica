@@ -7,7 +7,8 @@ public enum Feature {
     MODIFY, // commands to modify the placement of a syncmatic placement on the server
     MESSAGE, // ability to send messages to display from server to client
     QUOTA,  // quota on client uploads to the server
-    DEBUG;  // ability to configure debugging
+    DEBUG,  // ability to configure debugging
+    CORE_EX; // extended basic features - such as who owns a placement and subregion sharing
 
     public static Feature fromString(final String s) {
         for (final Feature f : Feature.values()) {

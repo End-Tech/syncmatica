@@ -10,7 +10,6 @@ import ch.endte.syncmatica.litematica.ScreenHelper;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.Message;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -33,7 +32,7 @@ public class ModifyExchangeClient extends AbstractExchange {
         if (id.equals(PacketType.MODIFY_REQUEST_DENY.identifier)
                 || id.equals(PacketType.MODIFY_REQUEST_ACCEPT.identifier)
                 || (expectRemove && id.equals(PacketType.REMOVE_SYNCMATIC.identifier))) {
-            return checkUUID(packetBuf, placement.getId());
+            return AbstractExchange.checkUUID(packetBuf, placement.getId());
         }
         return false;
     }
@@ -86,8 +85,7 @@ public class ModifyExchangeClient extends AbstractExchange {
     }
 
     public void conclude() {
-        final String dimension = MinecraftClient.getInstance().getCameraEntity().getEntityWorld().getRegistryKey().getValue().toString();
-        placement.move(dimension, litematic.getOrigin(), litematic.getRotation(), litematic.getMirror());
+        LitematicManager.getInstance().updateServerPlacement(litematic, placement);
         sendFinish();
         if (!litematic.isLocked()) {
             litematic.toggleLocked();
@@ -99,7 +97,7 @@ public class ModifyExchangeClient extends AbstractExchange {
         if (getPartner().getFeatureSet().hasFeature(Feature.MODIFY)) {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getContext().getCommunicationManager().putPositionData(placement, buf);
+            getContext().getCommunicationManager().putPositionData(placement, buf, getPartner());
             getPartner().sendPacket(PacketType.MODIFY_FINISH.identifier, buf, getContext());
             succeed();
             getContext().getCommunicationManager().notifyClose(this);
@@ -116,7 +114,7 @@ public class ModifyExchangeClient extends AbstractExchange {
         if (getPartner().getFeatureSet().hasFeature(Feature.MODIFY)) {
             final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             buf.writeUuid(placement.getId());
-            getContext().getCommunicationManager().putPositionData(placement, buf);
+            getContext().getCommunicationManager().putPositionData(placement, buf, getPartner());
             getPartner().sendPacket(PacketType.MODIFY_FINISH.identifier, buf, getContext());
         }
     }

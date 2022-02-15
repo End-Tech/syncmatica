@@ -57,7 +57,7 @@ public class VersionHandshakeServer extends FeatureExchange {
         final Collection<ServerPlacement> l = getContext().getSyncmaticManager().getAll();
         newBuf.writeInt(l.size());
         for (final ServerPlacement p : l) {
-            getManager().putMetaData(p, newBuf);
+            getManager().putMetaData(p, newBuf, getPartner());
         }
         getPartner().sendPacket(PacketType.CONFIRM_USER.identifier, newBuf, getContext());
         succeed();

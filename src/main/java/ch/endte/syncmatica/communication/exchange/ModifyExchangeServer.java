@@ -4,6 +4,7 @@ import ch.endte.syncmatica.Context;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.ExchangeTarget;
 import ch.endte.syncmatica.communication.PacketType;
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -30,7 +31,12 @@ public class ModifyExchangeServer extends AbstractExchange {
     public void handle(final Identifier id, final PacketByteBuf packetBuf) {
         packetBuf.readUuid(); // consume uuid
         if (id.equals(PacketType.MODIFY_FINISH.identifier)) {
-            getContext().getCommunicationManager().receivePositionData(placement, packetBuf);
+            getContext().getCommunicationManager().receivePositionData(placement, packetBuf, getPartner());
+
+            final PlayerIdentifier identifier = getContext().getPlayerIdentifierProvider().createOrGet(
+                    getPartner()
+            );
+            placement.setLastModifiedBy(identifier);
             succeed();
         }
     }

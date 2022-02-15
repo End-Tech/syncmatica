@@ -1,10 +1,12 @@
 package ch.endte.syncmatica.communication;
 
 import ch.endte.syncmatica.Context;
+import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.exchange.DownloadExchange;
 import ch.endte.syncmatica.communication.exchange.Exchange;
 import ch.endte.syncmatica.communication.exchange.VersionHandshakeClient;
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
 import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
 import fi.dy.masa.malilib.gui.Message;
@@ -34,7 +36,7 @@ public class ClientCommunicationManager extends CommunicationManager {
     @Override
     protected void handle(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
         if (id.equals(PacketType.REGISTER_METADATA.identifier)) {
-            final ServerPlacement placement = receiveMetaData(packetBuf);
+            final ServerPlacement placement = receiveMetaData(packetBuf, source);
             context.getSyncmaticManager().addPlacement(placement);
             return;
         }
@@ -57,7 +59,15 @@ public class ClientCommunicationManager extends CommunicationManager {
         if (id.equals(PacketType.MODIFY.identifier)) {
             final UUID placementId = packetBuf.readUuid();
             final ServerPlacement toModify = context.getSyncmaticManager().getPlacement(placementId);
-            receivePositionData(toModify, packetBuf);
+            receivePositionData(toModify, packetBuf, source);
+            if (source.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+                final PlayerIdentifier lastModifiedBy = context.getPlayerIdentifierProvider().createOrGet(
+                        packetBuf.readUuid(),
+                        packetBuf.readString(32767)
+                );
+
+                toModify.setLastModifiedBy(lastModifiedBy);
+            }
             LitematicManager.getInstance().updateRendered(toModify);
             context.getSyncmaticManager().updateServerPlacement(toModify);
             return;

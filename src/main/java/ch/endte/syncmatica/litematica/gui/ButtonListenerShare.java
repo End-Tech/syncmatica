@@ -1,6 +1,7 @@
 package ch.endte.syncmatica.litematica.gui;
 
 import ch.endte.syncmatica.Context;
+import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.communication.ClientCommunicationManager;
 import ch.endte.syncmatica.communication.ExchangeTarget;
 import ch.endte.syncmatica.communication.exchange.ShareLitematicExchange;
@@ -30,13 +31,13 @@ public class ButtonListenerShare implements IButtonActionListener {
             messageDisplay.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_without_shift");
             return;
         }
-        if (schematicPlacement.isRegionPlacementModified()) {
-            messageDisplay.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
-            return;
-        }
         button.setEnabled(false);
         final Context con = LitematicManager.getInstance().getActiveContext();
         final ExchangeTarget server = ((ClientCommunicationManager) con.getCommunicationManager()).getServer();
+        if (!server.getFeatureSet().hasFeature(Feature.CORE_EX) && schematicPlacement.isRegionPlacementModified()) {
+            messageDisplay.addMessage(Message.MessageType.ERROR, "syncmatica.error.share_modified_subregions");
+            return;
+        }
         final ShareLitematicExchange ex = new ShareLitematicExchange(schematicPlacement, server, con);
         con.getCommunicationManager().startExchange(ex);
     }

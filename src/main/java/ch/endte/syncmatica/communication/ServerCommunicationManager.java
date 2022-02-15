@@ -4,6 +4,8 @@ import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.LocalLitematicState;
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.communication.exchange.*;
+import ch.endte.syncmatica.extended_core.PlayerIdentifier;
+import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,6 +26,10 @@ public class ServerCommunicationManager extends CommunicationManager {
         super();
     }
 
+    public GameProfile getGameProfile(final ExchangeTarget exchangeTarget) {
+        return playerMap.get(exchangeTarget).getGameProfile();
+    }
+
     public void sendMessage(final ExchangeTarget client, final MessageType type, final String identifier) {
         if (client.getFeatureSet().hasFeature(Feature.MESSAGE)) {
             final PacketByteBuf newPacketBuf = new PacketByteBuf(Unpooled.buffer());
@@ -39,6 +45,8 @@ public class ServerCommunicationManager extends CommunicationManager {
     public void onPlayerJoin(final ExchangeTarget newPlayer, final ServerPlayerEntity player) {
         final VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer, context);
         playerMap.put(newPlayer, player);
+        final GameProfile profile = player.getGameProfile();
+        context.getPlayerIdentifierProvider().updateName(profile.getId(), profile.getName());
         startExchangeUnchecked(hi);
     }
 
@@ -75,25 +83,43 @@ public class ServerCommunicationManager extends CommunicationManager {
             return;
         }
         if (id.equals(PacketType.REGISTER_METADATA.identifier)) {
-            final ServerPlacement placement = receiveMetaData(packetBuf);
-            if (context.getSyncmaticManager().getPlacement(placement.getId()) == null) {
-                if (!context.getFileStorage().getLocalState(placement).isLocalFileReady()) {
-                    // special edge case because files are transmitted by placement rather than file names/hashes
-                    if (context.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
-                        downloadingFile.computeIfAbsent(placement.getHash(), key -> new ArrayList<>()).add(placement);
-                        return;
-                    }
-                    try {
-                        download(placement, source);
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    addPlacement(source, placement);
-                }
-            } else {
+            final ServerPlacement placement = receiveMetaData(packetBuf, source);
+            if (context.getSyncmaticManager().getPlacement(placement.getId()) != null) {
                 cancelShare(source, placement);
+
+                return;
             }
+
+            // when the client does not communicate the owner
+            final GameProfile profile = playerMap.get(source).getGameProfile();
+            final PlayerIdentifier playerIdentifier = context.getPlayerIdentifierProvider().createOrGet(profile);
+            if (placement.getOwner().equals(PlayerIdentifier.MISSING_PLAYER)) {
+                placement.selectOwner(playerIdentifier);
+                placement.setLastModifiedBy(playerIdentifier);
+            }
+            if (!placement.getOwner().equals(playerIdentifier)) {
+                cancelShare(source, placement);
+
+                return;
+            }
+
+            if (!context.getFileStorage().getLocalState(placement).isLocalFileReady()) {
+                // special edge case because files are transmitted by placement rather than file names/hashes
+                if (context.getFileStorage().getLocalState(placement) == LocalLitematicState.DOWNLOADING_LITEMATIC) {
+                    downloadingFile.computeIfAbsent(placement.getHash(), key -> new ArrayList<>()).add(placement);
+                    return;
+                }
+                try {
+                    download(placement, source);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                }
+
+                return;
+            }
+
+            addPlacement(source, placement);
+
             return;
         }
         if (id.equals(PacketType.REMOVE_SYNCMATIC.identifier)) {
@@ -154,7 +180,11 @@ public class ServerCommunicationManager extends CommunicationManager {
                     // client supports modify so just send modify
                     final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
                     buf.writeUuid(placement.getId());
-                    putPositionData(placement, buf);
+                    putPositionData(placement, buf, client);
+                    if (client.getFeatureSet().hasFeature(Feature.CORE_EX)) {
+                        buf.writeUuid(placement.getLastModifiedBy().uuid);
+                        buf.writeString(placement.getLastModifiedBy().getName());
+                    }
                     client.sendPacket(PacketType.MODIFY.identifier, buf, context);
                 } else {
                     // client doesn't support modification so
@@ -163,7 +193,7 @@ public class ServerCommunicationManager extends CommunicationManager {
                     buf.writeUuid(placement.getId());
                     client.sendPacket(PacketType.REMOVE_SYNCMATIC.identifier, buf, context);
                     final PacketByteBuf buf2 = new PacketByteBuf(Unpooled.buffer());
-                    putMetaData(placement, buf2);
+                    putMetaData(placement, buf2, client);
                     client.sendPacket(PacketType.REGISTER_METADATA.identifier, buf2, context);
                 }
             }
