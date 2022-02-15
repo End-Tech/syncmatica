@@ -3,8 +3,6 @@ package ch.endte.syncmatica.extended_core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -47,6 +45,10 @@ public class SubRegionData {
     }
 
     public void modify(final SubRegionPlacementModification subRegionPlacementModification) {
+        if (subRegionPlacementModification == null) {
+
+            return;
+        }
         isModified = true;
         if (modificationData == null) {
             modificationData = new HashMap<>();
@@ -62,19 +64,9 @@ public class SubRegionData {
         return modificationData;
     }
 
-    public JsonObject toJson() {
-        final JsonObject obj = new JsonObject();
+    public JsonElement toJson() {
 
-        obj.add("isModified", new JsonPrimitive(isModified));
-
-        if (!isModified) {
-
-            return obj;
-        }
-
-        obj.add("modificationData", modificationDataToJson());
-
-        return obj;
+        return modificationDataToJson();
     }
 
     private JsonElement modificationDataToJson() {
@@ -87,22 +79,16 @@ public class SubRegionData {
         return arr;
     }
 
-    public static SubRegionData fromJson(final JsonObject obj) {
-        if (obj.has("isModified")) {
-            final SubRegionData newSubRegionData = new SubRegionData();
+    public static SubRegionData fromJson(final JsonElement obj) {
+        final SubRegionData newSubRegionData = new SubRegionData();
 
-            newSubRegionData.isModified = obj.get("isModified").getAsBoolean();
+        newSubRegionData.isModified = true;
 
-            if (newSubRegionData.isModified) {
-                for (final JsonElement modification : obj.get("modificationData").getAsJsonArray()) {
-                    newSubRegionData.modify(SubRegionPlacementModification.fromJson(modification.getAsJsonObject()));
-                }
-            }
-
-            return newSubRegionData;
+        for (final JsonElement modification : obj.getAsJsonArray()) {
+            newSubRegionData.modify(SubRegionPlacementModification.fromJson(modification.getAsJsonObject()));
         }
 
-        return null;
+        return newSubRegionData;
     }
 
     @Override
