@@ -37,6 +37,9 @@ public class ActorClientPlayNetworkHandler {
     }
 
     public void startClient() {
+        if (clientPlayNetworkHandler == null) {
+            throw new RuntimeException("Tried to start client before receiving a connection");
+        }
         final IFileStorage data = new RedirectFileStorage();
         final SyncmaticManager man = new SyncmaticManager();
         exTarget = new ExchangeTarget(clientPlayNetworkHandler);
@@ -50,15 +53,23 @@ public class ActorClientPlayNetworkHandler {
     public void packetEvent(final CustomPayloadS2CPacket packet, final CallbackInfo ci) {
         final Identifier id = packet.getChannel();
         final PacketByteBuf buf = packet.getData();
-        if (clientCommunication.handlePacket(id)) {
-            clientCommunication.onPacket(exTarget, id, buf);
+        if (packetEvent(id, buf)) {
+            
             ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
         }
     }
 
+    public boolean packetEvent(Identifier id, PacketByteBuf buf) {
+        if (clientCommunication.handlePacket(id)) {
+            clientCommunication.onPacket(exTarget, id, buf);
+
+            return true;
+        }
+
+        return false;
+    }
 
     private static void setClientPlayNetworkHandler(final ClientPlayNetworkHandler clientPlayNetworkHandler) {
         ActorClientPlayNetworkHandler.clientPlayNetworkHandler = clientPlayNetworkHandler;
     }
-
 }

@@ -3,12 +3,14 @@ package ch.endte.syncmatica.communication;
 import ch.endte.syncmatica.Context;
 import ch.endte.syncmatica.Feature;
 import ch.endte.syncmatica.ServerPlacement;
+import ch.endte.syncmatica.Syncmatica;
 import ch.endte.syncmatica.communication.exchange.DownloadExchange;
 import ch.endte.syncmatica.communication.exchange.Exchange;
 import ch.endte.syncmatica.communication.exchange.VersionHandshakeClient;
 import ch.endte.syncmatica.extended_core.PlayerIdentifier;
 import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
+import ch.endte.syncmatica.mixin_actor.ActorClientPlayNetworkHandler;
 import fi.dy.masa.malilib.gui.Message;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -77,6 +79,11 @@ public class ClientCommunicationManager extends CommunicationManager {
             final String text = packetBuf.readString(32767);
             ScreenHelper.ifPresent(s -> s.addMessage(type, text));
             return;
+        }
+        if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
+            LitematicManager.clear();
+            Syncmatica.restartClient();
+            ActorClientPlayNetworkHandler.getInstance().packetEvent(id, packetBuf);
         }
     }
 

@@ -1,6 +1,7 @@
 package ch.endte.syncmatica;
 
 import ch.endte.syncmatica.communication.CommunicationManager;
+import ch.endte.syncmatica.mixin_actor.ActorClientPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
@@ -33,6 +34,19 @@ public class Syncmatica {
     public static void initClient(final CommunicationManager comms, final IFileStorage fileStorage, final SyncmaticManager schematics) {
         final Context clientContext = new Context(fileStorage, comms, schematics, false, new File(CLIENT_PATH));
         init(clientContext, CLIENT_CONTEXT);
+    }
+
+    public static void restartClient() {
+        final Context oldClient = getContext(CLIENT_CONTEXT);
+        if (oldClient != null) {
+            if (oldClient.isStarted()) {
+                oldClient.shutdown();
+            }
+
+            contexts.remove(CLIENT_CONTEXT);
+        }
+
+        ActorClientPlayNetworkHandler.getInstance().startClient();
     }
 
     public static Context getContext(final Identifier id) {
