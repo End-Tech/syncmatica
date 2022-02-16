@@ -52,6 +52,7 @@ public enum PacketType {
 
     FEATURE_REQUEST("syncmatica:feature_request"),
     // requests the partner to send a list of its features
+    // does not require a fully finished handshake
 
     FEATURE("syncmatica:feature"),
     // sends feature set to the partner
