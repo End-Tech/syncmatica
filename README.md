@@ -9,7 +9,7 @@ you feel confident that your users won't abuse it too heavily.
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.2.6) is a mod for both Minecraft client and server.
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.0-1.16.5) is a mod for both Minecraft client and server.
 The mod works for Minecraft 1.16 to 1.17. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
 on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide all client features. Please make sure to
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
@@ -44,14 +44,19 @@ with everyone.
 
 ## Project Status & Road Map
 
-Since many servers have issues with the amount of syncmatics present on the server I have implemented a feature that
-makes it easier for users to find the placement they need. Instead of having a random order based on iterating over a
-HashMap.
+Subregions are now synchronized between clients. In addition, it is now shown who shared the initial placement
+with the server and who last modified it. There is also a fix for people behind proxies.
 
-This is the only relevant change of this update and thus servers don't need to update to this one.
+The code of this mod is kind of questionable. I'm now a very different developer than when I originally wrote this.
+I prefer a different style of coding and things that are once liked I now find repulsive.
+I'll slowly work on enhancing code quality over time, but I feel I will never completely fix this.
 
-This update delays the updates that synchronise subRegions. I have also seen that many servers have a problem with the
-amount of syncmatics that are persistently shared. I imagine I should also add better a fix for that.
+I have also seen that many servers have a problem with the amount of syncmatics that are persistently shared. 
+The ownership is a pre-requirement for the change that is supposed to this.
+Adding a better fix for this is also on the roadmap, but I'm debating the priority since I don't get any feedback like this anymore.
+
+What seems way more important is to get syncmatica working in single-player and by doing that in LAN worlds.
+I'm not sure how much work this is - we'll see. I just got way more reports about this.
 
 The MaterialGatherings button is supposed, to aid with collecting the materials as a group. It should synchronize and
 simplify the collection of material across the server. As of now it does nothing.
