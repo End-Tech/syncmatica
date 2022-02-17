@@ -9,8 +9,8 @@ you feel confident that your users won't abuse it too heavily.
 
 ## Setup
 
-[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.0-1.16.5) is a mod for both Minecraft client and server.
-The mod works for Minecraft 1.16 to 1.17. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
+[Syncmatica](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.0-1.18.1) is a mod for both Minecraft client and server.
+The mod works for Minecraft 1.18.0 to 1.18.1. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
 on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide all client features. Please make sure to
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
