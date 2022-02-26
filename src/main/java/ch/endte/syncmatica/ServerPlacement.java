@@ -93,10 +93,8 @@ public class ServerPlacement {
         return owner;
     }
 
-    public void selectOwner(final PlayerIdentifier playerIdentifier) {
-        if (owner.equals(PlayerIdentifier.MISSING_PLAYER)) {
-            owner = playerIdentifier;
-        }
+    public void setOwner(final PlayerIdentifier playerIdentifier) {
+        owner = playerIdentifier;
     }
 
     public PlayerIdentifier getLastModifiedBy() {

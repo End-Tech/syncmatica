@@ -93,14 +93,9 @@ public class ServerCommunicationManager extends CommunicationManager {
             // when the client does not communicate the owner
             final GameProfile profile = playerMap.get(source).getGameProfile();
             final PlayerIdentifier playerIdentifier = context.getPlayerIdentifierProvider().createOrGet(profile);
-            if (placement.getOwner().equals(PlayerIdentifier.MISSING_PLAYER)) {
-                placement.selectOwner(playerIdentifier);
-                placement.setLastModifiedBy(playerIdentifier);
-            }
             if (!placement.getOwner().equals(playerIdentifier)) {
-                cancelShare(source, placement);
-
-                return;
+                placement.setOwner(playerIdentifier);
+                placement.setLastModifiedBy(playerIdentifier);
             }
 
             if (!context.getFileStorage().getLocalState(placement).isLocalFileReady()) {
