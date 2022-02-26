@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.0-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.0-1.16.5) for 1.16 or 1.17
-Use [v0.3.0-1.18.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.0-1.18.1) for 1.18
+Use [v0.3.1-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.1-1.16.5) for 1.16 or 1.17
+Use [v0.3.1-1.18.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.1-1.18.1) for 1.18
 
 ### Client
 
@@ -46,6 +46,10 @@ To modify a placement just unlock a placement on your client. Lock it again afte
 with everyone.
 
 ## Project Status & Road Map
+
+v0.3.1 adds a hotfix for servers on which sharing is problematic due to a difference in 
+how the client and the server see the player identifier differently. This can be caused by other mods that change player
+uuids to keep old player data on the server.
 
 Subregions are now synchronized between clients. In addition, it is now shown who shared the initial placement
 with the server and who last modified it. There is also a fix for people behind proxies.
