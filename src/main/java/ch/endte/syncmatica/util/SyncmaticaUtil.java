@@ -1,5 +1,6 @@
 package ch.endte.syncmatica.util;
 
+import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class SyncmaticaUtil {
         // v sanitizes entire patterns
         return sanitized.toString().replaceAll(ILLEGAL_PATTERNS, "_");
     }
-
+    
     public static void backupAndReplace(final Path backup, final Path current, final Path incoming) {
         if (!Files.exists(incoming)) {
 
@@ -91,5 +92,11 @@ public class SyncmaticaUtil {
         return true;
     }
 
+    public static double getBlockDistanceSquared(final BlockPos a, final double x, final double y, final double z) {
+        final double combinedX = a.getX() - x;
+        final double combinedY = a.getY() - y;
+        final double combinedZ = a.getZ() - z;
 
+        return combinedX * combinedX + combinedY * combinedY + combinedZ * combinedZ;
+    }
 }
