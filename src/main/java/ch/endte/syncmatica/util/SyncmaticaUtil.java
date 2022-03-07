@@ -1,5 +1,7 @@
 package ch.endte.syncmatica.util;
 
+import net.minecraft.util.math.BlockPos;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -54,5 +56,13 @@ public class SyncmaticaUtil {
         // ^ sanitizes unique characters
         // v sanitizes entire patterns
         return sanitized.toString().replaceAll(ILLEGAL_PATTERNS, "_");
+    }
+
+    public static double getBlockDistanceSquared(final BlockPos a, final double x, final double y, final double z) {
+        final double combinedX = a.getX() - x;
+        final double combinedY = a.getY() - y;
+        final double combinedZ = a.getZ() - z;
+
+        return combinedX * combinedX + combinedY * combinedY + combinedZ * combinedZ;
     }
 }
