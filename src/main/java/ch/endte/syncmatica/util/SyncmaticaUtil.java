@@ -60,7 +60,7 @@ public class SyncmaticaUtil {
         // v sanitizes entire patterns
         return sanitized.toString().replaceAll(ILLEGAL_PATTERNS, "_");
     }
-
+    
     public static void backupAndReplace(final Path backup, final Path current, final Path incoming) {
         if (!Files.exists(incoming)) {
 
