@@ -1,6 +1,7 @@
 package ch.endte.syncmatica;
 
 import com.google.gson.*;
+import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileReader;
@@ -54,6 +55,10 @@ public class SyncmaticManager {
         for (final Consumer<ServerPlacement> consumer : consumers) {
             consumer.accept(updated);
         }
+
+        if (context.isServer()) {
+            saveServer();
+        }
     }
 
     public void startup() {
@@ -63,9 +68,6 @@ public class SyncmaticManager {
     }
 
     public void shutdown() {
-        if (context.isServer()) {
-            saveServer();
-        }
     }
 
     private void saveServer() {
@@ -77,13 +79,18 @@ public class SyncmaticManager {
         }
 
         obj.add(PLACEMENTS_JSON_KEY, arr);
+        final File backup = new File(context.getConfigFolder(), "placements.json.bak");
+        final File newFile = new File(context.getConfigFolder(), "placements.json.new");
         final File f = new File(context.getConfigFolder(), "placements.json");
 
-        try (final FileWriter writer = new FileWriter(f)) {
+        try (final FileWriter writer = new FileWriter(newFile)) {
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
         } catch (final IOException e) {
             e.printStackTrace();
+            return;
         }
+
+        Util.backupAndReplace(f, newFile, backup);
     }
 
     private void loadServer() {
