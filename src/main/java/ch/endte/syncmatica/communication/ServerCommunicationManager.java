@@ -11,7 +11,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +37,7 @@ public class ServerCommunicationManager extends CommunicationManager {
             client.sendPacket(PacketType.MESSAGE.identifier, newPacketBuf, context);
         } else if (playerMap.containsKey(client)) {
             final ServerPlayerEntity player = playerMap.get(client);
-            player.sendMessage(Text.literal("Syncmatica " + type.toString() + " " + identifier));
+            player.sendMessage(Text.of("Syncmatica " + type.toString() + " " + identifier), false);
         }
     }
 
