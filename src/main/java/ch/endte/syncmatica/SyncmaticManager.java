@@ -1,7 +1,7 @@
 package ch.endte.syncmatica;
 
+import ch.endte.syncmatica.util.SyncmaticaUtil;
 import com.google.gson.*;
-import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileReader;
@@ -80,17 +80,17 @@ public class SyncmaticManager {
 
         obj.add(PLACEMENTS_JSON_KEY, arr);
         final File backup = new File(context.getConfigFolder(), "placements.json.bak");
-        final File newFile = new File(context.getConfigFolder(), "placements.json.new");
-        final File f = new File(context.getConfigFolder(), "placements.json");
+        final File incoming = new File(context.getConfigFolder(), "placements.json.new");
+        final File current = new File(context.getConfigFolder(), "placements.json");
 
-        try (final FileWriter writer = new FileWriter(newFile)) {
+        try (final FileWriter writer = new FileWriter(incoming)) {
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
         } catch (final IOException e) {
             e.printStackTrace();
             return;
         }
 
-        Util.backupAndReplace(f, newFile, backup);
+        SyncmaticaUtil.backupAndReplace(backup.toPath(), current.toPath(), incoming.toPath());
     }
 
     private void loadServer() {
@@ -119,8 +119,8 @@ public class SyncmaticManager {
                 }
                 final JsonArray arr = obj.getAsJsonArray(PLACEMENTS_JSON_KEY);
                 for (final JsonElement elem : arr) {
-                    final ServerPlacement p = ServerPlacement.fromJson(elem.getAsJsonObject(), context);
-                    addPlacement(p);
+                    final ServerPlacement placement = ServerPlacement.fromJson(elem.getAsJsonObject(), context);
+                    schematics.put(placement.getId(), placement); // NOSONAR
                 }
 
             } catch (final IllegalStateException | NullPointerException e) {

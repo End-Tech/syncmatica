@@ -37,6 +37,7 @@ public class ModifyExchangeServer extends AbstractExchange {
                     getPartner()
             );
             placement.setLastModifiedBy(identifier);
+            getContext().getSyncmaticManager().updateServerPlacement(placement);
             succeed();
         }
     }
