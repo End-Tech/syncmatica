@@ -181,12 +181,10 @@ public abstract class CommunicationManager {
         final Exchange downloadExchange = new DownloadExchange(syncmatic, toDownload, source, context);
         setDownloadState(syncmatic, true);
         startExchange(downloadExchange);
-        context.getSyncmaticManager().updateServerPlacement(syncmatic);
     }
 
     public void setDownloadState(final ServerPlacement syncmatic, final boolean b) {
         downloadState.put(syncmatic.getHash(), b);
-        context.getSyncmaticManager().updateServerPlacement(syncmatic);
     }
 
     public boolean getDownloadState(final ServerPlacement syncmatic) {

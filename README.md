@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.2-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.2-1.16.5) for 1.16 or 1.17
-Use [v0.3.2-1.18.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.2-1.18.1) for 1.18
+Use [v0.3.3-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.3-1.16.5) for 1.16 or 1.17
+Use [v0.3.3-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.3-1.18.2) for 1.18
 
 ### Client
 
@@ -47,16 +47,8 @@ with everyone.
 
 ## Project Status & Road Map
 
-v0.3.1 adds a hotfix for servers on which sharing is problematic due to a difference in 
-how the client and the server see the player identifier differently. This can be caused by other mods that change player
-uuids to keep old player data on the server.
-
-Subregions are now synchronized between clients. In addition, it is now shown who shared the initial placement
-with the server and who last modified it. There is also a fix for people behind proxies.
-
-The code of this mod is kind of questionable. I'm now a very different developer than when I originally wrote this.
-I prefer a different style of coding and things that are once liked I now find repulsive.
-I'll slowly work on enhancing code quality over time, but I feel I will never completely fix this.
+v0.3.3 adds a small feature change where servers now save all syncmatics every time one updates.
+If this causes issues feel free to let me know.
 
 I have also seen that many servers have a problem with the amount of syncmatics that are persistently shared. 
 The ownership is a pre-requirement for the change that is supposed to this.

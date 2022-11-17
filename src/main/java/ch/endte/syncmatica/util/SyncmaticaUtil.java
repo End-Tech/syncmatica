@@ -1,9 +1,12 @@
 package ch.endte.syncmatica.util;
 
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -56,6 +59,37 @@ public class SyncmaticaUtil {
         // ^ sanitizes unique characters
         // v sanitizes entire patterns
         return sanitized.toString().replaceAll(ILLEGAL_PATTERNS, "_");
+    }
+    
+    public static void backupAndReplace(final Path backup, final Path current, final Path incoming) {
+        if (!Files.exists(incoming)) {
+
+            return;
+        }
+
+        if (overwrite(backup, current, 2) && !overwrite(current, incoming, 4)) {
+            overwrite(current, backup, 8); // NOSONAR restore backup
+        }
+    }
+
+    private static boolean overwrite(final Path backup, final Path current, final int tries) {
+        if (!Files.exists(current)) {
+
+            return true;
+        }
+        try {
+            Files.deleteIfExists(backup);
+            Files.move(current, backup);
+        } catch (final IOException exception) {
+            if (tries <= 0) {
+                LogManager.getLogger(SyncmaticaUtil.class).error("Excessive retries when trying to write Syncmatica placement", exception);
+
+                return false;
+            }
+            return overwrite(backup, current, tries - 1);
+        }
+
+        return true;
     }
 
     public static double getBlockDistanceSquared(final BlockPos a, final double x, final double y, final double z) {
