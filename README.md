@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.3-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.2-1.16.5) for 1.16 or 1.17
-Use [v0.3.3-1.18.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.2-1.18.1) for 1.18
+Use [v0.3.3-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.3-1.16.5) for 1.16 or 1.17
+Use [v0.3.3-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.3-1.18.2) for 1.18
 
 ### Client
 
