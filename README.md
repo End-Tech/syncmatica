@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.4-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.4-1.16.5) for 1.16 or 1.17
-Use [v0.3.4-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.4-1.18.2) for 1.18
+Use [v0.3.5-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.5-1.16.5) for 1.16 or 1.17
+Use [v0.3.5-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.5-1.18.2) for 1.18 or 1.19
 
 ### Client
 
@@ -47,7 +47,7 @@ with everyone.
 
 ## Project Status & Road Map
 
-v0.3.4 adds compatibility with 1.19.
+v0.3.5 makes it possible to use syncmatica in Singleplayer and LAN
 
 I have also seen that many servers have a problem with the amount of syncmatics that are persistently shared. 
 The ownership is a pre-requirement for the change that is supposed to this.
