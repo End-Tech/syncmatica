@@ -1,7 +1,8 @@
 package ch.endte.syncmatica.mixin;
 
-import ch.endte.syncmatica.*;
-import ch.endte.syncmatica.communication.CommunicationManager;
+import ch.endte.syncmatica.FileStorage;
+import ch.endte.syncmatica.SyncmaticManager;
+import ch.endte.syncmatica.Syncmatica;
 import ch.endte.syncmatica.communication.ServerCommunicationManager;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,19 +17,13 @@ import java.util.function.Function;
 public class MixinMinecraftServer {
     @Inject(method = "startServer", at = @At("TAIL"))
     private static <S extends MinecraftServer> void initSyncmatica(final Function<Thread, S> serverFactory, final CallbackInfoReturnable<S> ci) {
-        final IFileStorage data = new FileStorage();
-        final SyncmaticManager man = new SyncmaticManager();
-        final CommunicationManager comms = new ServerCommunicationManager();
-
-        Syncmatica.initServer(comms, data, man);
-        final Context con = Syncmatica.getContext(Syncmatica.SERVER_CONTEXT);
-        con.startup();
+        Syncmatica.initServer(new ServerCommunicationManager(), new FileStorage(), new SyncmaticManager());
+        Syncmatica.getContext(Syncmatica.SERVER_CONTEXT).startup();
     }
 
     // at
     @Inject(method = "shutdown", at = @At("TAIL"))
     public void shutdownSyncmatica(final CallbackInfo ci) {
-        final Context con = Syncmatica.getContext(Syncmatica.SERVER_CONTEXT);
-        con.shutdown();
+        Syncmatica.shutdown();
     }
 }
