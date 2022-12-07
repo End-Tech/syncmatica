@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.5-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.5-1.16.5) for 1.16 or 1.17
-Use [v0.3.5-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.5-1.18.2) for 1.18 or 1.19
+Use [v0.3.6-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.6-1.16.5) for 1.16 or 1.17
+Use [v0.3.6-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.6-1.18.2) for 1.18 or 1.19
 
 ### Client
 
@@ -47,14 +47,19 @@ with everyone.
 
 ## Project Status & Road Map
 
-v0.3.5 makes it possible to use syncmatica in Singleplayer and LAN
+v0.3.6 fixes an issue with saving in single player and LAN worlds where the save file is the same for all your
+single player worlds. I recommend updating as soon as possible. 
+
+Sadly all existing single player placements will be lost unless you specifically rescue them.
+To rescue them move the file `placements.json` from `%minecraft_folder%/config/syncmatica/placements.json` to 
+`%minecraft_folder%/saves/%minecraft_world%/syncmatica`. If the folder doesn't exist yet just create it. 
+When you start minecraft afterwards your syncmatica placements should be back. 
+
+You can also do so later at any point as long as no-one deletes `placements.json`. 
 
 I have also seen that many servers have a problem with the amount of syncmatics that are persistently shared. 
-The ownership is a pre-requirement for the change that is supposed to this.
+The ownership is a pre-requirement for the change that is supposed to fix this.
 Adding a better fix for this is also on the roadmap, but I'm debating the priority since I don't get any feedback like this anymore.
-
-What seems way more important is to get syncmatica working in single-player and by doing that in LAN worlds.
-I'm not sure how much work this is - we'll see. I just got way more reports about this.
 
 The MaterialGatherings button is supposed, to aid with collecting the materials as a group. It should synchronize and
 simplify the collection of material across the server. As of now it does nothing.
