@@ -21,13 +21,33 @@ public class Context {
     private final SyncmaticManager synMan;
     private FeatureSet fs = null;
     private final boolean server;
+    private final boolean integratedServer;
     private final File litematicFolder;
+    private final File worldFolder;
     private boolean isStarted = false;
     private final QuotaService quota;
     private final DebugService debugService;
     private final PlayerIdentifierProvider playerIdentifierProvider;
 
-    public Context(final IFileStorage fs, final CommunicationManager comMan, final SyncmaticManager synMan, final boolean isServer, final File litematicFolder) {
+
+    public Context(
+            final IFileStorage fs,
+            final CommunicationManager comMan,
+            final SyncmaticManager synMan,
+            final File litematicFolder
+    ) {
+        this(fs, comMan, synMan, false, litematicFolder, false, null);
+    }
+
+    public Context(
+            final IFileStorage fs,
+            final CommunicationManager comMan,
+            final SyncmaticManager synMan,
+            final boolean isServer,
+            final File litematicFolder,
+            final boolean integrated,
+            final File worldFolder
+    ) {
         files = fs;
         fs.setContext(this);
         this.comMan = comMan;
@@ -44,6 +64,8 @@ public class Context {
         debugService = new DebugService();
         this.litematicFolder = litematicFolder;
         litematicFolder.mkdirs();
+        integratedServer = integrated;
+        this.worldFolder = worldFolder;
         loadConfiguration();
     }
 
@@ -82,6 +104,10 @@ public class Context {
         return server;
     }
 
+    public boolean isIntegratedServer() {
+        return integratedServer;
+    }
+
     public boolean isStarted() {
         return isStarted;
     }
@@ -111,6 +137,10 @@ public class Context {
     }
 
     public File getConfigFolder() {
+        if (isServer() && isIntegratedServer()) {
+
+            return new File(worldFolder, Syncmatica.MOD_ID);
+        }
         return new File(new File("."), "config" + File.separator + Syncmatica.MOD_ID);
     }
 

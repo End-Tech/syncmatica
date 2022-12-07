@@ -26,14 +26,29 @@ public class Syncmatica {
 
     private static Map<Identifier, Context> contexts = null;
 
-    public static void initServer(final CommunicationManager comms, final IFileStorage fileStorage, final SyncmaticManager schematics) {
-        final Context serverContext = new Context(fileStorage, comms, schematics, true, new File(SERVER_PATH));
+    public static Context initServer(final CommunicationManager comms, final IFileStorage fileStorage, final SyncmaticManager schematics, final boolean isIntegratedServer, final File worldPath) {
+        final Context serverContext = new Context(
+                fileStorage,
+                comms,
+                schematics,
+                true,
+                new File(SERVER_PATH),
+                isIntegratedServer,
+                worldPath
+        );
         init(serverContext, SERVER_CONTEXT);
+        return serverContext;
     }
 
-    public static void initClient(final CommunicationManager comms, final IFileStorage fileStorage, final SyncmaticManager schematics) {
-        final Context clientContext = new Context(fileStorage, comms, schematics, false, new File(CLIENT_PATH));
+    public static Context initClient(final CommunicationManager comms, final IFileStorage fileStorage, final SyncmaticManager schematics) {
+        final Context clientContext = new Context(
+                fileStorage,
+                comms,
+                schematics,
+                new File(CLIENT_PATH)
+        );
         init(clientContext, CLIENT_CONTEXT);
+        return clientContext;
     }
 
     public static void restartClient() {
