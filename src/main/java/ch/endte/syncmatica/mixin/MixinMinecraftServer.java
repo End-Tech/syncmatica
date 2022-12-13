@@ -5,7 +5,6 @@ import ch.endte.syncmatica.SyncmaticManager;
 import ch.endte.syncmatica.Syncmatica;
 import ch.endte.syncmatica.communication.ServerCommunicationManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.WorldSavePath;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +23,7 @@ public class MixinMinecraftServer {
                 new ServerCommunicationManager(),
                 new FileStorage(),
                 new SyncmaticManager(),
-                returnValue instanceof IntegratedServer,
+                returnValue.isDedicated(),
                 returnValue.getSavePath(WorldSavePath.ROOT).toFile()
         ).startup();
     }
