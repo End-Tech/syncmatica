@@ -23,7 +23,7 @@ public class MixinMinecraftServer {
                 new ServerCommunicationManager(),
                 new FileStorage(),
                 new SyncmaticManager(),
-                returnValue.isDedicated(),
+                !returnValue.isDedicated(),
                 returnValue.getSavePath(WorldSavePath.ROOT).toFile()
         ).startup();
     }
