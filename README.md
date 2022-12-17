@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.7-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.7-1.16.5) for 1.16 or 1.17
-Use [v0.3.7-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.7-1.18.2) for 1.18 or 1.19
+Use [v0.3.8-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.8-1.16.5) for 1.16 or 1.17
+Use [v0.3.8-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.8-1.18.2) for 1.18 or 1.19
 
 ### Client
 
@@ -47,7 +47,10 @@ with everyone.
 
 ## Project Status & Road Map
 
-v0.3.7 fixes an issue where 1.19.2 Servers wouldn't boot anymore.
+v0.3.8 attempts to achieve compatability with 1.19.3 
+- In doing so I change the way the mod starts up (client now starts when the first custom packet is received)
+- I also had to remove a detection for the removal of GUIs - 
+this now might cause crashes under very rare conditions.  Please look out for any kind of issues regarding this.
 
 Sadly all existing single player placements will be lost unless you specifically rescue them.
 To rescue them move the file `placements.json` from `%minecraft_folder%/config/syncmatica/placements.json` to 
