@@ -3,6 +3,7 @@ package ch.endte.syncmatica.mixin;
 import ch.endte.syncmatica.Syncmatica;
 import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
+import ch.endte.syncmatica.mixin_actor.ActorClientPlayNetworkHandler;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,5 +18,6 @@ public class MixinMinecraftClient {
         ScreenHelper.close();
         Syncmatica.shutdown();
         LitematicManager.clear();
+        ActorClientPlayNetworkHandler.getInstance().reset();
     }
 }

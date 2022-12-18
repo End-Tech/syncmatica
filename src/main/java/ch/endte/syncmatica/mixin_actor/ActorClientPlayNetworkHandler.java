@@ -73,6 +73,12 @@ public class ActorClientPlayNetworkHandler {
         return false;
     }
 
+    public void reset() {
+        clientCommunication = null;
+        exTarget = null;
+        clientPlayNetworkHandler = null;
+    }
+
     private static void setClientPlayNetworkHandler(final ClientPlayNetworkHandler clientPlayNetworkHandler) {
         ActorClientPlayNetworkHandler.clientPlayNetworkHandler = clientPlayNetworkHandler;
     }
