@@ -1,5 +1,11 @@
 package ch.endte.syncmatica.litematica.gui;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+
+import org.apache.logging.log4j.LogManager;
+
 import ch.endte.syncmatica.Context;
 import ch.endte.syncmatica.LocalLitematicState;
 import ch.endte.syncmatica.ServerPlacement;
@@ -15,13 +21,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
-import org.apache.logging.log4j.LogManager;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
 
 public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<ServerPlacement> {

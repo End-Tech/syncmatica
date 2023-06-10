@@ -1,12 +1,18 @@
 package ch.endte.syncmatica.litematica.gui;
 
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
+
 import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.ServerPosition;
 import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
 import ch.endte.syncmatica.util.SyncmaticaUtil;
-import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.LeftRight;
@@ -16,13 +22,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
