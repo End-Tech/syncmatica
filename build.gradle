@@ -22,8 +22,12 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "curse.maven:litematica-${project.litematica_minecraft_version}-308892:${project.litematica_fileid}"
-	modImplementation "curse.maven:malilib-${project.litematica_minecraft_version}-303119:${project.malilib_fileid}"
+	//TODO: Temporary; change when these mods are available on curseforge
+	modImplementation files("dependencies/litematica.jar")
+	modImplementation files("dependencies/malilib.jar")
+	
+	//modImplementation "curse.maven:litematica-${project.litematica_minecraft_version}-308892:${project.litematica_fileid}"
+	//modImplementation "curse.maven:malilib-${project.litematica_minecraft_version}-303119:${project.malilib_fileid}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-resource-loader-v0:${project.fabric_resource_loader_version}"
 }
