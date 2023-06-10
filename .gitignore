@@ -12,6 +12,10 @@ build/
 out/
 classes/
 
+# dependencies
+
+dependencies/
+
 # eclipse
 
 *.launch
