@@ -98,10 +98,9 @@ public class SyncmaticManager {
         if (f.exists() && f.isFile() && f.canRead()) {
             JsonElement element = null;
             try {
-                final JsonParser parser = new JsonParser();
                 final FileReader reader = new FileReader(f);
 
-                element = parser.parse(reader);
+                element = JsonParser.parseReader(reader);
                 reader.close();
 
             } catch (final Exception e) {
