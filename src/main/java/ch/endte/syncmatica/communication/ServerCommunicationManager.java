@@ -9,9 +9,8 @@ import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +37,7 @@ public class ServerCommunicationManager extends CommunicationManager {
             client.sendPacket(PacketType.MESSAGE.identifier, newPacketBuf, context);
         } else if (playerMap.containsKey(client)) {
             final ServerPlayerEntity player = playerMap.get(client);
-            player.sendSystemMessage(new LiteralText("Syncmatica " + type.toString() + " " + identifier), Util.NIL_UUID);
+            player.sendMessage(Text.literal("Syncmatica " + type.toString() + " " + identifier));
         }
     }
 

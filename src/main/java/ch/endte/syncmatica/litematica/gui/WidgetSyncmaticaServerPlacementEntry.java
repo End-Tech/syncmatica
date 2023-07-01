@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.network.PacketByteBuf;
 import org.apache.logging.log4j.LogManager;
 
@@ -76,7 +76,7 @@ public class WidgetSyncmaticaServerPlacementEntry extends WidgetListEntryBase<Se
     }
 
     @Override
-    public void render(final int mouseX, final int mouseY, final boolean selected, final MatrixStack matrixStack) {
+    public void render(final int mouseX, final int mouseY, final boolean selected, final DrawContext matrixStack) {
         // Source: WidgetSchematicEntry
         RenderUtils.color(1f, 1f, 1f, 1f);
 

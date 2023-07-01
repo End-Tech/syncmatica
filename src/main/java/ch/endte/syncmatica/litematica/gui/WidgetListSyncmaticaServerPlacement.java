@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
@@ -57,7 +57,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 
     // source: WidgetFileBrowserBase
     @Override
-    public void drawContents(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
+    public void drawContents(final DrawContext matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
         // Draw an outline around the entire widget
         RenderUtils.drawOutlinedBox(posX, posY, browserWidth, browserHeight, 0xB0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
@@ -66,7 +66,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         drawPlacementInfo(getLastSelectedEntry(), matrixStack);
     }
 
-    private void drawPlacementInfo(final ServerPlacement placement, final MatrixStack matrixStack) {
+    private void drawPlacementInfo(final ServerPlacement placement, final DrawContext matrixStack) {
         int x = posX + totalWidth - infoWidth;
         int y = posY;
         final int height = Math.min(infoHeight, parent.getMaxInfoHeight());
@@ -196,23 +196,20 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
                 return position.getBlockPosition().getSquaredDistance(
                         playerPositionOverworld.getX(),
                         playerPositionOverworld.getY(),
-                        playerPositionOverworld.getZ(),
-                        false
+                        playerPositionOverworld.getZ()
                 );
             }
             if (position.getDimensionId().equals(ServerPosition.NETHER_DIMENSION_ID)) {
                 return position.getBlockPosition().getSquaredDistance(
                         playerPositionNether.getX(),
                         playerPositionNether.getY(),
-                        playerPositionNether.getZ(),
-                        false
+                        playerPositionNether.getZ()
                 );
             }
             return position.getBlockPosition().getSquaredDistance(
                     playerPosition.getX(),
                     playerPosition.getY(),
-                    playerPosition.getZ(),
-                    false
+                    playerPosition.getZ()
             );
         }
 
