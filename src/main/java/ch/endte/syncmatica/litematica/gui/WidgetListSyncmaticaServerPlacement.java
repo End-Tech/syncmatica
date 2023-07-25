@@ -5,6 +5,7 @@ import ch.endte.syncmatica.ServerPlacement;
 import ch.endte.syncmatica.ServerPosition;
 import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
+import ch.endte.syncmatica.util.SyncmaticaUtil;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -193,20 +194,23 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 
         private double getDimensionDistanceSquared(final ServerPosition position) {
             if (position.getDimensionId().equals(ServerPosition.OVERWORLD_DIMENSION_ID)) {
-                return position.getBlockPosition().getSquaredDistance(
+                return SyncmaticaUtil.getBlockDistanceSquared(
+                        position.getBlockPosition(),
                         playerPositionOverworld.getX(),
                         playerPositionOverworld.getY(),
                         playerPositionOverworld.getZ()
                 );
             }
             if (position.getDimensionId().equals(ServerPosition.NETHER_DIMENSION_ID)) {
-                return position.getBlockPosition().getSquaredDistance(
+                return SyncmaticaUtil.getBlockDistanceSquared(
+                        position.getBlockPosition(),
                         playerPositionNether.getX(),
                         playerPositionNether.getY(),
                         playerPositionNether.getZ()
                 );
             }
-            return position.getBlockPosition().getSquaredDistance(
+            return SyncmaticaUtil.getBlockDistanceSquared(
+                    position.getBlockPosition(),
                     playerPosition.getX(),
                     playerPosition.getY(),
                     playerPosition.getZ()
