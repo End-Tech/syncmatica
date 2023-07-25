@@ -10,13 +10,13 @@ you feel confident that your users won't abuse it too heavily.
 ## Setup
 
 Syncmatica is a mod for both Minecraft client and server.
-The mod works for Minecraft 1.16+. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
+The mod works for Minecraft 1.18+. It's made for [Minecraft Fabric](https://fabricmc.net/). It relies
 on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide all client features. Please make sure to
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.8-1.16.5](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.8-1.16.5) for 1.16 or 1.17
-Use [v0.3.8-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.8-1.18.2) for 1.18 or 1.19
+Use [v0.3.9-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.9-1.18.2) for 1.18 or 1.19. 
+Use [v0.3.9-1.20.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.9-1.20.1) for 1.20+.
 
 ### Client
 
@@ -47,17 +47,10 @@ with everyone.
 
 ## Project Status & Road Map
 
-v0.3.8 attempts to achieve compatability with 1.19.3 
-- In doing so I change the way the mod starts up (client now starts when the first custom packet is received)
-- I also had to remove a detection for the removal of GUIs - 
-this now might cause crashes under very rare conditions.  Please look out for any kind of issues regarding this.
-
-Sadly all existing single player placements will be lost unless you specifically rescue them.
-To rescue them move the file `placements.json` from `%minecraft_folder%/config/syncmatica/placements.json` to 
-`%minecraft_folder%/saves/%minecraft_world%/syncmatica`. If the folder doesn't exist yet just create it. 
-When you start minecraft afterwards your syncmatica placements should be back. 
-
-You can also do so later at any point as long as no-one deletes `placements.json`. 
+v0.3.9 better chinese translation adds minor fixes and compatability with 1.20
+This was mostly done by other people. I want to thank them for their work. A thanks here to kpzip, whitecat346 and s-yh-china. (Especially kpzip <3)
+We drop compatability with 1.17 and 1.16 since it doesn't compile anymore and I do not feel like fixing that
+If you  play 1.16 feel free to drop by in the discord to let me know.
 
 I have also seen that many servers have a problem with the amount of syncmatics that are persistently shared. 
 The ownership is a pre-requirement for the change that is supposed to fix this.
