@@ -83,7 +83,7 @@ public class ClientCommunicationManager extends CommunicationManager {
         if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
             LitematicManager.clear();
             Syncmatica.restartClient();
-            ActorClientPlayNetworkHandler.getInstance().packetEvent(id, packetBuf);
+            ActorClientPlayNetworkHandler.getInstance().packetEvent(id, () -> packetBuf);
         }
     }
 

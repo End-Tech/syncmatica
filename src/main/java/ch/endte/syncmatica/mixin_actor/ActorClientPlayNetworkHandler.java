@@ -15,6 +15,8 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Supplier;
+
 public class ActorClientPlayNetworkHandler {
 
     private static ActorClientPlayNetworkHandler instance;
@@ -52,20 +54,20 @@ public class ActorClientPlayNetworkHandler {
 
     public void packetEvent(final ClientPlayNetworkHandler clientPlayNetworkHandler, final CustomPayloadS2CPacket packet, final CallbackInfo ci) {
         final Identifier id = packet.getChannel();
-        final PacketByteBuf buf = packet.getData();
+        final Supplier<PacketByteBuf> bufSupplier = packet::getData;
         if (clientCommunication == null) {
 
             ActorClientPlayNetworkHandler.getInstance().startEvent(clientPlayNetworkHandler);
         }
-        if (packetEvent(id, buf)) {
+        if (packetEvent(id, bufSupplier)) {
 
             ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
         }
     }
 
-    public boolean packetEvent(final Identifier id, final PacketByteBuf buf) {
+    public boolean packetEvent(final Identifier id, final Supplier<PacketByteBuf> bufSupplier) {
         if (clientCommunication.handlePacket(id)) {
-            clientCommunication.onPacket(exTarget, id, buf);
+            clientCommunication.onPacket(exTarget, id, bufSupplier.get());
 
             return true;
         }
