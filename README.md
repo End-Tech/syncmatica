@@ -15,8 +15,8 @@ on [litematica and malilib](https://masa.dy.fi/mcmods/client_mods/) to provide a
 update litematica, malilib and other potentially conflicting mods like Multiconnect before making a bug report about
 Syncmaticas functionality :)
 
-Use [v0.3.9-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.9-1.18.2) for 1.18 or 1.19. 
-Use [v0.3.9-1.20.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.9-1.20.1) for 1.20+.
+Use [v0.3.10-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.10-1.18.2) for 1.18 or 1.19. 
+Use [v0.3.10-1.20.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.10-1.20.1) for 1.20+.
 
 ### Client
 
@@ -46,6 +46,7 @@ To modify a placement just unlock a placement on your client. Lock it again afte
 with everyone.
 
 ## Project Status & Road Map
+v0.3.10 is a quick hotfix for compatability issues with pca and other masa mods.
 
 v0.3.9 better chinese translation adds minor fixes and compatability with 1.20
 This was mostly done by other people. I want to thank them for their work. A thanks here to kpzip, whitecat346 and s-yh-china. (Especially kpzip <3)
