@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ServerCommunicationManager extends CommunicationManager {
@@ -63,6 +64,15 @@ public class ServerCommunicationManager extends CommunicationManager {
 
     @Override
     protected void handle(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
+        // 注册通道
+        if (id.equals(PacketType.MINECRAFT_REGISTER.identifier)) {
+            PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
+            for (PacketType packetType : PacketType.values()) {
+                byteBuf.writeBytes(packetType.identifier.toString().getBytes(StandardCharsets.UTF_8));
+                byteBuf.writeByte(0x00);
+            }
+            source.sendPacket(PacketType.MINECRAFT_REGISTER.identifier, byteBuf, context);
+        }
         if (id.equals(PacketType.REQUEST_LITEMATIC.identifier)) {
             final UUID syncmaticaId = packetBuf.readUuid();
             final ServerPlacement placement = context.getSyncmaticManager().getPlacement(syncmaticaId);

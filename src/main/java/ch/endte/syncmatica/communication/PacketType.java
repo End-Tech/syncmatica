@@ -3,7 +3,7 @@ package ch.endte.syncmatica.communication;
 import net.minecraft.util.Identifier;
 
 public enum PacketType {
-
+    MINECRAFT_REGISTER ("minecraft:register"),
     REGISTER_METADATA("syncmatica:register_metadata"),
     // one packet will be responsible for sending the entire metadata of a syncmatic
     // it marks the creation of a syncmatic - for now it also is responsible
