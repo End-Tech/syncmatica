@@ -24,10 +24,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-
-@Mixin(ServerPlayNetworkHandler.class)
+// Higher level compared to fabric API. fabric-api=999
+@Mixin(value = ServerPlayNetworkHandler.class, priority = 998)
 public abstract class MixinServerPlayNetworkHandler {
-
     @Unique
     private ExchangeTarget exTarget = null;
     @Unique
