@@ -56,11 +56,9 @@ public class ActorClientPlayNetworkHandler {
         final Identifier id = packet.getChannel();
         final Supplier<PacketByteBuf> bufSupplier = packet::getData;
         if (clientCommunication == null) {
-
             ActorClientPlayNetworkHandler.getInstance().startEvent(clientPlayNetworkHandler);
         }
         if (packetEvent(id, bufSupplier)) {
-
             ci.cancel(); // prevent further unnecessary comparisons and reporting a warning
         }
     }

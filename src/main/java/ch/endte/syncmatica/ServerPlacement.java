@@ -38,7 +38,7 @@ public class ServerPlacement {
         this.fileName = fileName;
         this.hashValue = hashValue;
         this.owner = owner;
-        lastModifiedBy = owner;
+        this.lastModifiedBy = owner;
     }
 
     public ServerPlacement(final UUID id, final File file, final PlayerIdentifier owner) {

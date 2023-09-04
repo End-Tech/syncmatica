@@ -4,6 +4,8 @@ import net.minecraft.util.Identifier;
 
 public enum PacketType {
     MINECRAFT_REGISTER ("minecraft:register"),
+    // minecraft plug-in channel registration
+
     REGISTER_METADATA("syncmatica:register_metadata"),
     // one packet will be responsible for sending the entire metadata of a syncmatic
     // it marks the creation of a syncmatic - for now it also is responsible

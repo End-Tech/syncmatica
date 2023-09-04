@@ -21,7 +21,6 @@ public class ExchangeTarget {
     private ClientPlayNetworkHandler server = null;
     private ServerPlayNetworkHandler client = null;
     private final String persistentName;
-
     private FeatureSet features;
     private final List<Exchange> ongoingExchanges = new ArrayList<>(); // implicitly relies on priority
 
