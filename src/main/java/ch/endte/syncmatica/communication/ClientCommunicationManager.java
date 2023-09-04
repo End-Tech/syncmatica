@@ -12,11 +12,9 @@ import ch.endte.syncmatica.litematica.LitematicManager;
 import ch.endte.syncmatica.litematica.ScreenHelper;
 import ch.endte.syncmatica.mixin_actor.ActorClientPlayNetworkHandler;
 import fi.dy.masa.malilib.gui.Message;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
@@ -39,15 +37,6 @@ public class ClientCommunicationManager extends CommunicationManager {
 
     @Override
     protected void handle(final ExchangeTarget source, final Identifier id, final PacketByteBuf packetBuf) {
-        // 注册通道
-        if (id.equals(PacketType.MINECRAFT_REGISTER.identifier)) {
-            PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
-            for (PacketType packetType : PacketType.values()) {
-                byteBuf.writeBytes(packetType.identifier.toString().getBytes(StandardCharsets.UTF_8));
-                byteBuf.writeByte(0x00);
-            }
-            source.sendPacket(PacketType.MINECRAFT_REGISTER.identifier, byteBuf, context);
-        }
         if (id.equals(PacketType.REGISTER_METADATA.identifier)) {
             final ServerPlacement placement = receiveMetaData(packetBuf, source);
             context.getSyncmaticManager().addPlacement(placement);
