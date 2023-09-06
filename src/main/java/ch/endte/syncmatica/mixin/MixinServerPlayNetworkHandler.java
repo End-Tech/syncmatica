@@ -3,6 +3,7 @@ package ch.endte.syncmatica.mixin;
 import java.util.function.Consumer;
 
 import ch.endte.syncmatica.communication.PacketType;
+import ch.endte.syncmatica.network.ChannelManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,11 +26,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 
-@Mixin(ServerPlayNetworkHandler.class)
+@Mixin(value = ServerPlayNetworkHandler.class, priority = 998)
 public abstract class MixinServerPlayNetworkHandler {
-
     @Unique
     private ExchangeTarget exTarget = null;
+
     @Unique
     private ServerCommunicationManager comManager = null;
 
@@ -43,24 +44,19 @@ public abstract class MixinServerPlayNetworkHandler {
 
     @Inject(method = "onDisconnected", at = @At("HEAD"))
     public void onDisconnected(final Text reason, final CallbackInfo ci) {
+        ChannelManager.onDisconnected();
         operateComms(sm -> sm.onPlayerLeave(getExchangeTarget()));
     }
 
     @Inject(method = "onCustomPayload", at = @At("HEAD"))
     public void onCustomPayload(final CustomPayloadC2SPacket packet, final CallbackInfo ci) {
+        ChannelManager.onChannelRegisterHandle(getExchangeTarget(), packet.getChannel(), packet.getData());
         final Identifier id = ((MixinCustomPayloadC2SPacket) packet).getChannel();
         if (PacketType.containsIdentifier(id)) {
             NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler) (Object) this, player.getWorld());
             final PacketByteBuf packetBuf = ((MixinCustomPayloadC2SPacket) packet).getData();
             operateComms(sm -> sm.onPacket(getExchangeTarget(), id, packetBuf));
         }
-    }
-
-    private ExchangeTarget getExchangeTarget() {
-        if (exTarget == null) {
-            exTarget = new ExchangeTarget((ServerPlayNetworkHandler) (Object) this);
-        }
-        return exTarget;
     }
 
     private void operateComms(final Consumer<ServerCommunicationManager> operation) {
@@ -73,5 +69,14 @@ public abstract class MixinServerPlayNetworkHandler {
         if (comManager != null) {
             operation.accept(comManager);
         }
+    }
+
+
+    @Unique
+    private ExchangeTarget getExchangeTarget() {
+        if (exTarget == null) {
+            exTarget = new ExchangeTarget((ServerPlayNetworkHandler) (Object) this);
+        }
+        return exTarget;
     }
 }
