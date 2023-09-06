@@ -18,33 +18,38 @@ import java.util.List;
 // on both without having to recode them individually I have an adapter class here
 
 public class ExchangeTarget {
-    private ClientPlayNetworkHandler server = null;
-    private ServerPlayNetworkHandler client = null;
+    public final ClientPlayNetworkHandler clientPlayNetworkHandler;
+    public final ServerPlayNetworkHandler serverPlayNetworkHandler;
     private final String persistentName;
 
     private FeatureSet features;
     private final List<Exchange> ongoingExchanges = new ArrayList<>(); // implicitly relies on priority
 
-    public ExchangeTarget(final ClientPlayNetworkHandler server) {
-        this.server = server;
-        persistentName = StringUtils.getWorldOrServerName();
+    public ExchangeTarget(ClientPlayNetworkHandler clientPlayNetworkHandler) {
+        this.clientPlayNetworkHandler = clientPlayNetworkHandler;
+        this.serverPlayNetworkHandler = null;
+        this.persistentName = StringUtils.getWorldOrServerName();
     }
 
-    public ExchangeTarget(final ServerPlayNetworkHandler client) {
-        this.client = client;
-        persistentName = client.player.getUuidAsString();
+    public ExchangeTarget(ServerPlayNetworkHandler serverPlayNetworkHandler) {
+        this.clientPlayNetworkHandler = null;
+        this.serverPlayNetworkHandler = serverPlayNetworkHandler;
+        this.persistentName = serverPlayNetworkHandler.player.getUuidAsString();
     }
 
     // this application exclusively communicates in CustomPayLoad packets
     // this class handles the sending of either S2C or C2S packets
     public void sendPacket(final Identifier id, final PacketByteBuf packetBuf, final Context context) {
-        context.getDebugService().logSendPacket(id, persistentName);
-        if (server == null) {
-            final CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(id, packetBuf);
-            client.sendPacket(packet);
-        } else {
-            final CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(id, packetBuf);
-            server.sendPacket(packet);
+        if (context != null) {
+            context.getDebugService().logSendPacket(id, persistentName);
+        }
+        if (clientPlayNetworkHandler != null) {
+            CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(id, packetBuf);
+            clientPlayNetworkHandler.sendPacket(packet);
+        }
+        if (serverPlayNetworkHandler != null) {
+            CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(id, packetBuf);
+            serverPlayNetworkHandler.sendPacket(packet);
         }
     }
 
@@ -64,5 +69,13 @@ public class ExchangeTarget {
 
     public String getPersistentName() {
         return persistentName;
+    }
+
+    public boolean isServer() {
+        return serverPlayNetworkHandler != null;
+    }
+
+    public boolean isClient() {
+        return clientPlayNetworkHandler != null;
     }
 }
