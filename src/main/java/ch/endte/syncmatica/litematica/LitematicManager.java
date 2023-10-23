@@ -128,7 +128,8 @@ public class LitematicManager {
             }
 
             final PlayerIdentifier owner = context.getPlayerIdentifierProvider().createOrGet(
-                    MinecraftClient.getInstance().getSession().getProfile()
+                    MinecraftClient.getInstance().getSession().getUuidOrNull(),
+                    MinecraftClient.getInstance().getSession().getUsername()
             );
 
             final ServerPlacement placement = new ServerPlacement(UUID.randomUUID(), placementFile, owner);

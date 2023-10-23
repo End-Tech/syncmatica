@@ -1,19 +1,22 @@
 {
-	"required": true,
-	"minVersion": "0.8",
-	"package": "ch.endte.syncmatica.mixin",
-	"compatibilityLevel": "JAVA_8",
-	"mixins": [
-		"MixinMinecraftServer",
-		"MixinCustomPayloadC2SPacket",
-		"MixinServerPlayNetworkHandler"
-	],
-	"client": [
-		"MixinClientPlayNetworkHandler",
-		"MixinMinecraftClient"
-	],
-	"server": [],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ch.endte.syncmatica.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinCustomPayloadS2CPacket",
+    "MixinCustomPayloadC2SPacket",
+    "MixinServerCommonNetworkHandler"
+  ],
+  "client": [
+    "MixinClientPlayNetworkHandler",
+    "MixinMinecraftClient"
+  ],
+  "server": [
+    "MixinMinecraftServer",
+    "MixinServerPlayNetworkHandler"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

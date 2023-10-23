@@ -22,6 +22,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 
@@ -68,7 +69,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
         drawPlacementInfo(getLastSelectedEntry(), drawContext);
     }
 
-    private void drawPlacementInfo(final ServerPlacement placement, DrawContext drawContext) {
+    private void drawPlacementInfo(final ServerPlacement placement, final DrawContext drawContext) {
         int x = posX + totalWidth - infoWidth;
         int y = posY;
         final int height = Math.min(infoHeight, parent.getMaxInfoHeight());
