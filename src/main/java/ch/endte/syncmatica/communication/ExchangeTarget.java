@@ -2,10 +2,10 @@ package ch.endte.syncmatica.communication;
 
 import ch.endte.syncmatica.Context;
 import ch.endte.syncmatica.communication.exchange.Exchange;
+import ch.endte.syncmatica.network.SyncmaticaPayload;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -45,31 +45,11 @@ public class ExchangeTarget {
             context.getDebugService().logSendPacket(id, persistentName);
         }
         if (clientPlayNetworkHandler != null) {
-            CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(new CustomPayload() {
-                @Override
-                public void write(PacketByteBuf buf) {
-                    buf.writeBytes(packetBuf);
-                }
-
-                @Override
-                public Identifier id() {
-                    return id;
-                }
-            });
+            CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(new SyncmaticaPayload(id, packetBuf));
             clientPlayNetworkHandler.sendPacket(packet);
         }
         if (serverPlayNetworkHandler != null) {
-            CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new CustomPayload() {
-                @Override
-                public void write(PacketByteBuf buf) {
-                    buf.writeBytes(packetBuf);
-                }
-
-                @Override
-                public Identifier id() {
-                    return id;
-                }
-            });
+            CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new SyncmaticaPayload(id, packetBuf));
             serverPlayNetworkHandler.sendPacket(packet);
         }
     }
