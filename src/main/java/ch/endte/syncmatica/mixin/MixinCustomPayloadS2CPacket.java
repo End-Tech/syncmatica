@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CustomPayloadS2CPacket.class)
 public class MixinCustomPayloadS2CPacket {
     @Inject(method = "readPayload", at = @At(value = "HEAD"), cancellable = true)
-    private static void onOnCustomPayload(Identifier id, PacketByteBuf buf, CallbackInfoReturnable<CustomPayload> cir) {
+    private static void readPayload(Identifier id, PacketByteBuf buf, CallbackInfoReturnable<CustomPayload> cir) {
         if (id.getNamespace().equals(Syncmatica.MOD_ID)) {
             cir.setReturnValue(new SyncmaticaPayload(id, buf));
         }

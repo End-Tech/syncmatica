@@ -4,17 +4,18 @@
   "package": "ch.endte.syncmatica.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinCustomPayloadS2CPacket",
     "MixinCustomPayloadC2SPacket",
-    "MixinServerCommonNetworkHandler"
+    "MixinCustomPayloadS2CPacket",
+    "MixinServerCommonNetworkHandler",
+    "MixinClientPlayNetworkHandler",
+    "MixinMinecraftClient",
+    "MixinMinecraftServer",
+    "MixinServerPlayNetworkHandler",
+    "MixinPlayerManager"
   ],
   "client": [
-    "MixinClientPlayNetworkHandler",
-    "MixinMinecraftClient"
   ],
   "server": [
-    "MixinMinecraftServer",
-    "MixinServerPlayNetworkHandler"
   ],
   "injectors": {
     "defaultRequire": 1
