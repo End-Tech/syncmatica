@@ -7,13 +7,13 @@
     "MixinCustomPayloadC2SPacket",
     "MixinCustomPayloadS2CPacket",
     "MixinServerCommonNetworkHandler",
-    "MixinClientPlayNetworkHandler",
-    "MixinMinecraftClient",
     "MixinMinecraftServer",
     "MixinServerPlayNetworkHandler",
     "MixinPlayerManager"
   ],
   "client": [
+    "MixinClientPlayNetworkHandler",
+    "MixinMinecraftClient"
   ],
   "server": [
   ],
