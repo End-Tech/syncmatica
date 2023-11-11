@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 
 public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPlacement, WidgetSyncmaticaServerPlacementEntry> {
 
+    public final GuiSyncmaticaServerPlacementList parent;
     private final int infoWidth;
     private final int infoHeight;
-    private final GuiSyncmaticaServerPlacementList parent;
 
     public WidgetListSyncmaticaServerPlacement(final int x, final int y, final int width, final int height, final GuiSyncmaticaServerPlacementList parent,
                                                final ISelectionListener<ServerPlacement> selectionListener) {
@@ -125,7 +125,7 @@ public class WidgetListSyncmaticaServerPlacement extends WidgetListBase<ServerPl
 
     @Override
     protected WidgetSyncmaticaServerPlacementEntry createListEntryWidget(final int x, final int y, final int listIndex, final boolean isOdd, final ServerPlacement entry) {
-        return new WidgetSyncmaticaServerPlacementEntry(x, y, browserEntryWidth, getBrowserEntryHeightFor(entry), entry, listIndex);
+        return new WidgetSyncmaticaServerPlacementEntry(x, y, browserEntryWidth, getBrowserEntryHeightFor(entry), entry, listIndex, this);
     }
 
     @Override
