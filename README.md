@@ -17,12 +17,14 @@ Syncmaticas functionality :)
 
 Use [v0.3.11-1.18.2](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.11-1.18.2) for 1.18 or 1.19. 
 Use [v0.3.11-1.20.1](https://github.com/End-Tech/syncmatica/releases/tag/v0.3.11-1.20.1) for 1.20+.
+Use [v0.3.12-1.20.2]() for 1.20.2.
+Use [v0.3.12-1.20.4]() for 1.20.4.
 
 ### Client
 
 You first need to install fabric and add the litematica and malilib mods to your client. The next step is to move the
 Syncmatica mod file to the mod folder. Now you are ready to go.
-
+ 
 Versions as old as v0.0.0-dev.20210106.181551 appear to cause issues due to a field renaming or not existing or being
 invisible. If you have versions as old as that you will have to update or Syncmatica may not function properly.
 
